@@ -1,5 +1,5 @@
 const { pathsToModuleNameMapper } = require("ts-jest");
-const { compilerOptions } = require("./server/tsconfig");
+const { compilerOptions } = require("./tsconfig");
 
 // SET TESTING PORT //
 process.env.PORT = 4444;
