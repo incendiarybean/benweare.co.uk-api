@@ -1,0 +1,46 @@
+# This is a basic workflow that is manually triggered
+
+name: Build and Deploy
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    push:
+        branches:
+            - main
+            - development
+    pull_request:
+        branches:
+            - main
+            - development
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        env:
+            REACT_APP_HOSTNAME: "TEST_VALUE"
+            REACT_APP_SOCKET_TOKEN: "TEST_VALUE"
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16.x"
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Update to NPM 8.6.0
+              run: |
+                  npm i -g npm@8.6.0
+                  echo Node Version: `node --version`
+                  echo NPM Version: `npm --version`
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Run Tests
+              run: npm test
+
+            - name: Test Server build
+              run: npm run build

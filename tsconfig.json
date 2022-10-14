@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "commonjs",
+        "rootDir": "./server",
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "checkJs": true,
+        "allowJs": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitReturns": true,
+        "allowUnusedLabels": false,
+        "allowUnreachableCode": false,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "paths": {
+            "@resources/*": ["./server/resources/*"],
+            "@handlers": ["./server/handlers"],
+            "@lib/types": ["./server/lib/types.ts"]
+        }
+    },
+    "ts-node": {
+        "files": true
+    },
+    "exclude": ["tests/**", "*.config.js", "dist"]
+}
