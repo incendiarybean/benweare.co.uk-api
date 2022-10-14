@@ -7,7 +7,7 @@ describe("Server should accept/reject paths as defied in validatorHandler.", () 
         "/api/weather/pcgamer",
         "/api/weather/nasa",
         "/api/weather?timeframe=weekly",
-        "/forecast/huh?timeframe=weekly",
+        "/api/forecast/huh?timeframe=weekly",
     ])("Status for %s should be 404", async (path) => {
         const result = await request(app)
             .get(path)
