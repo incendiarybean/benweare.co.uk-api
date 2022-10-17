@@ -1,5 +1,5 @@
 import path from "path";
-import absolutePath from "benweare.com-client";
+import absolutePath from "benweare.co.uk-client";
 import cors from "cors";
 import express from "express";
 import * as swaggerUi from "swagger-ui-slim";
