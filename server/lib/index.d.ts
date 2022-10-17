@@ -5,4 +5,4 @@ declare namespace Express {
     }
 }
 
-declare module "benweare.com-client";
+declare module "benweare.co.uk-client";

@@ -1,4 +1,4 @@
-import absolutePath from "benweare.com-client";
+import absolutePath from "benweare.co.uk-client";
 import type { Request, Response } from "express";
 import express from "express";
 
@@ -16,8 +16,7 @@ router
         return res.sendFile(index);
     })
     .post((req: Request, res: Response) => {
-        return res.json({
-            code: 400,
+        return res.status(404).json({
             message: `${req.method} is not defined on ${req.path}`,
         });
     });
@@ -28,8 +27,7 @@ router
         return res.sendFile(index);
     })
     .post((req: Request, res: Response) => {
-        return res.json({
-            code: 400,
+        return res.status(404).json({
             message: `${req.method} is not defined on ${req.path}`,
         });
     });
