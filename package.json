@@ -1,5 +1,5 @@
 {
-    "name": "benweare.com-server",
+    "name": "benweare.co.uk-server",
     "version": "1.0.0",
     "private": true,
     "main": "./dist/index.js",
