@@ -1,9 +1,9 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
 import { JSDOM } from "jsdom";
-import { NewsArticle, NewsStorage } from "@lib/types";
-import { MOCK_NEWS_RESPONSE } from "@resources/data/news";
-import { IO } from "../..";
+import { MOCK_NEWS_RESPONSE } from "@common/data/news";
+import { NewsArticle, NewsStorage } from "@common/types";
+import { IO } from "@server";
 
 /*--------------*/
 /*    CONFIG    */
