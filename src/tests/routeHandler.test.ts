@@ -1,5 +1,5 @@
 import request from "supertest";
-import { HTTPServer, app } from "..";
+import { HTTPServer, app } from "@server";
 
 describe("Server should return expected JSON from endpoints defined in routeHandler.", () => {
     test.each([

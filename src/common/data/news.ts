@@ -1,4 +1,4 @@
-import { NewsResponse } from "@lib/types";
+import { NewsResponse } from "@common/types";
 
 export const MOCK_BBC_NEWS_RESPONSE = [
     {
