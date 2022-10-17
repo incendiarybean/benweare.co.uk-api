@@ -1,13 +1,14 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
+import type { AxiosResponse } from "axios";
+import { MOCK_WEATHER_RESPONSE } from "@common/data/weather";
 import {
     WeatherConfig,
     WeatherRequestHeaders,
     WeatherResponse,
     WeatherStorage,
     WeatherTimeSeries,
-} from "@lib/types";
-import { MOCK_WEATHER_RESPONSE } from "@resources/data/weather";
-import { IO } from "../..";
+} from "@common/types";
+import { IO } from "@server";
 
 /*--------------*/
 /*    CONFIG    */

@@ -6,7 +6,7 @@ import {
     headerHandler,
     routeHandler,
     validatorHandler,
-} from "./handlers";
+} from "@handlers";
 
 export const app = express();
 

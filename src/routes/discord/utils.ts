@@ -1,5 +1,3 @@
-import { createReadStream } from "fs";
-import { join } from "path";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -13,6 +11,8 @@ import {
     Routes,
     SlashCommandBuilder,
 } from "discord.js";
+import { die } from "@common/data/discord";
+import { DiscordUsernameOptions } from "@common/types";
 import {
     AudioPlayerStatus,
     VoiceConnectionStatus,
@@ -20,8 +20,6 @@ import {
     createAudioResource,
     joinVoiceChannel,
 } from "@discordjs/voice";
-import { DiscordUsernameOptions } from "@lib/types";
-import { die } from "@resources/data/discord";
 
 /*--------------*/
 /*    CONFIG    */
@@ -133,9 +131,8 @@ export const assist = async (
     try {
         await interaction.reply("https://www.youtube.com/watch?v=CRzfZu0GH14");
     } catch (e: any) {
-        console.log(e);
         await interaction.reply({
-            content: "Bot couldn't complete your request at this time.",
+            content: `Bot couldn't complete your request at this time. (${e.message})`,
             ephemeral: true,
         });
     }
@@ -160,9 +157,8 @@ export const cry = async (
             });
         }
     } catch (e: any) {
-        console.log(e);
         await interaction.reply({
-            content: "Bot couldn't complete your request at this time.",
+            content: `Bot couldn't complete your request at this time. (${e.message})`,
             ephemeral: true,
         });
     }
@@ -191,9 +187,8 @@ export const roll = async (
             components: [row],
         });
     } catch (e: any) {
-        console.log(e);
         await interaction.reply({
-            content: "Bot couldn't complete your request at this time.",
+            content: `Bot couldn't complete your request at this time. (${e.message})`,
             ephemeral: true,
         });
     }
@@ -210,11 +205,7 @@ export const rpg = async (
         await interaction.reply({ content: "BOOM!" });
 
         connection.on(VoiceConnectionStatus.Ready, () => {
-            const resource = createAudioResource(
-                createReadStream(
-                    join(__dirname, "../../resources/audio/rpg.mp3")
-                )
-            );
+            const resource = createAudioResource("./src/common/audio/rpg.mp3");
 
             resource.volume?.setVolume(1);
 
@@ -225,9 +216,8 @@ export const rpg = async (
             });
         });
     } catch (e: any) {
-        console.log(e);
         await interaction.reply({
-            content: "Bot couldn't complete your request at this time.",
+            content: `Bot couldn't complete your request at this time. (${e.message})`,
             ephemeral: true,
         });
     }

@@ -2,10 +2,10 @@
     "compilerOptions": {
         "target": "es2022",
         "module": "commonjs",
-        "rootDir": "./server",
+        "rootDir": "./src",
         "moduleResolution": "node",
         "baseUrl": ".",
-        "outDir": "./dist",
+        "outDir": "./build",
         "esModuleInterop": true,
         "checkJs": true,
         "allowJs": true,
@@ -24,13 +24,14 @@
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "paths": {
-            "@resources/*": ["./server/resources/*"],
-            "@handlers": ["./server/handlers"],
-            "@lib/types": ["./server/lib/types.ts"]
+            "@server": ["./src/server"],
+            "@routes/*": ["./src/routes/*"],
+            "@common/*": ["./src/common/*"],
+            "@handlers": ["./src/handlers"]
         }
     },
     "ts-node": {
         "files": true
     },
-    "exclude": ["tests/**", "*.config.js", "dist"]
+    "exclude": ["*/tests/**", "*.config.js", "build"]
 }
