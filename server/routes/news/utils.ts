@@ -73,22 +73,21 @@ const fetchArticles = (
     containerSelector: string,
     splitSelector: string
 ) =>
-    new Promise<HTMLElement[]>((resolve, reject) =>
+    new Promise<Element[]>((resolve, reject) =>
         axios
             .get(url, { responseType: "text" })
             .then((response: AxiosResponse) => {
                 const { document } = new JSDOM(response.data).window;
-                const HTMLArticles: HTMLElement[] = [];
-                Array.prototype.slice
-                    .call(document.querySelectorAll(containerSelector))
-                    .forEach((container) =>
-                        Array.prototype.slice
-                            .call(container.querySelectorAll(splitSelector))
-                            .forEach((article, index) => {
-                                if (index < 9 || !article.textContent) {
-                                    return null;
+                const HTMLArticles: Element[] = [];
+                document
+                    .querySelectorAll(containerSelector)
+                    .forEach((container: Element) =>
+                        container
+                            .querySelectorAll(splitSelector)
+                            .forEach((article: Element, index: number) => {
+                                if (index < 9 && article.textContent) {
+                                    HTMLArticles.push(article);
                                 }
-                                return HTMLArticles.push(article);
                             })
                     );
                 return resolve(HTMLArticles);
@@ -104,7 +103,7 @@ const getPCNews = () =>
         ".list-text-links-trending-panel",
         ".listingResult"
     )
-        .then((HTMLArticles: HTMLElement[]) => {
+        .then((HTMLArticles: Element[]) => {
             const Articles: NewsArticle[] = [];
             HTMLArticles.forEach((HTMLDivElement) => {
                 const title: string =
@@ -154,7 +153,7 @@ const getUKNews: any = () =>
         "#topos-component",
         ".gs-t-News"
     )
-        .then((HTMLArticles: HTMLElement[]) => {
+        .then((HTMLArticles: Element[]) => {
             const Articles: NewsArticle[] = [];
             const ArticleTitles: string[] = [];
             HTMLArticles.forEach((HTMLDivElement) => {
