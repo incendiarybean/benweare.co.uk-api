@@ -33,5 +33,5 @@
     "ts-node": {
         "files": true
     },
-    "exclude": ["*/tests/**", "*.config.js", "build"]
+    "exclude": ["tests/**", "*.config.js", "build"]
 }
