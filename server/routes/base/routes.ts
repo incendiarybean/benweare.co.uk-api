@@ -1,4 +1,4 @@
-import absolutePath from "benweare.com-client";
+import absolutePath from "benweare.co.uk-client";
 import type { Request, Response } from "express";
 import express from "express";
 
