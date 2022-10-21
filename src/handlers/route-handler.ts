@@ -4,7 +4,7 @@ import {
     discordRoutes,
     newsRoutes,
     weatherRoutes,
-} from "../routes";
+} from "@routes/index";
 
 const router = express.Router();
 

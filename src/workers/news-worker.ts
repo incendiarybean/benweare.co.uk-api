@@ -1,8 +1,12 @@
-import type { AxiosResponse } from "axios";
 import axios from "axios";
-import { JSDOM } from "jsdom";
-import { MOCK_NEWS_RESPONSE } from "@common/data/news";
-import { NewsArticle, NewsStorage } from "@common/types";
+import { mockNewsArticles } from "@common/resources/news-resources";
+import type { NasaArticle, NewsArticle } from "@common/types";
+import {
+    dateGenerator,
+    fetchArticles,
+    staticRefresher,
+} from "@common/utils/common-utils";
+import { ObjectStorage } from "@common/utils/data-store";
 import { IO } from "@server";
 
 /*--------------*/
@@ -13,104 +17,34 @@ let pcRetryCount = 0;
 let ukRetryCount = 0;
 let nasaRetryCount = 0;
 
-export const storage: NewsStorage = {
-    timestamp: null,
-    data: {
-        pc: null,
-        bbc: null,
-        nasa: null,
-    },
-};
-
-/*--------------*/
-/*    EVENTS    */
-/*--------------*/
-
-setTimeout(() => {
-    console.log(`[${new Date()}] Initialising News Cache...`);
-
-    if (process.env.NODE_ENV === "test") {
-        console.log(`[${new Date()}] Mock News Used...`);
-        storage.data = MOCK_NEWS_RESPONSE;
-        return;
-    }
-
-    getNews();
-    setInterval(() => {
-        getNews();
-    }, 480000);
-}, 0);
+export const storage = new ObjectStorage();
 
 /*--------------*/
 /* INTERACTIONS */
 /*--------------*/
 
-export const getNews = () => {
+export const getNews = (): void => {
     getPCNews();
     getUKNews();
     getNasaImage();
-    storage.timestamp = new Date().toISOString();
 };
 
-const generateDate = (date: string | undefined | null) => {
-    const newDate = date ? new Date(date) : new Date();
-
-    if (newDate.toString() === "Invalid Date") {
-        return new Date().toLocaleDateString("en-UK");
-    }
-    return newDate.toLocaleDateString("en-UK");
-};
-
-/**
- *
- * @param url URL of the site you wish to fetch from
- * @param containerSelector QuerySelector you wish to grab articles from
- * @param splitSelector QuerySelector used to identify and split each article
- * @returns HTMLArticles[], an array of elements depending on your above selection
- */
-const fetchArticles = (
-    url: string,
-    containerSelector: string,
-    splitSelector: string
-) =>
-    new Promise<Element[]>((resolve, reject) =>
-        axios
-            .get(url, { responseType: "text" })
-            .then((response: AxiosResponse) => {
-                const { document } = new JSDOM(response.data).window;
-                const HTMLArticles: Element[] = [];
-                document
-                    .querySelectorAll(containerSelector)
-                    .forEach((container: Element) =>
-                        container
-                            .querySelectorAll(splitSelector)
-                            .forEach((article: Element, index: number) => {
-                                if (index < 9 && article.textContent) {
-                                    HTMLArticles.push(article);
-                                }
-                            })
-                    );
-                return resolve(HTMLArticles);
-            })
-            .catch((e: any) => {
-                reject(e);
-            })
-    );
-
-const getPCNews = () =>
+const getPCNews = (): Promise<void> =>
     fetchArticles(
         "https://www.pcgamer.com/uk/",
         ".list-text-links-trending-panel",
         ".listingResult"
     )
         .then((HTMLArticles: Element[]) => {
-            const Articles: NewsArticle[] = [];
+            const site: string = "PCGamer";
+            const articles: NewsArticle[] = [];
+
             HTMLArticles.forEach((HTMLDivElement) => {
                 const title: string =
                     HTMLDivElement.querySelector(".article-name")
                         ?.textContent || "Not Found";
 
-                const link: string =
+                const url: string =
                     HTMLDivElement.querySelector("a")?.href || "Not Found";
 
                 const img: string =
@@ -118,24 +52,23 @@ const getPCNews = () =>
                         ".article-lead-image-wrap"
                     )?.getAttribute("data-original") || "Not Found";
 
-                const date: string = generateDate(
+                const date: string = dateGenerator(
                     HTMLDivElement.querySelector(
                         ".relative-date"
                     )?.getAttribute("datetime")
                 );
 
-                const site: string = "PCGamer";
-
-                Articles.push({
+                articles.push({
                     title,
-                    link,
+                    url,
                     img,
                     date,
-                    site,
                 });
             });
             pcRetryCount = 0;
-            storage.data.pc = Articles;
+
+            storage.write(site, articles, `${site}'s Latest News.`);
+
             IO.local.emit("RELOAD_NEWS");
         })
         .catch(() => {
@@ -147,15 +80,17 @@ const getPCNews = () =>
             getPCNews();
         });
 
-const getUKNews: any = () =>
+const getUKNews = (): Promise<void> =>
     fetchArticles(
         "https://www.bbc.co.uk/news/england",
         "#topos-component",
         ".gs-t-News"
     )
         .then((HTMLArticles: Element[]) => {
-            const Articles: NewsArticle[] = [];
-            const ArticleTitles: string[] = [];
+            const site: string = "BBC";
+            const articles: NewsArticle[] = [];
+            const articleTitles: string[] = [];
+
             HTMLArticles.forEach((HTMLDivElement) => {
                 let imgUrl: string | undefined | null =
                     HTMLDivElement.querySelector("img")?.getAttribute(
@@ -175,36 +110,33 @@ const getUKNews: any = () =>
                     HTMLDivElement.querySelector(".gs-c-promo-heading__title")
                         ?.textContent || "Not Found";
 
-                const link: string =
+                const url: string =
                     `https://bbc.co.uk${
                         HTMLDivElement.querySelector("a")?.href
                     }` || "Not Found";
 
-                const date: string = generateDate(
+                const date: string = dateGenerator(
                     HTMLDivElement.querySelector("time")?.getAttribute(
                         "datetime"
                     )
                 );
 
-                const site = "BBC";
-
                 const live =
                     HTMLDivElement.querySelector("a")?.href.split("/")[2] ||
                     "Not Found";
 
-                if (!ArticleTitles.includes(title) && live !== "live") {
-                    ArticleTitles.push(title);
-                    Articles.push({
+                if (!articleTitles.includes(title) && live !== "live") {
+                    articleTitles.push(title);
+                    articles.push({
                         title,
-                        link,
+                        url,
                         img,
                         date,
-                        site,
                     });
                 }
             });
             ukRetryCount = 0;
-            storage.data.bbc = Articles;
+            storage.write(site, articles, `${site}'s Latest News.`);
             IO.local.emit("RELOAD_NEWS");
         })
         .catch(() => {
@@ -216,21 +148,29 @@ const getUKNews: any = () =>
             return getUKNews();
         });
 
-const getNasaImage = () => {
+const getNasaImage = (): void => {
     if (process.env.NASA_API_KEY) {
         axios
             .get(
                 `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
             )
-            .then((response: AxiosResponse) => {
-                const { data } = response;
-                data.date = generateDate(response.data.date);
-                data.site = "NASA";
-                storage.data.nasa = response.data;
+            .then(({ data }: { data: NasaArticle }) => {
+                const site: string = "NASA";
+                const articles = [
+                    {
+                        title: data.title,
+                        url: data.url,
+                        description: data.explanation,
+                        img: data.url,
+                        date: dateGenerator(data.date),
+                    },
+                ];
+
+                storage.write(site, articles, "NASA Daily Image.");
             })
             .catch(() => {
                 nasaRetryCount += 1;
-                console.log(`Failed to get UK News... Retrying.`);
+                console.log(`Failed to get NASA News... Retrying.`);
                 if (nasaRetryCount < 5) {
                     return console.log(
                         `Failed to get NASA News... (Tried 5 times).`
@@ -240,3 +180,17 @@ const getNasaImage = () => {
             });
     }
 };
+
+/*--------------*/
+/*    EVENTS    */
+/*--------------*/
+
+const { NODE_ENV } = process.env;
+const service = "News";
+
+if (NODE_ENV === "test") {
+    console.log(`[${new Date()}] Initialising Offline ${service} Cache...`);
+    storage.write("OUTLET NAME", mockNewsArticles, "NEWS OUTLET DESCRIPTION");
+} else {
+    staticRefresher(480000, getNews, service);
+}

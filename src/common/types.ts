@@ -1,14 +1,31 @@
-import { AxiosRequestHeaders } from "axios";
-import { CacheType, CommandInteractionOption } from "discord.js";
+import type { AxiosRequestHeaders } from "axios";
+import type {
+    CacheType,
+    CommandInteractionOption,
+    Guild,
+    GuildMember,
+} from "discord.js";
+import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 
-/* TYPES FOR SERVER */
+/* GLOBAL TYPES */
+export interface DataStorage {
+    name: string;
+    updated: Date;
+    description: string;
+    items: WeatherTimeSeries[] | NewsArticle[];
+}
 
+export interface FilterDataInput {
+    [key: string]: any;
+}
+
+/* NEWS TYPES */
 export interface NewsArticle {
     title: string;
-    link: string;
+    url: string;
+    description?: string;
     img: string;
     date: string;
-    site: string;
 }
 
 export interface NasaArticle {
@@ -20,9 +37,9 @@ export interface NasaArticle {
     service_version: string;
     title: string;
     url: string;
-    site: string;
 }
 
+/* WEATHER TYPES */
 export interface WeatherFeatures {
     type: string;
     geometry: { type: string; coordinates: number[] };
@@ -35,6 +52,7 @@ export interface WeatherFeatures {
 }
 
 export interface WeatherTimeSeries {
+    location: string;
     time: string;
     Description: string;
     WeatherType: string;
@@ -99,28 +117,6 @@ export interface WeatherParam {
     };
 }
 
-export interface WeatherResponse {
-    location: string;
-    timeseries: WeatherTimeSeries[];
-    type?: string;
-    features?: WeatherFeatures[];
-    parameters?: WeatherParam[];
-}
-
-export interface WeatherAxiosResponse {
-    status: string;
-    httpMessage: string;
-    data: WeatherResponse;
-}
-
-export interface WeatherStorage {
-    timestamp: string | null;
-    data: {
-        timeseries: WeatherTimeSeries[] | null;
-        location: string | null;
-    };
-}
-
 export interface WeatherConfig {
     method: string;
     url: string;
@@ -130,19 +126,26 @@ export interface WeatherConfig {
     headers: WeatherRequestHeaders;
 }
 
-export interface NewsResponse {
-    nasa: NasaArticle;
-    pc: NewsArticle[];
-    bbc: NewsArticle[];
+export type WeatherRequestHeaders = {
+    "x-ibm-client-id": string;
+    "x-ibm-client-secret": string;
+    accept: string;
+} & AxiosRequestHeaders;
+
+export interface WeatherCodes {
+    [index: number]: string[];
 }
 
-export interface NewsStorage {
-    timestamp: string | null;
-    data: {
-        bbc: NewsArticle[] | null;
-        pc: NewsArticle[] | null;
-        nasa: NasaArticle | null;
-    };
+/* DISCORD TYPES */
+export interface CheckDiscordVoiceTarget {
+    targetUser: GuildMember;
+    targetVoiceChannel: string;
+    guild: Guild;
+}
+
+export interface CreateDiscordPlayer {
+    connection: VoiceConnection;
+    player: AudioPlayer;
 }
 
 export type DiscordUsernameOptions =
@@ -158,9 +161,3 @@ export type DiscordUsernameOptions =
               accentColor: undefined | string;
           };
       } & CommandInteractionOption<CacheType>;
-
-export type WeatherRequestHeaders = {
-    "x-ibm-client-id": string;
-    "x-ibm-client-secret": string;
-    accept: string;
-} & AxiosRequestHeaders;

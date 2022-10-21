@@ -1,5 +1,5 @@
 import { ActivityType } from "discord.js";
-import { assist, client, cry, roll, rpg } from "./utils";
+import { assist, client, cry, roll, rpg } from "@workers/discord-worker";
 
 /*--------------*/
 /*    EVENTS    */
