@@ -6,7 +6,7 @@ import {
     fetchArticles,
     staticRefresher,
 } from "@common/utils/common-utils";
-import { ObjectStorage } from "@common/utils/data-store";
+import { ObjectStorage } from "@common/utils/storage-utils";
 import { IO } from "@server";
 
 /*--------------*/
@@ -188,9 +188,15 @@ const getNasaImage = (): void => {
 const { NODE_ENV } = process.env;
 const service = "News";
 
-if (NODE_ENV === "test") {
-    console.log(`[${new Date()}] Initialising Offline ${service} Cache...`);
-    storage.write("OUTLET NAME", mockNewsArticles, "NEWS OUTLET DESCRIPTION");
-} else {
-    staticRefresher(480000, getNews, service);
-}
+setImmediate(() => {
+    if (NODE_ENV === "test") {
+        console.log(`[${new Date()}] Initialising Offline ${service}...`);
+        storage.write(
+            "OUTLET NAME",
+            mockNewsArticles,
+            "NEWS OUTLET DESCRIPTION"
+        );
+    } else {
+        staticRefresher(480000, getNews, service);
+    }
+});

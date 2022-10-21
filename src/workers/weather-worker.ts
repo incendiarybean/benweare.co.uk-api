@@ -10,7 +10,7 @@ import type {
     WeatherTimeSeries,
 } from "@common/types";
 import { staticRefresher } from "@common/utils/common-utils";
-import { ObjectStorage } from "@common/utils/data-store";
+import { ObjectStorage } from "@common/utils/storage-utils";
 import { IO } from "@server";
 
 /*--------------*/
@@ -51,7 +51,7 @@ const fetchWeather = (url: string, headers: WeatherRequestHeaders) =>
     );
 
 export const getWeather = () => {
-    const site: string = "PCGamer";
+    const site: string = "MetOffice";
     const url = new URL(
         `${config.url}?${new URLSearchParams(config.qs).toString()}`
     ).toString();
@@ -89,7 +89,7 @@ export const getWeather = () => {
                         }
                     );
             }
-
+            console.log(features[0].properties.timeSeries);
             storage.write(
                 site,
                 features[0].properties.timeSeries,
@@ -111,13 +111,15 @@ export const getWeather = () => {
 const { NODE_ENV } = process.env;
 const service = "Weather";
 
-if (NODE_ENV === "development" || NODE_ENV === "test" || !NODE_ENV) {
-    console.log(`[${new Date()}] Initialising Offline ${service} Cache...`);
-    storage.write(
-        "MetOffice",
-        mockWeatherResponse,
-        "WEATHER OUTLET DESCRIPTION"
-    );
-} else {
-    staticRefresher(900000, getWeather, service);
-}
+setImmediate(() => {
+    if (NODE_ENV === "development" || NODE_ENV === "test" || !NODE_ENV) {
+        console.log(`[${new Date()}] Initialising Offline ${service}...`);
+        storage.write(
+            "MetOffice",
+            mockWeatherResponse,
+            "WEATHER OUTLET DESCRIPTION"
+        );
+    } else {
+        staticRefresher(900000, getWeather, service);
+    }
+});

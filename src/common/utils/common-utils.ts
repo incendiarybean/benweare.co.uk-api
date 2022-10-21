@@ -7,23 +7,22 @@ import type { FilterDataInput } from "@common/types";
  * This function is wrapped in a setImmediate to schedule execution
  * This will trigger at the end of the current event loop to ensure other processing is complete.
  * See: https://nodejs.org/en/docs/guides/timers-in-node/
- * @param timer Number - Number of MS before refresh
- * @param trigger Function - Function to trigger on refresh
- * @param collectorName String - Name of collector
+ * @param timer Number - Number of MS before refresh.
+ * @param trigger Function - Function to trigger on refresh.
+ * @param functionName String - Name of function being refreshed.
  */
 export const staticRefresher = (
     timer: number,
     trigger: Function,
-    collectorName: string
-) =>
-    setImmediate((): void => {
-        console.log(`[${new Date()}] Initialising ${collectorName} Cache...`);
+    functionName: string
+) => {
+    console.log(`[${new Date()}] Initialising ${functionName} Refresher...`);
 
+    trigger();
+    setInterval((): void => {
         trigger();
-        setInterval((): void => {
-            trigger();
-        }, timer);
-    });
+    }, timer);
+};
 
 /**
  * This function retrieves a container element using containerSelector

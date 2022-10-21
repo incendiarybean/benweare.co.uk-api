@@ -5,7 +5,7 @@ import { storage } from "@workers/news-worker";
 
 const router = express.Router();
 
-const formulateResponse = (req: Request, res: Response) =>
+router.get("/api/news/:outlet/articles", (req: Request, res: Response) =>
     res.json({
         response: storage.findByName(req.params.outlet).items || [],
         description: OpenApiSchema.paths["/api/news/{outlet}"]?.get?.summary,
@@ -14,9 +14,8 @@ const formulateResponse = (req: Request, res: Response) =>
             action: req.method,
             href: req.path,
         },
-    });
-
-router.get("/api/news/:outlet/articles", formulateResponse);
+    })
+);
 
 router.get("/api/news/:outlet", (req: Request, res: Response) =>
     res.json({

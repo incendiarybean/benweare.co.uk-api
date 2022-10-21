@@ -11,7 +11,7 @@ export class ObjectStorage {
         this.storage = [];
     }
 
-    private getStorage(omit?: string[]) {
+    private getStorage = (omit?: string[]) => {
         if (!omit) {
             return this.storage;
         }
@@ -26,7 +26,7 @@ export class ObjectStorage {
             });
             return itemReturn;
         });
-    }
+    };
 
     /**
      * Filters storage object by name.
