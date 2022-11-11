@@ -1,11 +1,11 @@
 import request from "supertest";
-import { HTTPServer, app } from "@server";
+import { HTTPServer, app } from "../src/server";
 
 describe("Server should accept/reject paths as defied in validatorHandler.", () => {
     test.each([
-        "/api/news/bbc",
-        "/api/weather/pcgamer",
-        "/api/weather/nasa",
+        "/api/new",
+        "/api/weather",
+        "/api/anythin",
         "/api/weather?timeframe=weekly",
         "/api/forecast/huh?timeframe=weekly",
     ])("Status for %s should be 404", async (path) => {
@@ -18,11 +18,10 @@ describe("Server should accept/reject paths as defied in validatorHandler.", () 
 
     test.each([
         "/api/news",
-        "/api/news?outlet=bbc",
-        "/api/news?outlet=pcgamer",
-        "/api/news?outlet=nasa",
-        "/api/forecast",
-        "/api/forecast?date=2022-08-16",
+        "/api/news/bbc",
+        "/api/news/pcgamer",
+        "/api/forecasts",
+        "/api/forecasts/metoffice",
     ])("Status for %s should be 200", async (path) => {
         const result = await request(app)
             .get(path)

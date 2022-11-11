@@ -13,6 +13,9 @@ import { IO } from "@server";
 /*    CONFIG    */
 /*--------------*/
 
+const { NODE_ENV } = process.env;
+const service = "News";
+
 let pcRetryCount = 0;
 let ukRetryCount = 0;
 let nasaRetryCount = 0;
@@ -38,6 +41,14 @@ const getPCNews = (): Promise<void> =>
         .then((HTMLArticles: Element[]) => {
             const site: string = "PCGamer";
             const articles: NewsArticle[] = [];
+
+            if ([undefined, "test"].includes(NODE_ENV)) {
+                return storage.write(
+                    site,
+                    mockNewsArticles,
+                    `${site}'s Latest News.`
+                );
+            }
 
             HTMLArticles.forEach((HTMLDivElement) => {
                 const title: string =
@@ -90,6 +101,14 @@ const getUKNews = (): Promise<void> =>
             const site: string = "BBC";
             const articles: NewsArticle[] = [];
             const articleTitles: string[] = [];
+
+            if ([undefined, "test"].includes(NODE_ENV)) {
+                return storage.write(
+                    site,
+                    mockNewsArticles,
+                    `${site}'s Latest News.`
+                );
+            }
 
             HTMLArticles.forEach((HTMLDivElement) => {
                 let imgUrl: string | undefined | null =
@@ -156,6 +175,15 @@ const getNasaImage = (): void => {
             )
             .then(({ data }: { data: NasaArticle }) => {
                 const site: string = "NASA";
+
+                if ([undefined, "test"].includes(NODE_ENV)) {
+                    return storage.write(
+                        site,
+                        mockNewsArticles,
+                        `${site}'s Latest News.`
+                    );
+                }
+
                 const articles = [
                     {
                         title: data.title,
@@ -185,18 +213,4 @@ const getNasaImage = (): void => {
 /*    EVENTS    */
 /*--------------*/
 
-const { NODE_ENV } = process.env;
-const service = "News";
-
-setImmediate(() => {
-    if (NODE_ENV === "test") {
-        console.log(`[${new Date()}] Initialising Offline ${service}...`);
-        storage.write(
-            "OUTLET NAME",
-            mockNewsArticles,
-            "NEWS OUTLET DESCRIPTION"
-        );
-    } else {
-        staticRefresher(480000, getNews, service);
-    }
-});
+staticRefresher(480000, getNews, service);

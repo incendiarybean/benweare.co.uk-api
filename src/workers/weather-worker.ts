@@ -17,6 +17,8 @@ import { IO } from "@server";
 /*    CONFIG    */
 /*--------------*/
 
+const { NODE_ENV } = process.env;
+const service = "Weather";
 export const storage = new ObjectStorage();
 
 const config: WeatherConfig = {
@@ -56,45 +58,53 @@ export const getWeather = () => {
         `${config.url}?${new URLSearchParams(config.qs).toString()}`
     ).toString();
 
+    if ([undefined, "test", "development"].includes(NODE_ENV)) {
+        return storage.write(
+            site,
+            mockWeatherResponse,
+            `Weather in development`
+        );
+    }
+
     fetchWeather(url, config.headers)
         .then((response) => {
             const { data } = response;
             const { features } = data;
-
+            let series = [];
             if (features) {
-                features[0].properties.timeSeries =
-                    features[0].properties.timeSeries.map(
-                        (day: WeatherTimeSeries) => {
-                            const [type, description] =
-                                weatherCodes[
-                                    day.daySignificantWeatherCode || 1
-                                ];
+                series = features[0].properties.timeSeries.map(
+                    (timeSeries: WeatherTimeSeries) => {
+                        const [type, description] =
+                            weatherCodes[
+                                timeSeries.daySignificantWeatherCode || 1
+                            ];
 
-                            day.MaxTemp = `${Math.round(
-                                day.dayMaxScreenTemperature
-                            )}º`;
-                            day.LowTemp = `${Math.round(
-                                day.nightMinScreenTemperature
-                            )}º`;
-                            day.MaxFeels = `${Math.round(
-                                day.dayMaxFeelsLikeTemp
-                            )}º`;
-                            day.Wind = Math.round(day.midnight10MWindGust);
-
-                            day.WeatherType = type;
-                            day.Description = description;
-                            day.location = features[0].properties.location.name;
-
-                            return day;
-                        }
-                    );
+                        return {
+                            maxTemp: `${Math.round(
+                                timeSeries.dayMaxScreenTemperature
+                            )}º`,
+                            lowTemp: `${Math.round(
+                                timeSeries.nightMinScreenTemperature
+                            )}º`,
+                            maxFeels: `${Math.round(
+                                timeSeries.dayMaxFeelsLikeTemp
+                            )}º`,
+                            maxWindSpeed: Math.round(
+                                timeSeries.midday10MWindSpeed
+                            ),
+                            weather: type,
+                            weatherDescription: description,
+                        };
+                    }
+                );
             }
-            console.log(features[0].properties.timeSeries);
+
             storage.write(
                 site,
-                features[0].properties.timeSeries,
+                series,
                 `Weather in ${features[0].properties.location.name}`
             );
+
             IO.local.emit("RELOAD_WEATHER");
         })
         .catch(() => {
@@ -108,18 +118,4 @@ export const getWeather = () => {
 /*    EVENTS    */
 /*--------------*/
 
-const { NODE_ENV } = process.env;
-const service = "Weather";
-
-setImmediate(() => {
-    if (NODE_ENV === "development" || NODE_ENV === "test" || !NODE_ENV) {
-        console.log(`[${new Date()}] Initialising Offline ${service}...`);
-        storage.write(
-            "MetOffice",
-            mockWeatherResponse,
-            "WEATHER OUTLET DESCRIPTION"
-        );
-    } else {
-        staticRefresher(900000, getWeather, service);
-    }
-});
+staticRefresher(900000, getWeather, service);

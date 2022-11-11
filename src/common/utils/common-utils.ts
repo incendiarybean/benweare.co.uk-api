@@ -15,14 +15,17 @@ export const staticRefresher = (
     timer: number,
     trigger: Function,
     functionName: string
-) => {
-    console.log(`[${new Date()}] Initialising ${functionName} Refresher...`);
+) =>
+    setImmediate(() => {
+        console.log(
+            `[${new Date()}] Initialising ${functionName} Refresher...`
+        );
 
-    trigger();
-    setInterval((): void => {
         trigger();
-    }, timer);
-};
+        setInterval((): void => {
+            trigger();
+        }, timer);
+    });
 
 /**
  * This function retrieves a container element using containerSelector

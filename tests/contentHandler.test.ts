@@ -1,5 +1,5 @@
 import request from "supertest";
-import { HTTPServer, app } from "@server";
+import { HTTPServer, app } from "../src/server";
 
 describe("Server should server static content.", () => {
     test("Api Docs are served.", async () => {

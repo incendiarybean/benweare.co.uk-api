@@ -13,6 +13,7 @@ module.exports = {
             isolatedModules: true,
         },
     },
+    fakeTimers: { enableGlobally: true },
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
         prefix: "<rootDir>/",
     }),
