@@ -13,10 +13,6 @@ import { staticRefresher } from "@common/utils/common-utils";
 import { ObjectStorage } from "@common/utils/storage-utils";
 import { IO } from "@server";
 
-/*--------------*/
-/*    CONFIG    */
-/*--------------*/
-
 const { NODE_ENV } = process.env;
 const service = "Weather";
 export const storage = new ObjectStorage();
@@ -36,10 +32,6 @@ const config: WeatherConfig = {
     },
 };
 
-/*--------------*/
-/* INTERACTIONS */
-/*--------------*/
-
 const fetchWeather = (url: string, headers: WeatherRequestHeaders) =>
     new Promise<AxiosResponse>((resolve, reject) =>
         axios
@@ -52,6 +44,10 @@ const fetchWeather = (url: string, headers: WeatherRequestHeaders) =>
             })
     );
 
+/**
+ * This function gets Weather for the given location
+ * @returns void -> Writes data to storage object
+ */
 export const getWeather = () => {
     const site: string = "MetOffice";
     const url = new URL(
@@ -113,9 +109,5 @@ export const getWeather = () => {
             );
         });
 };
-
-/*--------------*/
-/*    EVENTS    */
-/*--------------*/
 
 staticRefresher(900000, getWeather, service);

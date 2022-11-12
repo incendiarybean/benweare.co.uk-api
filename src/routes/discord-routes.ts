@@ -1,10 +1,6 @@
 import { ActivityType } from "discord.js";
 import { assist, client, cry, roll, rpg } from "@workers/discord-worker";
 
-/*--------------*/
-/*    EVENTS    */
-/*--------------*/
-
 const { DISCORD_TOKEN, DISCORD_ENABLED } = process.env;
 
 client.on("ready", () => {

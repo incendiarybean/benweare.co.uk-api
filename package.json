@@ -4,7 +4,6 @@
     "private": true,
     "main": "./build/index.js",
     "dependencies": {
-        "@aws-sdk/client-dynamodb": "^3.194.0",
         "@discordjs/voice": "^0.11.0",
         "axios": "^0.27.2",
         "benweare.co.uk-client": "^1.1.2",

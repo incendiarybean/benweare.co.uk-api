@@ -4,10 +4,6 @@ import express from "express";
 
 const router = express.Router();
 
-/*--------------*/
-/*    HANDLER   */
-/*--------------*/
-
 const index = `${absolutePath}/index.html`;
 
 router.get("/api*", (req: Request, res: Response) =>

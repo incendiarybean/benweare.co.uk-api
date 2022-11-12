@@ -9,10 +9,6 @@ import {
 import { ObjectStorage } from "@common/utils/storage-utils";
 import { IO } from "@server";
 
-/*--------------*/
-/*    CONFIG    */
-/*--------------*/
-
 const { NODE_ENV } = process.env;
 const service = "News";
 
@@ -22,16 +18,16 @@ let nasaRetryCount = 0;
 
 export const storage = new ObjectStorage();
 
-/*--------------*/
-/* INTERACTIONS */
-/*--------------*/
-
 export const getNews = (): void => {
     getPCNews();
     getUKNews();
     getNasaImage();
 };
 
+/**
+ * This function gets news for the given outlet
+ * @returns void -> Writes data to storage object
+ */
 const getPCNews = (): Promise<void> =>
     fetchArticles(
         "https://www.pcgamer.com/uk/",
@@ -91,6 +87,10 @@ const getPCNews = (): Promise<void> =>
             getPCNews();
         });
 
+/**
+ * This function gets news for the given outlet
+ * @returns void -> Writes data to storage object
+ */
 const getUKNews = (): Promise<void> =>
     fetchArticles(
         "https://www.bbc.co.uk/news/england",
@@ -167,50 +167,47 @@ const getUKNews = (): Promise<void> =>
             return getUKNews();
         });
 
-const getNasaImage = (): void => {
-    if (process.env.NASA_API_KEY) {
-        axios
-            .get(
-                `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
-            )
-            .then(({ data }: { data: NasaArticle }) => {
-                const site: string = "NASA";
+/**
+ * This function gets news for the given outlet
+ * @returns void -> Writes data to storage object
+ */
+const getNasaImage = (): Promise<void> =>
+    axios
+        .get(
+            `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
+        )
+        .then(({ data }: { data: NasaArticle }) => {
+            const site: string = "NASA";
 
-                if ([undefined, "test"].includes(NODE_ENV)) {
-                    return storage.write(
-                        site,
-                        mockNewsArticles,
-                        `${site}'s Latest News.`
-                    );
-                }
+            if ([undefined, "test"].includes(NODE_ENV)) {
+                return storage.write(
+                    site,
+                    mockNewsArticles,
+                    `${site}'s Latest News.`
+                );
+            }
 
-                const articles = [
-                    {
-                        title: data.title,
-                        url: data.url,
-                        description: data.explanation,
-                        img: data.url,
-                        date: dateGenerator(data.date),
-                    },
-                ];
+            const articles = [
+                {
+                    title: data.title,
+                    url: data.url,
+                    description: data.explanation,
+                    img: data.url,
+                    date: dateGenerator(data.date),
+                },
+            ];
 
-                storage.write(site, articles, "NASA Daily Image.");
-            })
-            .catch(() => {
-                nasaRetryCount += 1;
-                console.log(`Failed to get NASA News... Retrying.`);
-                if (nasaRetryCount < 5) {
-                    return console.log(
-                        `Failed to get NASA News... (Tried 5 times).`
-                    );
-                }
-                return getNasaImage();
-            });
-    }
-};
-
-/*--------------*/
-/*    EVENTS    */
-/*--------------*/
+            storage.write(site, articles, "NASA Daily Image.");
+        })
+        .catch(() => {
+            nasaRetryCount += 1;
+            console.log(`Failed to get NASA News... Retrying.`);
+            if (nasaRetryCount < 5) {
+                return console.log(
+                    `Failed to get NASA News... (Tried 5 times).`
+                );
+            }
+            return getNasaImage();
+        });
 
 staticRefresher(480000, getNews, service);
