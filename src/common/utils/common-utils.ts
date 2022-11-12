@@ -65,6 +65,45 @@ export const fetchArticles = (
     );
 
 /**
+ * This function retrieves the body of the provided page
+ * @param url URL of the site you wish to fetch from
+ * @returns Element containing body
+ */
+export const fetchWikiBody = (url: string) =>
+    new Promise<string>((resolve, reject) =>
+        axios
+            .get(url, { responseType: "text" })
+            .then((response: AxiosResponse) => {
+                const { document } = new JSDOM(response.data).window;
+                resolve(document.getElementsByTagName("body")[0].innerHTML);
+            })
+            .catch((e: any) => {
+                reject(e);
+            })
+    );
+
+/**
+ * This function scrapes a WIKI page depending on ID provided.
+ * @param gameId - SteamID of game
+ * @returns String of webpage Document
+ */
+export const getWikiContent = async (gameId: string) => {
+    let wikiUrl;
+
+    switch (gameId) {
+        case "250900":
+            wikiUrl =
+                "https://bindingofisaacrebirth.fandom.com/wiki/Achievements";
+            break;
+        default:
+            return undefined;
+    }
+
+    const response = await fetchWikiBody(wikiUrl);
+    return response;
+};
+
+/**
  * This function is used to ensure the user enters correct date stamp.
  * @param date String - Expects date in format "DD/MM/YYYY"
  * @returns Boolean - Returns true/false depending if it matches REGEX.

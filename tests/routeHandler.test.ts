@@ -2,7 +2,7 @@ import request from "supertest";
 import { HTTPServer, app } from "../src/server";
 
 describe("Server should return expected JSON from endpoints defined in routeHandler.", () => {
-    const expectedKeys = ["response", "timestamp", "description", "link"];
+    const expectedKeys = ["response", "description", "timestamp", "link"];
     test.each([
         {
             path: "/api/news/bbc",
