@@ -12,6 +12,10 @@
         {
             "name": "Weather",
             "description": "This API allows you to get a JSON response of the weather data I collect."
+        },
+        {
+            "name": "Steam",
+            "description": "This API allows you to get a JSON response of a Steam game's achievements and the Wiki page (if collected)."
         }
     ],
     "components": {
@@ -124,6 +128,17 @@
                     }
                 }
             },
+            "SteamResponse": {
+                "type": "object",
+                "properties": {
+                    "achievements": {
+                        "type": "array"
+                    },
+                    "wiki": {
+                        "type": "string"
+                    }
+                }
+            },
             "DefaultResponse": {
                 "type": "object",
                 "properties": {
@@ -139,6 +154,12 @@
                                 "type": "array",
                                 "items": {
                                     "$ref": "#/components/schemas/WeatherResponse"
+                                }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SteamResponse"
                                 }
                             }
                         ]
@@ -341,6 +362,54 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Weather"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/steam/achieve": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "SteamID of game.",
+                        "in": "query",
+                        "name": "gameId",
+                        "required": true
+                    },
+                    {
+                        "description": "Steam API key.",
+                        "in": "query",
+                        "name": "key",
+                        "required": false
+                    },
+                    {
+                        "description": "Steam user ID.",
+                        "in": "query",
+                        "name": "userId",
+                        "required": false
+                    }
+                ],
+                "tags": ["Steam"],
+                "summary": "Retrieve a specific game's data from Steam.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefaultResponse"
                                 }
                             }
                         }
