@@ -11,8 +11,12 @@ import {
     Routes,
     SlashCommandBuilder,
 } from "discord.js";
-import { die } from "@common/data/discord";
-import { DiscordUsernameOptions } from "@common/types";
+import { die } from "@common/resources/discord-resources";
+import type {
+    CheckDiscordVoiceTarget,
+    CreateDiscordPlayer,
+    DiscordUsernameOptions,
+} from "@common/types";
 import {
     AudioPlayerStatus,
     VoiceConnectionStatus,
@@ -89,7 +93,7 @@ if (DISCORD_ENABLED) {
 
 export const checkVoiceTarget = (
     interaction: ChatInputCommandInteraction<CacheType>
-) => {
+): CheckDiscordVoiceTarget => {
     if (!interaction.guild) {
         throw new Error("Play only works while in a guild!");
     }
@@ -107,7 +111,10 @@ export const checkVoiceTarget = (
     return { targetUser, targetVoiceChannel, guild: interaction.guild };
 };
 
-export const createPlayer = (guild: Guild, targetVoiceChannel: string) => {
+export const createPlayer = (
+    guild: Guild,
+    targetVoiceChannel: string
+): CreateDiscordPlayer => {
     const player = createAudioPlayer();
     const connection = joinVoiceChannel({
         channelId: targetVoiceChannel,
@@ -127,7 +134,7 @@ export const createPlayer = (guild: Guild, targetVoiceChannel: string) => {
 
 export const assist = async (
     interaction: ChatInputCommandInteraction<CacheType>
-) => {
+): Promise<void> => {
     try {
         await interaction.reply("https://www.youtube.com/watch?v=CRzfZu0GH14");
     } catch (e: any) {
@@ -140,7 +147,7 @@ export const assist = async (
 
 export const cry = async (
     interaction: ChatInputCommandInteraction<CacheType>
-) => {
+): Promise<void> => {
     try {
         const message = interaction.options.data[0] as DiscordUsernameOptions;
         if (message && message.user) {
@@ -166,7 +173,7 @@ export const cry = async (
 
 export const roll = async (
     interaction: ChatInputCommandInteraction<CacheType>
-) => {
+): Promise<void> => {
     try {
         const faceCount = interaction.options.data[0].value
             ? parseInt(interaction.options.data[0].value as string)
@@ -196,7 +203,7 @@ export const roll = async (
 
 export const rpg = async (
     interaction: ChatInputCommandInteraction<CacheType>
-) => {
+): Promise<void> => {
     try {
         const { targetVoiceChannel, guild } = checkVoiceTarget(interaction);
 

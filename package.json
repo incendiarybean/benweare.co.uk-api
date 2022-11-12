@@ -1,12 +1,12 @@
 {
     "name": "benweare.co.uk-server",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "private": true,
     "main": "./build/index.js",
     "dependencies": {
         "@discordjs/voice": "^0.11.0",
         "axios": "^0.27.2",
-        "benweare.co.uk-client": "^1.1.0",
+        "benweare.co.uk-client": "^1.1.2",
         "cors": "^2.8.5",
         "discord.js": "^14.3.0",
         "dotenv": "^16.0.1",
@@ -22,7 +22,7 @@
         "start": "node -r dotenv/config .",
         "start-dev": "nodemon ./src/index.ts",
         "build": "tsc -p ./ && tsc-alias -p ./tsconfig.json",
-        "test": "jest ./src/* --silent --runInBand"
+        "test": "jest ./* --silent --runInBand"
     },
     "eslintConfig": {
         "extends": [

@@ -1,12 +1,7 @@
 import http from "http";
 import express from "express";
 import { Server } from "socket.io";
-import {
-    contentHandler,
-    headerHandler,
-    routeHandler,
-    validatorHandler,
-} from "@handlers";
+import { contentHandler, headerHandler, routeHandler } from "@handlers/index";
 
 export const app = express();
 
@@ -37,9 +32,6 @@ app.use(headerHandler);
 
 // SET CONTENT RULES \\
 app.use(contentHandler);
-
-// VALIDATE ROUTE \\
-app.use(validatorHandler);
 
 // USE ROUTES \\
 app.use(routeHandler);

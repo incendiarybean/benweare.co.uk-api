@@ -1,0 +1,431 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "benweare.co.uk's base API",
+        "version": "0.1.0"
+    },
+    "tags": [
+        {
+            "name": "News",
+            "description": "This API allows you to get a JSON response of the news I collect."
+        },
+        {
+            "name": "Weather",
+            "description": "This API allows you to get a JSON response of the weather data I collect."
+        },
+        {
+            "name": "Steam",
+            "description": "This API allows you to get a JSON response of a Steam game's achievements and the Wiki page (if collected)."
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "APIKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-KEY"
+            }
+        },
+        "schemas": {
+            "Error": {
+                "required": ["message"],
+                "properties": {
+                    "message": { "type": "string" }
+                }
+            },
+            "NewsOption": {
+                "type": "string",
+                "enum": ["bbc", "pcgamer", "nasa"]
+            },
+            "Article": {
+                "type": "object",
+                "properties": {
+                    "title": { "type": "string" },
+                    "link": { "type": "string" },
+                    "img": { "type": "string" },
+                    "date": { "type": "string" },
+                    "site": { "type": "string" }
+                }
+            },
+            "Link": {
+                "type": "object",
+                "properties": {
+                    "action": { "type": "string" },
+                    "href": { "type": "string" }
+                }
+            },
+            "NewsResponse": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "updated": { "type": "string" },
+                    "description": { "type": "string" }
+                }
+            },
+            "WeatherResponse": {
+                "type": "object",
+                "properties": {
+                    "location": { "type": "string" },
+                    "timeseries": {
+                        "type": "object",
+                        "properties": {
+                            "time": { "type": "string" },
+                            "midnight10MWindSpeed": {
+                                "type": "number"
+                            },
+                            "midnight10MWindDirection": {
+                                "type": "number"
+                            },
+                            "midnight10MWindGust": { "type": "number" },
+                            "midnightVisibility": { "type": "number" },
+                            "midnightRelativeHumidity": {
+                                "type": "number"
+                            },
+                            "midnightMslp": { "type": "number" },
+                            "nightSignificantWeatherCode": {
+                                "type": "number"
+                            },
+                            "nightMinScreenTemperature": {
+                                "type": "number"
+                            },
+                            "nightUpperBoundMinTemp": {
+                                "type": "number"
+                            },
+                            "nightLowerBoundMinTemp": {
+                                "type": "number"
+                            },
+                            "nightMinFeelsLikeTemp": {
+                                "type": "number"
+                            },
+                            "nightUpperBoundMinFeelsLikeTemp": {
+                                "type": "number"
+                            },
+                            "nightLowerBoundMinFeelsLikeTemp": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfPrecipitation": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfSnow": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfHeavySnow": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfRain": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfHeavyRain": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfHail": {
+                                "type": "number"
+                            },
+                            "nightProbabilityOfSferics": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            },
+            "SteamResponse": {
+                "type": "object",
+                "properties": {
+                    "achievements": {
+                        "type": "array"
+                    },
+                    "wiki": {
+                        "type": "string"
+                    }
+                }
+            },
+            "DefaultResponse": {
+                "type": "object",
+                "properties": {
+                    "response": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/NewsResponse"
+                                }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/WeatherResponse"
+                                }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SteamResponse"
+                                }
+                            }
+                        ]
+                    },
+                    "timestamp": { "type": "string" },
+                    "description": { "type": "string" },
+                    "link": {
+                        "$ref": "#/components/schemas/Link"
+                    }
+                }
+            },
+            "News": {
+                "$ref": "#/components/schemas/DefaultResponse"
+            },
+            "Weather": {
+                "$ref": "#/components/schemas/DefaultResponse"
+            }
+        }
+    },
+    "security": [{ "APIKeyAuth": [] }],
+    "paths": {
+        "/api/news": {
+            "get": {
+                "tags": ["News"],
+                "summary": "Retrieve all available news outlets.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/News"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/news/{outlet}": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "News Outlet Name.",
+                        "in": "path",
+                        "name": "outlet"
+                    }
+                ],
+                "tags": ["News"],
+                "summary": "Retrieve a specific news outlet.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/News"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/news/{outlet}/articles": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "News Outlet Name.",
+                        "in": "path",
+                        "name": "outlet",
+                        "required": true
+                    }
+                ],
+                "tags": ["News"],
+                "summary": "Retrieve a specific news outlet's articles.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/News"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/forecasts": {
+            "get": {
+                "tags": ["Weather"],
+                "summary": "Retrieve all available weather outlets.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Weather"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/forecasts/{outlet}": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "Weather Outlet Name.",
+                        "in": "path",
+                        "name": "outlet"
+                    }
+                ],
+                "tags": ["Weather"],
+                "summary": "Retrieve a specific weather outlet.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Weather"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/forecasts/{outlet}/timeseries": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "Weather Outlet Name.",
+                        "in": "path",
+                        "name": "outlet",
+                        "required": true
+                    }
+                ],
+                "tags": ["Weather"],
+                "summary": "Retrieve a specific news outlet's weather.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Weather"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/steam/achieve": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "SteamID of game.",
+                        "in": "query",
+                        "name": "gameId",
+                        "required": true
+                    },
+                    {
+                        "description": "Steam API key.",
+                        "in": "query",
+                        "name": "key",
+                        "required": false
+                    },
+                    {
+                        "description": "Steam user ID.",
+                        "in": "query",
+                        "name": "userId",
+                        "required": false
+                    }
+                ],
+                "tags": ["Steam"],
+                "summary": "Retrieve a specific game's data from Steam.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefaultResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

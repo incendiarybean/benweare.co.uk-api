@@ -3,7 +3,7 @@ import absolutePath from "benweare.co.uk-client";
 import cors from "cors";
 import express from "express";
 import * as swaggerUi from "swagger-ui-slim";
-import schema from "./schema";
+import OpenApiSchema from "@schema";
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.use(
 router.use(
     "/api/docs",
     swaggerUi.serve,
-    swaggerUi.build(schema, {
+    swaggerUi.build(OpenApiSchema, {
         customSiteTitle: "Ben's API Docs",
         faviconUrl: `/favicon.ico`,
     })
