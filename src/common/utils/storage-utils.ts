@@ -68,6 +68,9 @@ export class ObjectStorage {
             description,
         };
 
-        this.storage = [...this.storage, template];
+        this.storage = [
+            ...this.storage.filter(({ name }) => name !== template.name),
+            template,
+        ];
     };
 }

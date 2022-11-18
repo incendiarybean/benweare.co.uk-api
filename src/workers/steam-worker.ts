@@ -37,20 +37,22 @@ export const getGameData = async (req: Request) => {
 
         if (userId) {
             const playerAchievements = steam[1].data.playerstats.achievements;
-            const achievementList = playerAchievements.map((achieve: any) => {
-                return {
-                    ...achieve,
-                    ...steamAchievements[achieve.apiname - 1],
-                };
-            });
+
+            // Steam's API is inconsistent -> steamAchievements.name = playerAchievements.apiname
+            const achievementList = playerAchievements.map((achieve: any) => ({
+                ...steamAchievements.filter(
+                    (item: any) => item.name === achieve.apiname
+                )[0],
+                ...achieve,
+            }));
 
             return { achievements: achievementList, wiki };
         }
         return { achievements: steamAchievements, wiki };
     } catch (e) {
-        const error = new Error("Could not process request", {
-            cause: e as Error,
-        }) as NodeJS.ErrnoException;
+        const error = new Error(
+            "Could not process request"
+        ) as NodeJS.ErrnoException;
         error.code = "502";
         throw error;
     }

@@ -16,7 +16,7 @@ export const staticRefresher = (
     trigger: Function,
     functionName: string
 ) =>
-    setImmediate(() => {
+    setImmediate((): void => {
         console.log(
             `[${new Date()}] Initialising ${functionName} Refresher...`
         );
@@ -70,12 +70,24 @@ export const fetchArticles = (
  * @returns Element containing body
  */
 export const fetchWikiBody = (url: string) =>
-    new Promise<string>((resolve, reject) =>
+    new Promise<string[]>((resolve, reject) =>
         axios
             .get(url, { responseType: "text" })
             .then((response: AxiosResponse) => {
                 const { document } = new JSDOM(response.data).window;
-                resolve(document.getElementsByTagName("body")[0].innerHTML);
+
+                const tables = document.querySelectorAll(
+                    '[data-description="Achievements"]'
+                );
+
+                const wikiArticles: string[] = [];
+                tables.forEach((table) => {
+                    const rows = table.querySelectorAll("tr");
+                    rows.forEach((row) => {
+                        wikiArticles.push(row.innerHTML.replaceAll(/\n/g, ""));
+                    });
+                });
+                resolve(wikiArticles);
             })
             .catch((e: any) => {
                 reject(e);
