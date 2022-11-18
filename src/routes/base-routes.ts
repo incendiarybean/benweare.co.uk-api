@@ -6,6 +6,10 @@ const router = express.Router();
 
 const index = `${absolutePath}/index.html`;
 
+router.get("/api/status", (req: Request, res: Response) =>
+    res.status(200).json({ message: "ok" })
+);
+
 router.get("/api*", (req: Request, res: Response) =>
     res
         .status(404)

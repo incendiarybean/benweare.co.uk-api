@@ -6,16 +6,20 @@
     },
     "tags": [
         {
+            "name": "API",
+            "description": "These endpoints allows you to check the status of the API."
+        },
+        {
             "name": "News",
-            "description": "This API allows you to get a JSON response of the news I collect."
+            "description": "These endpoints allow you to get a JSON response of the news I collect."
         },
         {
             "name": "Weather",
-            "description": "This API allows you to get a JSON response of the weather data I collect."
+            "description": "These endpoints allow you to get a JSON response of the weather data I collect."
         },
         {
             "name": "Steam",
-            "description": "This API allows you to get a JSON response of a Steam game's achievements and the Wiki page (if collected)."
+            "description": "These endpoints allow you to get a JSON response of a Steam game's achievements and the Wiki page (if collected)."
         }
     ],
     "components": {
@@ -181,6 +185,39 @@
     },
     "security": [{ "APIKeyAuth": [] }],
     "paths": {
+        "/api/status": {
+            "get": {
+                "tags": ["API"],
+                "summary": "Check API status.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/news": {
             "get": {
                 "tags": ["News"],
@@ -410,6 +447,39 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/DefaultResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/steam/status": {
+            "get": {
+                "tags": ["Steam"],
+                "summary": "Check Steam API status.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             }
                         }
