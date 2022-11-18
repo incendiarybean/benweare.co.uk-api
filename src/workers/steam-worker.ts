@@ -3,6 +3,17 @@ import type { Request } from "express";
 import { getWikiContent } from "@common/utils/common-utils";
 
 /**
+ * This is purely for checking if the Steam API is functional
+ * @returns Status 200 or error
+ */
+export const checkSteamApi = () => {
+    const { STEAM_API, STEAM_API_KEY } = process.env;
+    return axios.get(
+        `${STEAM_API}/ISteamUser/GetPlayerSummaries/v0002/?key=${STEAM_API_KEY}&steamids=`
+    );
+};
+
+/**
  * This function gets Steam Achievements for the user and a Wiki document where applicable
  * @param req Express request, to get query params
  * @returns Object containing achievements and Wiki Document as string
