@@ -22,4 +22,13 @@ router.get("/api/steam/achieve", async (req: Request, res: Response) => {
     }
 });
 
+router.get("/api/steam/status", async (req: Request, res: Response) => {
+    try {
+        await getGameData(req);
+        res.status(200).json({ message: "ok" });
+    } catch (e) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 export default router;
