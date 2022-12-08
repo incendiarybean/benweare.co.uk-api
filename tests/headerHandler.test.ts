@@ -1,5 +1,5 @@
 import request from "supertest";
-import { HTTPServer, app } from "@server";
+import { HTTPServer, app } from "../src/server";
 
 describe("Server should redirect to HTTPS when HTTP is used", () => {
     test("Status code matches the redirect", async () => {

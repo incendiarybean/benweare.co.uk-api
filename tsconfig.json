@@ -25,9 +25,11 @@
         "resolveJsonModule": true,
         "paths": {
             "@server": ["./src/server"],
+            "@schema": ["./src/schema"],
+            "@handlers/*": ["./src/handlers/*"],
             "@routes/*": ["./src/routes/*"],
-            "@common/*": ["./src/common/*"],
-            "@handlers": ["./src/handlers"]
+            "@workers/*": ["./src/workers/*"],
+            "@common/*": ["./src/common/*"]
         }
     },
     "ts-node": {

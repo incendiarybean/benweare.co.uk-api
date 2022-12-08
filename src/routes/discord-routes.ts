@@ -1,9 +1,5 @@
 import { ActivityType } from "discord.js";
-import { assist, client, cry, roll, rpg } from "./utils";
-
-/*--------------*/
-/*    EVENTS    */
-/*--------------*/
+import { assist, client, cry, roll, rpg } from "@workers/discord-worker";
 
 const { DISCORD_TOKEN, DISCORD_ENABLED } = process.env;
 
