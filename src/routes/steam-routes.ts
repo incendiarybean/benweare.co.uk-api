@@ -1,3 +1,4 @@
+import cors from "cors";
 import type { Request, Response } from "express";
 import express from "express";
 import OpenApiSchema from "@schema";
@@ -22,13 +23,17 @@ router.get("/api/steam/achieve", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/api/steam/status", async (req: Request, res: Response) => {
-    try {
-        await checkSteamApi();
-        res.status(200).json({ message: "ok" });
-    } catch (e) {
-        res.status(500).json({ message: "Internal Server Error" });
+router.get(
+    "/api/steam/status",
+    cors({ origin: "*" }),
+    async (req: Request, res: Response) => {
+        try {
+            await checkSteamApi();
+            res.status(200).json({ message: "ok" });
+        } catch (e) {
+            res.status(500).json({ message: "Internal Server Error" });
+        }
     }
-});
+);
 
 export default router;
