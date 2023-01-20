@@ -52,7 +52,7 @@ export const fetchArticles = (
                         container
                             .querySelectorAll(splitSelector)
                             .forEach((article: Element, index: number) => {
-                                if (index < 9 && article.textContent) {
+                                if (index < 12 && article.textContent) {
                                     HTMLArticles.push(article);
                                 }
                             })
