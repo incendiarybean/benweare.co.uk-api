@@ -30,8 +30,8 @@ export const getNews = (): void => {
  */
 const getPCNews = (): Promise<void> =>
     fetchArticles(
-        "https://www.pcgamer.com/uk/",
-        ".list-text-links-trending-panel",
+        "https://www.pcgamer.com/uk/news/",
+        "[data-list='news/news/latest']",
         ".listingResult"
     )
         .then((HTMLArticles: Element[]) => {
@@ -47,30 +47,30 @@ const getPCNews = (): Promise<void> =>
             }
 
             HTMLArticles.forEach((HTMLDivElement) => {
-                const title: string =
-                    HTMLDivElement.querySelector(".article-name")
-                        ?.textContent || "Not Found";
+                const title: string | null | undefined =
+                    HTMLDivElement.querySelector(".article-name")?.textContent;
+                if (title) {
+                    const url: string =
+                        HTMLDivElement.querySelector("a")?.href || "Not Found";
 
-                const url: string =
-                    HTMLDivElement.querySelector("a")?.href || "Not Found";
+                    const img: string =
+                        HTMLDivElement.querySelector(
+                            ".article-lead-image-wrap"
+                        )?.getAttribute("data-original") || "Not Found";
 
-                const img: string =
-                    HTMLDivElement.querySelector(
-                        ".article-lead-image-wrap"
-                    )?.getAttribute("data-original") || "Not Found";
+                    const date: string = dateGenerator(
+                        HTMLDivElement.querySelector(
+                            ".relative-date"
+                        )?.getAttribute("datetime")
+                    );
 
-                const date: string = dateGenerator(
-                    HTMLDivElement.querySelector(
-                        ".relative-date"
-                    )?.getAttribute("datetime")
-                );
-
-                articles.push({
-                    title,
-                    url,
-                    img,
-                    date,
-                });
+                    articles.push({
+                        title,
+                        url,
+                        img,
+                        date,
+                    });
+                }
             });
             pcRetryCount = 0;
 
