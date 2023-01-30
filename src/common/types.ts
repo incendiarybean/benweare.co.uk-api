@@ -20,6 +20,8 @@ export interface FilterDataInput {
 }
 
 /* NEWS TYPES */
+export type UndefinedNews = string | null | undefined;
+
 export interface NewsArticle {
     title: string;
     url: string;
