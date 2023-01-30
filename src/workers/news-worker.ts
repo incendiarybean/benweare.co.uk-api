@@ -12,14 +12,16 @@ import { IO } from "@server";
 const { NODE_ENV } = process.env;
 const service = "News";
 
-let pcRetryCount = 0;
+let pcGamerRetryCount = 0;
+let rpsRetryCount = 0;
 let ukRetryCount = 0;
 let nasaRetryCount = 0;
 
 export const storage = new ObjectStorage();
 
 export const getNews = (): void => {
-    getPCNews();
+    getPCGamerNews();
+    getRPSNews();
     getUKNews();
     getNasaImage();
 };
@@ -28,7 +30,70 @@ export const getNews = (): void => {
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
-const getPCNews = (): Promise<void> =>
+const getRPSNews = (): Promise<void> =>
+    fetchArticles("https://www.rockpapershotgun.com/latest", ".articles", "li")
+        .then((HTMLArticles: Element[]) => {
+            const site: string = "RockPaperShotgun";
+            const articles: NewsArticle[] = [];
+
+            if ([undefined, "test"].includes(NODE_ENV)) {
+                return storage.write(
+                    site,
+                    mockNewsArticles,
+                    `${site}'s Latest News.`
+                );
+            }
+
+            HTMLArticles.forEach((HTMLDivElement) => {
+                const title: string | null | undefined =
+                    HTMLDivElement.querySelector(".title")?.children[0]
+                        .textContent;
+                if (title) {
+                    const url: string =
+                        HTMLDivElement.querySelector("a")?.href || "Not Found";
+
+                    const img: string =
+                        HTMLDivElement.querySelector(
+                            ".thumbnail_image"
+                        )?.getAttribute("src") || "Not Found";
+
+                    const date: string = dateGenerator(
+                        HTMLDivElement.querySelector("time")?.getAttribute(
+                            "datetime"
+                        )
+                    );
+
+                    articles.push({
+                        title,
+                        url,
+                        img,
+                        date,
+                    });
+                }
+            });
+            rpsRetryCount = 0;
+
+            storage.write(site, articles, `${site}'s Latest News.`);
+
+            IO.local.emit("RELOAD_NEWS");
+        })
+        .catch((e) => {
+            console.log(e);
+            rpsRetryCount += 1;
+            console.log(`Failed to get Rock Paper Shotgun News... Retrying.`);
+            if (rpsRetryCount > 5) {
+                return console.log(
+                    `Failed to get Rock Paper Shotgun News... (Tried 5 times).`
+                );
+            }
+            getRPSNews();
+        });
+
+/**
+ * This function gets news for the given outlet
+ * @returns void -> Writes data to storage object
+ */
+const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
         "https://www.pcgamer.com/uk/news/",
         "[data-list='news/news/latest']",
@@ -72,19 +137,19 @@ const getPCNews = (): Promise<void> =>
                     });
                 }
             });
-            pcRetryCount = 0;
+            pcGamerRetryCount = 0;
 
             storage.write(site, articles, `${site}'s Latest News.`);
 
             IO.local.emit("RELOAD_NEWS");
         })
         .catch(() => {
-            pcRetryCount += 1;
+            pcGamerRetryCount += 1;
             console.log(`Failed to get PC News... Retrying.`);
-            if (pcRetryCount > 5) {
+            if (pcGamerRetryCount > 5) {
                 return console.log(`Failed to get PC News... (Tried 5 times).`);
             }
-            getPCNews();
+            getPCGamerNews();
         });
 
 /**
