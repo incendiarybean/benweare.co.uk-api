@@ -15,6 +15,18 @@ client.on("ready", () => {
     }
 });
 
+/**
+ * This block handles direct messages to the bot
+ */
+client.on("messageCreate", async (interaction) => {
+    if (!interaction.content) return;
+
+    // TODO: Do something cool here!
+});
+
+/**
+ * This block handles button commands to the bot
+ */
 client.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
 
@@ -33,6 +45,9 @@ client.on("interactionCreate", async (interaction) => {
     }
 });
 
+/**
+ * This block handles slash commands to the bot
+ */
 client.on("interactionCreate", async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
     switch (interaction.commandName) {

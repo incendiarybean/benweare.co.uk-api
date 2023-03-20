@@ -7,6 +7,7 @@ import {
     Client,
     GatewayIntentBits,
     Guild,
+    Partials,
     REST,
     Routes,
     SlashCommandBuilder,
@@ -39,6 +40,7 @@ export const client = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.MessageContent,
     ],
+    partials: [Partials.Channel, Partials.Message],
 });
 
 /*--------------*/
