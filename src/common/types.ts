@@ -12,7 +12,7 @@ export interface DataStorage {
     name: string;
     updated: Date;
     description: string;
-    items: WeatherTimeSeries[] | NewsArticle[];
+    items: WeatherRecord[] | NewsArticle[];
 }
 
 export interface FilterDataInput {
@@ -51,6 +51,15 @@ export interface WeatherFeatures {
         modelRunDate: string;
         timeSeries: WeatherTimeSeries[];
     };
+}
+
+export interface WeatherRecord {
+    maxTemp: string;
+    lowTemp: string;
+    maxFeels: string;
+    maxWindSpeed: number;
+    weather: string;
+    weatherDescription: string;
 }
 
 export interface WeatherTimeSeries {

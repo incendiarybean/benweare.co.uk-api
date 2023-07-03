@@ -1,8 +1,4 @@
-import type {
-    DataStorage,
-    NewsArticle,
-    WeatherTimeSeries,
-} from "@common/types";
+import type { DataStorage, NewsArticle, WeatherRecord } from "@common/types";
 
 export class ObjectStorage {
     private storage: DataStorage[];
@@ -48,12 +44,12 @@ export class ObjectStorage {
 
     /**
      * @param name string - Name of service
-     * @param items WeatherTimeSeries[] | NewsArticle[] - Formatted data object
+     * @param items WeatherRecord[] | NewsArticle[] - Formatted data object
      * @param description string - Service description
      */
     public write = (
         name: string,
-        items: WeatherTimeSeries[] | NewsArticle[],
+        items: WeatherRecord[] | NewsArticle[],
         description: string
     ): void => {
         const dataKeys = Object.keys(items);

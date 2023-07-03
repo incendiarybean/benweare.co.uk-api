@@ -156,16 +156,16 @@ const getUKNews = (): Promise<void> =>
                 HTMLDivElement.querySelector(".gs-c-promo-heading__title")
                     ?.textContent || "Not Found";
 
-            const url: string =
-                `https://bbc.co.uk${HTMLDivElement.querySelector("a")?.href}` ||
-                "Not Found";
+            const url: string = HTMLDivElement.querySelector("a")?.href
+                ? `https://bbc.co.uk${HTMLDivElement.querySelector("a")?.href}`
+                : "Not Found";
 
             const date: string = dateGenerator(
                 HTMLDivElement.querySelector("time")?.getAttribute("datetime")
             );
 
             const live =
-                HTMLDivElement.querySelector("a")?.href.split("/")[2] ||
+                HTMLDivElement.querySelector("a")?.href.split("/")[2] ??
                 "Not Found";
 
             if (!articleTitles.includes(title) && live !== "live") {

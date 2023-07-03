@@ -22,17 +22,20 @@ const config: WeatherConfig = {
     url: "https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily",
     qs: {
         includeLocationName: "true",
-        latitude: process.env.LATITUDE || "",
-        longitude: process.env.LONGITUDE || "",
+        latitude: process.env.LATITUDE ?? "",
+        longitude: process.env.LONGITUDE ?? "",
     },
     headers: {
-        "x-ibm-client-id": process.env.MET_CLIENT_ID || "",
-        "x-ibm-client-secret": process.env.MET_API_SECRET || "",
+        "x-ibm-client-id": process.env.MET_CLIENT_ID ?? "",
+        "x-ibm-client-secret": process.env.MET_API_SECRET ?? "",
         accept: "application/json",
     },
 };
 
-const fetchWeather = (url: string, headers: WeatherRequestHeaders) =>
+const fetchWeather = (
+    url: string,
+    headers: WeatherRequestHeaders
+): Promise<AxiosResponse> =>
     new Promise<AxiosResponse>((resolve, reject) =>
         axios
             .get(url, { headers })
