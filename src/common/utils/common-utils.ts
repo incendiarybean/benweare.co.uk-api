@@ -52,7 +52,7 @@ export const fetchArticles = (
                         container
                             .querySelectorAll(splitSelector)
                             .forEach((article: Element, index: number) => {
-                                if (index < 9 && article.textContent) {
+                                if (index < 12 && article.textContent) {
                                     HTMLArticles.push(article);
                                 }
                             })
@@ -175,3 +175,22 @@ export const dataFilter = (
             (operation ? operation(item["key"]) : item[key].toLowerCase()) ===
             query.toLocaleLowerCase()
     );
+
+/**
+ * This utility is for catching failures in a function.
+ * It will retry for a specified number of times.
+ * @param fn Function - A function you want to retry after failure.
+ * @param tries number - The maximum tries before stopping.
+ */
+export const retryHandler = (fn: Function, tries: number): void => {
+    let retries = 0;
+    fn().catch((e: any) => {
+        console.log(`Function: ${fn.name} failed... Retrying.`);
+        if (retries < tries) {
+            return console.log(
+                `Function: ${fn.name} failed... (Tried ${tries} times).`
+            );
+        }
+        return fn();
+    });
+};
