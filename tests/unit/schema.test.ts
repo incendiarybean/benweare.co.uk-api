@@ -1,6 +1,10 @@
 describe("documentation/schema should be provided the correct servers dependant on environment", () => {
     it("should provide dev domains on development environment", () => {
         const { getServers } = require("../../src/schema");
+        const PORT = process.env.PORT;
+
+        // Remove env variables to use fallback value
+        delete process.env.PORT;
 
         expect(getServers()).toEqual([
             {
@@ -16,6 +20,9 @@ describe("documentation/schema should be provided the correct servers dependant 
                 description: "Heroku-Dev",
             },
         ]);
+
+        // Re-add env variables for future tests
+        process.env.PORT = PORT;
     });
 
     it("should provide a default domain in development if not provided by the environment", () => {

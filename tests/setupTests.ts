@@ -52,6 +52,7 @@ beforeAll(async () => {
 afterEach(() => {
     // Reset Environment after each test
     process.env.NODE_ENV = "test";
+
     jest.clearAllMocks();
     jest.resetAllMocks();
 });

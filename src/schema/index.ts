@@ -12,10 +12,9 @@ export const getServers = () => {
     }
     return [
         {
-            url:
-                process.env.HOSTNAME && process.env.PORT
-                    ? `${process.env.HOSTNAME}:${process.env.PORT}`
-                    : "http://localhost/",
+            url: !process.env.PORT
+                ? "http://localhost/"
+                : `http://localhost:${process.env.PORT}`,
             description: "Local build",
         },
         {
