@@ -46,7 +46,7 @@ export const retryHandler = (
             );
         }
         console.error(`Function: ${fn.name} failed... Retrying.`);
-        return retryHandler(fn, tries - 1, counter || tries);
+        return retryHandler(fn, tries - 1, counter ?? tries);
     });
 };
 

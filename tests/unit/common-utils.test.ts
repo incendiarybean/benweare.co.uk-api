@@ -1,13 +1,13 @@
+import { readFileSync } from "fs";
 import {
-    staticRefresher,
+    dateGenerator,
+    dateParses,
+    fetchArticles,
     fetchWikiBody,
     getWikiContent,
-    fetchArticles,
-    dateParses,
-    dateGenerator,
     retryHandler,
+    staticRefresher,
 } from "../../src/common/utils/common-utils";
-import { readFileSync } from "fs";
 import { genericContent } from "../data/test-data";
 
 const mockAxios = globalThis.__mockAxios__;

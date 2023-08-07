@@ -1,5 +1,6 @@
-import { getGameData, checkSteamApi } from "../../src/workers/steam-worker";
+import { checkSteamApi, getGameData } from "../../src/workers/steam-worker";
 import { steamContent, steamUserContent } from "../data/test-data";
+
 const mockAxios = globalThis.__mockAxios__;
 
 describe("the steam worker should correctly validate data and return it", () => {

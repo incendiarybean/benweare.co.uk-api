@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+
 const template = readFileSync("./tests/data/default.html", "utf8");
 
 const replacer = (
