@@ -1,7 +1,6 @@
 describe("documentation/schema should be provided the correct servers dependant on environment", () => {
     it("should provide dev domains on development environment", () => {
         const { getServers } = require("../../src/schema");
-        process.env.HOSTNAME = "http://localhost";
 
         expect(getServers()).toEqual([
             {
