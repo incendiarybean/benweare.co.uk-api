@@ -9,13 +9,13 @@ import type {
     WeatherRequestHeaders,
     WeatherTimeSeries,
 } from "@common/types";
-import { staticRefresher } from "@common/utils/common-utils";
-import { ObjectStorage } from "@common/utils/storage-utils";
+import {
+    dateGenerator,
+    retryHandler,
+    staticRefresher,
+} from "@common/utils/common-utils";
 import { IO } from "@server";
-
-const { NODE_ENV } = process.env;
-const service = "Weather";
-export const storage = new ObjectStorage();
+import { storage } from "..";
 
 const config: WeatherConfig = {
     method: "GET",
@@ -36,81 +36,71 @@ const fetchWeather = (
     url: string,
     headers: WeatherRequestHeaders
 ): Promise<AxiosResponse> =>
-    new Promise<AxiosResponse>((resolve, reject) =>
-        axios
-            .get(url, { headers })
-            .then((response: AxiosResponse) => {
-                return resolve(response);
-            })
-            .catch((e: any) => {
-                reject(e);
-            })
-    );
+    axios
+        .get(url, { headers })
+        .then(async (response: AxiosResponse) => response);
 
 /**
  * This function gets Weather for the given location
  * @returns void -> Writes data to storage object
  */
-export const getWeather = () => {
-    const site: string = "MetOffice";
-    const url = new URL(
-        `${config.url}?${new URLSearchParams(config.qs).toString()}`
-    ).toString();
+export const getMetOffice = (): Promise<void> =>
+    fetchWeather(
+        new URL(
+            `${config.url}?${new URLSearchParams(config.qs).toString()}`
+        ).toString(),
+        config.headers
+    ).then((response) => {
+        const { data } = response;
+        const { features } = data;
+        let series = [];
+        if (features) {
+            series = features[0].properties.timeSeries.map(
+                (timeSeries: WeatherTimeSeries) => {
+                    const [type, description] =
+                        weatherCodes[timeSeries.daySignificantWeatherCode];
 
-    if ([undefined, "test", "development"].includes(NODE_ENV)) {
-        return storage.write(
-            site,
-            mockWeatherResponse,
-            `Weather in development`
+                    return {
+                        maxTemp: `${Math.round(
+                            timeSeries.dayMaxScreenTemperature
+                        )}º`,
+                        lowTemp: `${Math.round(
+                            timeSeries.nightMinScreenTemperature
+                        )}º`,
+                        maxFeels: `${Math.round(
+                            timeSeries.dayMaxFeelsLikeTemp
+                        )}º`,
+                        maxWindSpeed: Math.round(timeSeries.midday10MWindSpeed),
+                        weather: type,
+                        weatherDescription: description,
+                        time: dateGenerator(timeSeries.time),
+                    };
+                }
+            );
+        }
+
+        storage.write(
+            "WEATHER",
+            "MetOffice",
+            `Weather in ${features[0].properties.location.name}`,
+            series
         );
+        IO.local.emit("RELOAD_WEATHER");
+    });
+
+export const getWeather = (): void => {
+    // This is to stop overrunning MetOffice API allowances
+    if (process.env.NODE_ENV === "development") {
+        console.info(`[${new Date()}] Using Development MetOffice weather...`);
+        storage.write(
+            "WEATHER",
+            "MetOffice",
+            `Weather in development`,
+            mockWeatherResponse
+        );
+        return;
     }
-
-    fetchWeather(url, config.headers)
-        .then((response) => {
-            const { data } = response;
-            const { features } = data;
-            let series = [];
-            if (features) {
-                series = features[0].properties.timeSeries.map(
-                    (timeSeries: WeatherTimeSeries) => {
-                        const [type, description] =
-                            weatherCodes[
-                                timeSeries.daySignificantWeatherCode || 1
-                            ];
-
-                        return {
-                            maxTemp: `${Math.round(
-                                timeSeries.dayMaxScreenTemperature
-                            )}º`,
-                            lowTemp: `${Math.round(
-                                timeSeries.nightMinScreenTemperature
-                            )}º`,
-                            maxFeels: `${Math.round(
-                                timeSeries.dayMaxFeelsLikeTemp
-                            )}º`,
-                            maxWindSpeed: Math.round(
-                                timeSeries.midday10MWindSpeed
-                            ),
-                            weather: type,
-                            weatherDescription: description,
-                        };
-                    }
-                );
-            }
-
-            storage.write(
-                site,
-                series,
-                `Weather in ${features[0].properties.location.name}`
-            );
-
-            IO.local.emit("RELOAD_WEATHER");
-        })
-        .catch(() => {
-            console.log(
-                `[${new Date()}] Failed to fetch weather at this time.`
-            );
-        });
+    retryHandler(getMetOffice, 2);
 };
 
-staticRefresher(900000, getWeather, service);
+staticRefresher(900000, getWeather, "Weather");

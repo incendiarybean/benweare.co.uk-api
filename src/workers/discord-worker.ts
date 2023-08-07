@@ -77,15 +77,15 @@ const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_ENABLED } = process.env;
 
 const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN as string);
 
-if (DISCORD_ENABLED) {
+if (DISCORD_ENABLED && ![undefined, "test"].includes(process.env.NODE_ENV)) {
     rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID as string), {
         body: commands,
     })
         .then(() => {
-            console.log(`[${new Date()}] Discord Bot commands loaded!`);
+            console.info(`[${new Date()}] Discord Bot commands loaded!`);
         })
         .catch((e) => {
-            console.log(`[${new Date()}] ERROR: ${e.message}`);
+            console.error(`[${new Date()}] ERROR: ${e.message}`);
         });
 }
 
@@ -152,7 +152,7 @@ export const cry = async (
 ): Promise<void> => {
     try {
         const message = interaction.options.data[0] as DiscordUsernameOptions;
-        if (message && message.user) {
+        if (message?.user) {
             await interaction.reply({
                 content: `${message.user}`,
                 embeds: [

@@ -2,18 +2,20 @@ import type { WeatherCodes, WeatherRecord } from "@common/types";
 
 export const mockWeatherResponse: WeatherRecord[] = [
     {
-        maxTemp: "18º",
-        lowTemp: "10º",
-        maxFeels: "16º",
-        maxWindSpeed: 4,
+        maxFeels: "18º",
+        lowTemp: "14º",
+        maxTemp: "20º",
+        maxWindSpeed: 3,
+        time: "01/02/2023",
         weather: "cloud",
         weatherDescription: "Cloudy",
     },
     {
-        maxTemp: "19º",
-        lowTemp: "11º",
-        maxFeels: "14º",
-        maxWindSpeed: 7,
+        lowTemp: "13º",
+        maxFeels: "16º",
+        maxTemp: "18º",
+        maxWindSpeed: 3,
+        time: "01/02/2023",
         weather: "rain",
         weatherDescription: "Light rain",
     },

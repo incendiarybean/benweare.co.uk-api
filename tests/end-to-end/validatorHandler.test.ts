@@ -1,7 +1,12 @@
 import request from "supertest";
-import { HTTPServer, app } from "../src/server";
+import { HTTPServer, app } from "../../src/server";
 
-describe("Server should accept/reject paths as defied in validatorHandler.", () => {
+describe("Server should accept/reject paths as defined in validatorHandler.", () => {
+    beforeAll(async () => {
+        jest.runOnlyPendingTimers();
+        jest.clearAllTimers();
+    }, 5000);
+
     test.each([
         "/api/new",
         "/api/weather",

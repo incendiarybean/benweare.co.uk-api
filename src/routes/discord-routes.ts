@@ -4,7 +4,7 @@ import { assist, client, cry, roll, rpg } from "@workers/discord-worker";
 const { DISCORD_TOKEN, DISCORD_ENABLED } = process.env;
 
 client.on("ready", () => {
-    console.log(
+    console.info(
         `[${new Date()}] Discord Bot ${client.user?.tag} has logged in!`
     );
 
@@ -37,7 +37,7 @@ client.on("interactionCreate", async (interaction) => {
             } catch (e) {
                 interaction.reply({
                     content:
-                        "Dimiss button has already been clicked, dismiss me!",
+                        "Dismiss button has already been clicked, dismiss me!",
                     ephemeral: true,
                 });
             }
@@ -67,9 +67,12 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 const discordRoutes = () => {
-    if (DISCORD_ENABLED) {
+    if (
+        DISCORD_ENABLED &&
+        ![undefined, "test"].includes(process.env.NODE_ENV)
+    ) {
         client.login(DISCORD_TOKEN as string).catch((e) => {
-            console.log(`ERROR: ${e.toString()}`);
+            console.error(`ERROR: ${e.toString()}`);
         });
     }
 };

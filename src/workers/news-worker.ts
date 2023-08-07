@@ -1,5 +1,4 @@
 import axios from "axios";
-import { mockNewsArticles } from "@common/resources/news-resources";
 import type { NasaArticle, NewsArticle, UndefinedNews } from "@common/types";
 import {
     dateGenerator,
@@ -7,19 +6,14 @@ import {
     retryHandler,
     staticRefresher,
 } from "@common/utils/common-utils";
-import { ObjectStorage } from "@common/utils/storage-utils";
 import { IO } from "@server";
-
-const { NODE_ENV } = process.env;
-const service = "News";
-
-export const storage = new ObjectStorage();
+import { storage } from "..";
 
 /**
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
-const getRPSNews = (): Promise<void> =>
+export const getRPSNews = (): Promise<void> =>
     fetchArticles(
         "https://www.rockpapershotgun.com/latest",
         ".articles",
@@ -28,25 +22,19 @@ const getRPSNews = (): Promise<void> =>
         const site: string = "RockPaperShotgun";
         const articles: NewsArticle[] = [];
 
-        if ([undefined, "test"].includes(NODE_ENV)) {
-            return storage.write(
-                site,
-                mockNewsArticles,
-                `${site}'s Latest News.`
-            );
-        }
-
         HTMLArticles.forEach((HTMLDivElement) => {
             const title: UndefinedNews =
-                HTMLDivElement.querySelector(".title")?.children[0].textContent;
+                HTMLDivElement.querySelector(
+                    ".title"
+                )?.children[0].textContent?.trim();
             if (title) {
                 const url: string =
-                    HTMLDivElement.querySelector("a")?.href || "Not Found";
+                    HTMLDivElement.querySelector("a")?.href ?? "Not Found";
 
                 const img: string =
                     HTMLDivElement.querySelector(
                         ".thumbnail_image"
-                    )?.getAttribute("src") || "Not Found";
+                    )?.getAttribute("src") ?? "Not Found";
 
                 const date: string = dateGenerator(
                     HTMLDivElement.querySelector("time")?.getAttribute(
@@ -62,7 +50,7 @@ const getRPSNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write(site, articles, `${site}'s Latest News.`);
+        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
         IO.local.emit("RELOAD_NEWS");
     });
 
@@ -70,7 +58,7 @@ const getRPSNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
-const getPCGamerNews = (): Promise<void> =>
+export const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
         "https://www.pcgamer.com/uk/news/",
         "[data-list='news/news/latest']",
@@ -79,25 +67,19 @@ const getPCGamerNews = (): Promise<void> =>
         const site: string = "PCGamer";
         const articles: NewsArticle[] = [];
 
-        if ([undefined, "test"].includes(NODE_ENV)) {
-            return storage.write(
-                site,
-                mockNewsArticles,
-                `${site}'s Latest News.`
-            );
-        }
-
         HTMLArticles.forEach((HTMLDivElement) => {
             const title: UndefinedNews =
-                HTMLDivElement.querySelector(".article-name")?.textContent;
+                HTMLDivElement.querySelector(
+                    ".article-name"
+                )?.textContent?.trim();
             if (title) {
                 const url: string =
-                    HTMLDivElement.querySelector("a")?.href || "Not Found";
+                    HTMLDivElement.querySelector("a")?.href ?? "Not Found";
 
                 const img: string =
                     HTMLDivElement.querySelector(
                         ".article-lead-image-wrap"
-                    )?.getAttribute("data-original") || "Not Found";
+                    )?.getAttribute("data-original") ?? "Not Found";
 
                 const date: string = dateGenerator(
                     HTMLDivElement.querySelector(
@@ -113,7 +95,7 @@ const getPCGamerNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write(site, articles, `${site}'s Latest News.`);
+        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
         IO.local.emit("RELOAD_NEWS");
     });
 
@@ -121,7 +103,7 @@ const getPCGamerNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
-const getUKNews = (): Promise<void> =>
+export const getUKNews = (): Promise<void> =>
     fetchArticles(
         "https://www.bbc.co.uk/news/england",
         "#topos-component",
@@ -131,30 +113,18 @@ const getUKNews = (): Promise<void> =>
         const articles: NewsArticle[] = [];
         const articleTitles: string[] = [];
 
-        if ([undefined, "test"].includes(NODE_ENV)) {
-            return storage.write(
-                site,
-                mockNewsArticles,
-                `${site}'s Latest News.`
-            );
-        }
-
         HTMLArticles.forEach((HTMLDivElement) => {
             let imgUrl: UndefinedNews =
                 HTMLDivElement.querySelector("img")?.getAttribute("data-src");
 
-            if (imgUrl) {
-                imgUrl = imgUrl.replace(/\{width}/g, "720");
-            } else {
-                imgUrl =
-                    HTMLDivElement.querySelector("img")?.src || "Not Found";
-            }
+            imgUrl = HTMLDivElement.querySelector("img")?.src ?? "Not Found";
 
             const img = imgUrl;
 
             const title: string =
-                HTMLDivElement.querySelector(".gs-c-promo-heading__title")
-                    ?.textContent || "Not Found";
+                HTMLDivElement.querySelector(
+                    ".gs-c-promo-heading__title"
+                )?.textContent?.trim() ?? "Not Found";
 
             const url: string = HTMLDivElement.querySelector("a")?.href
                 ? `https://bbc.co.uk${HTMLDivElement.querySelector("a")?.href}`
@@ -178,7 +148,7 @@ const getUKNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write(site, articles, `${site}'s Latest News.`);
+        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
         IO.local.emit("RELOAD_NEWS");
     });
 
@@ -186,21 +156,13 @@ const getUKNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
-const getNasaImage = (): Promise<void> =>
+export const getNasaImage = (): Promise<void> =>
     axios
         .get(
             `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
         )
         .then(({ data }: { data: NasaArticle }) => {
             const site: string = "NASA";
-
-            if ([undefined, "test"].includes(NODE_ENV)) {
-                return storage.write(
-                    site,
-                    mockNewsArticles,
-                    `${site}'s Latest News.`
-                );
-            }
 
             const articles = [
                 {
@@ -211,8 +173,7 @@ const getNasaImage = (): Promise<void> =>
                     date: dateGenerator(data.date),
                 },
             ];
-
-            storage.write(site, articles, "NASA Daily Image.");
+            storage.write("NEWS", site, "NASA Daily Image.", articles);
         });
 
 export const getNews = (): void => {
@@ -222,4 +183,4 @@ export const getNews = (): void => {
     retryHandler(getNasaImage, 5);
 };
 
-staticRefresher(480000, getNews, service);
+staticRefresher(480000, getNews, "News");

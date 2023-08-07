@@ -7,16 +7,39 @@ import type {
 } from "discord.js";
 import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 
-/* GLOBAL TYPES */
-export interface DataStorage {
+/* STORAGE TYPES */
+export interface CollectionList {
     name: string;
-    updated: Date;
     description: string;
-    items: WeatherRecord[] | NewsArticle[];
+    updated: Date;
 }
 
-export interface FilterDataInput {
-    [key: string]: any;
+export interface DataStorage<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: StorageTypes[];
+}
+
+export interface Store<StorageTypes> {
+    [key: string]: {
+        [key: string]: {
+            updated: Date;
+            description: string;
+            items: StorageTypes[];
+        };
+    };
+}
+
+export interface StorageErrorOptions extends ErrorOptions {
+    status: number;
+}
+
+export class StorageError extends Error {
+    public status: number | undefined;
+    constructor(message: string, options?: StorageErrorOptions) {
+        super(message);
+        this.status = options?.status;
+    }
 }
 
 /* NEWS TYPES */
@@ -54,6 +77,7 @@ export interface WeatherFeatures {
 }
 
 export interface WeatherRecord {
+    time: string;
     maxTemp: string;
     lowTemp: string;
     maxFeels: string;

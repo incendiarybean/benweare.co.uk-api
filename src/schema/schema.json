@@ -426,12 +426,6 @@
                         "required": true
                     },
                     {
-                        "description": "Steam API key.",
-                        "in": "query",
-                        "name": "key",
-                        "required": false
-                    },
-                    {
                         "description": "Steam user ID.",
                         "in": "query",
                         "name": "userId",
