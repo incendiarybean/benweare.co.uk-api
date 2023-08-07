@@ -5,9 +5,7 @@ describe("documentation/schema should be provided the correct servers dependant 
 
         expect(getServers()).toEqual([
             {
-                url: `${process.env.HOSTNAME}${
-                    process.env.PORT ? `:${process.env.PORT}` : ""
-                }`,
+                url: `http://localhost/`,
                 description: "Local build",
             },
             {
