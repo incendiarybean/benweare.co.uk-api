@@ -3,7 +3,7 @@ import { StorageError } from "../../src/common/types";
 
 describe("server should return error responses when processing requests fail", () => {
     jest.mock("../../src/common/utils/storage-utils", () => ({
-        DataStore: class StoreMock {
+        ObjectStorage: class ObjectStorageMock {
             write = () => {};
             list = (...args) => {
                 throw new StorageError(
@@ -21,6 +21,7 @@ describe("server should return error responses when processing requests fail", (
     }));
 
     const { HTTPServer, app } = require("../../src/server");
+
     describe("news/weather endpoints should return appropriate error responses", () => {
         test.each([
             {

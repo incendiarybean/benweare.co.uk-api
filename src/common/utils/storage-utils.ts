@@ -5,11 +5,11 @@ import {
     type Store,
 } from "@common/types";
 
-export class DataStore<StorageTypes> {
-    private store: Store<StorageTypes>;
+export class ObjectStorage<StorageTypes> {
+    private storage: Store<StorageTypes>;
 
     constructor() {
-        this.store = {};
+        this.storage = {};
     }
 
     /**
@@ -22,19 +22,19 @@ export class DataStore<StorageTypes> {
         namespace: string,
         collection: string
     ): DataStorage<StorageTypes> => {
-        if (!this.store[namespace.toUpperCase()]) {
+        if (!this.storage[namespace.toUpperCase()]) {
             throw new StorageError(`Could not find namespace: ${namespace}`, {
                 status: 404,
             });
         }
-        if (!this.store[namespace.toUpperCase()][collection.toUpperCase()]) {
+        if (!this.storage[namespace.toUpperCase()][collection.toUpperCase()]) {
             throw new StorageError(
                 `Could not find collection: ${collection} in ${namespace}`,
                 { status: 404 }
             );
         }
 
-        return this.store[namespace.toUpperCase()][collection.toUpperCase()];
+        return this.storage[namespace.toUpperCase()][collection.toUpperCase()];
     };
 
     /**
@@ -43,14 +43,14 @@ export class DataStore<StorageTypes> {
      * @returns {CollectionList[]} A list of available Sub-Collections
      */
     public list = (namespace: string): CollectionList[] => {
-        if (!this.store[namespace]) {
+        if (!this.storage[namespace]) {
             throw new StorageError(
                 `No items available in namespace: ${namespace}`,
                 { status: 404 }
             );
         }
 
-        const items = { ...this.store[namespace] };
+        const items = { ...this.storage[namespace] };
         return Object.entries(items).map(([key, { description, updated }]) => ({
             name: key,
             description,
@@ -71,13 +71,13 @@ export class DataStore<StorageTypes> {
         description: string,
         items: StorageTypes[]
     ): void => {
-        if (!this.store[namespace.toUpperCase()]) {
-            this.store[namespace.toUpperCase()] = {};
+        if (!this.storage[namespace.toUpperCase()]) {
+            this.storage[namespace.toUpperCase()] = {};
         }
 
         // TODO: Check if item exists and replace/ignore
         // TODO: Add expiration to ensure that cleanup takes place
-        this.store[namespace.toUpperCase()][collectionName.toUpperCase()] = {
+        this.storage[namespace.toUpperCase()][collectionName.toUpperCase()] = {
             items,
             updated: new Date(),
             description,

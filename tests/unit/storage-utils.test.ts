@@ -1,4 +1,4 @@
-import { DataStore } from "../../src/common/utils/storage-utils";
+import { ObjectStorage } from "../../src/common/utils/storage-utils";
 
 interface TestType {
     message: string;
@@ -6,7 +6,7 @@ interface TestType {
 
 describe("storage-utils should allow storage of items and access to stored items", () => {
     it("should throw a 404 if no items are found in namespace", () => {
-        const storage = new DataStore<TestType>();
+        const storage = new ObjectStorage<TestType>();
 
         try {
             storage.list("TEST");
@@ -17,7 +17,7 @@ describe("storage-utils should allow storage of items and access to stored items
     });
 
     it("should insert data successfully into a namespace", async () => {
-        const storage = new DataStore<TestType>();
+        const storage = new ObjectStorage<TestType>();
         storage.write(
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
@@ -36,7 +36,7 @@ describe("storage-utils should allow storage of items and access to stored items
     });
 
     it("should be able to search a namespace to return a collection", async () => {
-        const storage = new DataStore<TestType>();
+        const storage = new ObjectStorage<TestType>();
 
         // Collection we want to find
         storage.write(
@@ -89,7 +89,7 @@ describe("storage-utils should allow storage of items and access to stored items
     });
 
     it("should throw an error when searching if no namespace or collection is found", () => {
-        const storage = new DataStore<TestType>();
+        const storage = new ObjectStorage<TestType>();
 
         // Check that error is thrown if it cannot find a namespace to search
         try {
