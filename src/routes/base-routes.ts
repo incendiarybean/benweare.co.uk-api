@@ -19,8 +19,8 @@ router.get("/api*", (req: Request, res: Response) =>
         .json({ message: `${req.method} is not defined on ${req.path}` })
 );
 
-router.get("/", (req: Request, res: Response) => res.sendFile(index));
+router.get("/", (_req: Request, res: Response) => res.sendFile(index));
 
-router.get("*", (req: Request, res: Response) => res.sendFile(index));
+router.get("*", (_req: Request, res: Response) => res.sendFile(index));
 
 export default router;

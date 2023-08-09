@@ -63,7 +63,7 @@ describe("news-worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString(),
+                date: new Date().toLocaleDateString("en-UK"),
                 img: "Not Found",
                 url: "Not Found",
             },
@@ -119,7 +119,7 @@ describe("news-worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString(),
+                date: new Date().toLocaleDateString("en-UK"),
                 img: "Not Found",
                 url: "Not Found",
             },
@@ -175,7 +175,7 @@ describe("news-worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString(),
+                date: new Date().toLocaleDateString("en-UK"),
                 img: "Not Found",
                 url: "Not Found",
             },
