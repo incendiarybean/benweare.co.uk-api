@@ -3,7 +3,7 @@ import { steamContent, steamUserContent } from "../data/test-data";
 
 const mockAxios = globalThis.__mockAxios__;
 
-describe("the steam worker should correctly validate data and return it", () => {
+describe("The Steam-Worker should correctly validate data and return it", () => {
     it("should return a valid object containing achievements without a steam userId", async () => {
         mockAxios
             .onGet(

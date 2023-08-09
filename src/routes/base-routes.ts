@@ -10,7 +10,7 @@ const index = `${absolutePath}/index.html`;
 router.get(
     "/api/status",
     cors({ origin: "*" }),
-    (req: Request, res: Response) => res.status(200).json({ message: "ok" })
+    (_req: Request, res: Response) => res.status(200).json({ message: "ok" })
 );
 
 router.get("/api*", (req: Request, res: Response) =>

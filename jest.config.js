@@ -7,7 +7,6 @@ process.env.PORT = 4444;
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
-    transform: {},
     transform: {
         "^.+\\.ts?$": ["ts-jest", { isolatedModules: true }],
     },

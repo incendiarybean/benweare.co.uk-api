@@ -1,5 +1,5 @@
-describe("documentation/schema should be provided the correct servers dependant on environment", () => {
-    it("should provide dev domains on development environment", () => {
+describe("The Documentation/Schema should provide the correct hostnames dependant on the environment", () => {
+    it("should provide development domains on the development environment", () => {
         const { getServers } = require("../../src/schema");
         const PORT = process.env.PORT;
 
@@ -55,7 +55,7 @@ describe("documentation/schema should be provided the correct servers dependant 
         process.env.PORT = PORT;
     });
 
-    it("should provide production domains on production environment", () => {
+    it("should provide production domains on the production environment", () => {
         process.env.NODE_ENV = "production";
 
         const { getServers } = require("../../src/schema");

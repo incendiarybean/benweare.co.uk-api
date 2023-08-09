@@ -214,7 +214,7 @@ describe("news-worker should collect news as expected", () => {
         getNews();
 
         jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         const outlets = storageSpy.mock.calls.map((output: any[]) => output[1]);
 

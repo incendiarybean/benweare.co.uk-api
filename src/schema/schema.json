@@ -391,7 +391,7 @@
                     }
                 ],
                 "tags": ["Weather"],
-                "summary": "Retrieve a specific news outlet's weather.",
+                "summary": "Retrieve a specific weather outlet's timeseries.",
                 "responses": {
                     "200": {
                         "description": "Success",

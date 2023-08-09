@@ -4,7 +4,7 @@ interface TestType {
     message: string;
 }
 
-describe("storage-utils should allow storage of items and access to stored items", () => {
+describe("The Storage-Utils should allow storage of items and access to stored items", () => {
     it("should throw a 404 if no items are found in namespace", () => {
         const storage = new ObjectStorage<TestType>();
 

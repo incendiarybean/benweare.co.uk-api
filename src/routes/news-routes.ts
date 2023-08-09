@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/api/news/:outlet/articles", (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.search("NEWS", req.params.outlet).items,
+            items: storage.search("NEWS", req.params.outlet).items,
             description:
                 OpenApiSchema.paths["/api/news/{outlet}/articles"]?.get
                     ?.summary,

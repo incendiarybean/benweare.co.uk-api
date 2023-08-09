@@ -32,7 +32,7 @@ describe("refresh/retry utils should function as desired", () => {
         expect(loggerSpy).lastCalledWith("Testing Refresh Handler");
 
         jest.clearAllTimers();
-    }, 5000);
+    });
 
     it("should call a function and retry when it fails", async () => {
         const loggerErrorSpy = jest.spyOn(console, "error");
@@ -43,7 +43,7 @@ describe("refresh/retry utils should function as desired", () => {
         retryHandler(testFunction, 2);
 
         jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         expect(loggerErrorSpy.mock.calls.length).toEqual(2);
         expect(loggerErrorSpy.mock.calls).toEqual([
