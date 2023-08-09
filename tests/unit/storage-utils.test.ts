@@ -35,6 +35,42 @@ describe("storage-utils should allow storage of items and access to stored items
         expect(result[0].updated).toBeDefined();
     });
 
+    it("should overwrite current namespace/collection data with new items", () => {
+        const storage = new ObjectStorage<TestType>();
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test" }]
+        );
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_1",
+            "TEST_COLLECTION_1's latest test.",
+            [{ message: "test" }]
+        );
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "overwitten test" }]
+        );
+
+        expect(storage.list("TEST_NAMESPACE_0").length).toEqual(2);
+
+        // Expect TEST_NAMESPACE_0 to be overwritten
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([{ message: "overwitten test" }]);
+
+        // Expect TEST_NAMESPACE_0, TEST_COLLECTION_1 to be untouched
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_1").items
+        ).toEqual([{ message: "test" }]);
+    });
+
     it("should be able to search a namespace to return a collection", async () => {
         const storage = new ObjectStorage<TestType>();
 

@@ -1,4 +1,6 @@
 import request from "supertest";
+import { storage } from "../../src";
+import { StorageError } from "../../src/common/types";
 import { steamContent } from "../data/test-data";
 
 const mockAxios = globalThis.__mockAxios__;
@@ -8,8 +10,7 @@ describe("server should return expected JSON from endpoints defined in routeHand
 
     beforeAll(async () => {
         jest.runOnlyPendingTimers();
-        jest.clearAllTimers();
-    }, 5000);
+    });
 
     describe("base routes should return messages", () => {
         it("should return the API status", async () => {
@@ -19,6 +20,40 @@ describe("server should return expected JSON from endpoints defined in routeHand
             HTTPServer.close();
 
             expect(result.body.message).toEqual("ok");
+        });
+
+        it("should return the index file", async () => {
+            const result = await request(app)
+                .get("/")
+                .set("x-forwarded-proto", "https://test.com");
+            HTTPServer.close();
+
+            expect(result.headers["content-type"]).toEqual(
+                "text/html; charset=UTF-8"
+            );
+        });
+
+        it("should return the index file", async () => {
+            const result = await request(app)
+                .get("")
+                .set("x-forwarded-proto", "https://test.com");
+            HTTPServer.close();
+
+            expect(result.headers["content-type"]).toEqual(
+                "text/html; charset=UTF-8"
+            );
+        });
+
+        it("should error on an invalid endpoint", async () => {
+            const result = await request(app)
+                .get("/api/not-an-endpoint")
+                .set("x-forwarded-proto", "https://test.com");
+            HTTPServer.close();
+
+            expect(result.status).toEqual(404);
+            expect(result.body.message).toEqual(
+                "GET is not defined on /api/not-an-endpoint"
+            );
         });
     });
 
@@ -277,5 +312,112 @@ describe("server should return expected JSON from endpoints defined in routeHand
                 );
             }
         );
+    });
+
+    describe("news/weather endpoints should return appropriate error responses", () => {
+        test.each([
+            { path: "/api/news" },
+            { path: "/api/news/outlet" },
+            { path: "/api/news/outlet/articles" },
+            { path: "/api/forecasts" },
+            { path: "/api/forecasts/weather" },
+            { path: "/api/forecasts/weather/timeseries" },
+        ])("Expected $path to return an error", async ({ path }) => {
+            jest.spyOn(storage, "list").mockImplementationOnce(() => {
+                throw new StorageError(`No items available in namespace`, {
+                    status: 404,
+                });
+            });
+            jest.spyOn(storage, "search").mockImplementationOnce(() => {
+                throw new StorageError(`No items available in namespace`, {
+                    status: 404,
+                });
+            });
+
+            const result = await request(app)
+                .get(path)
+                .set("x-forwarded-proto", "https://test.com");
+            HTTPServer.close();
+
+            expect(result.status).toEqual(404);
+            expect(result.body.message).toEqual(
+                "No items available in namespace"
+            );
+        });
+
+        test.each([
+            { path: "/api/news" },
+            { path: "/api/news/outlet" },
+            { path: "/api/news/outlet/articles" },
+            { path: "/api/forecasts" },
+            { path: "/api/forecasts/weather" },
+            { path: "/api/forecasts/weather/timeseries" },
+        ])("Expected $path to return a 502", async ({ path }) => {
+            jest.spyOn(storage, "list").mockImplementationOnce(
+                new Error("Failed")
+            );
+            jest.spyOn(storage, "search").mockImplementationOnce(
+                new Error("Failed")
+            );
+
+            const result = await request(app)
+                .get(path)
+                .set("x-forwarded-proto", "https://test.com");
+            HTTPServer.close();
+
+            expect(result.status).toEqual(502);
+        });
+
+        test.each([
+            {
+                path: "/api/news",
+                type: "NEWS",
+            },
+            {
+                path: "/api/forecasts",
+                type: "WEATHER",
+            },
+        ])(
+            "should send an error response when no collections are available",
+            async ({ path, type }) => {
+                jest.spyOn(storage, "list").mockImplementationOnce(() => {
+                    throw new StorageError("No items available in namespace", {
+                        status: 404,
+                    });
+                });
+                jest.spyOn(storage, "search").mockImplementationOnce(() => {
+                    throw new StorageError("Could not find collection", {
+                        status: 404,
+                    });
+                });
+
+                const result = await request(app)
+                    .get(path)
+                    .set("x-forwarded-proto", "https://test.com");
+                HTTPServer.close();
+                expect(result.status).toEqual(404);
+                expect(result.body.message).toEqual(
+                    "No items available in namespace"
+                );
+            }
+        );
+
+        describe("steam routes should return appropriate errors", () => {
+            it("should send an error response when invalid query params are sent", async () => {
+                const result = await request(app)
+                    .get("/api/steam/achieve")
+                    .set("x-forwarded-proto", "https://test.com");
+                HTTPServer.close();
+                expect(result.status).toEqual(422);
+            });
+
+            it("should send an error response when the steam API is unavailable", async () => {
+                const result = await request(app)
+                    .get("/api/steam/status")
+                    .set("x-forwarded-proto", "https://test.com");
+                HTTPServer.close();
+                expect(result.status).toEqual(500);
+            });
+        });
     });
 });

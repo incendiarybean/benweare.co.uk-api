@@ -114,38 +114,45 @@ export const getUKNews = (): Promise<void> =>
         const articleTitles: string[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
-            let imgUrl: UndefinedNews =
-                HTMLDivElement.querySelector("img")?.getAttribute("data-src");
+            const title: UndefinedNews = HTMLDivElement.querySelector(
+                ".gs-c-promo-heading__title"
+            )?.textContent?.trim();
+            if (title) {
+                let imgUrl: UndefinedNews =
+                    HTMLDivElement.querySelector("img")?.getAttribute(
+                        "data-src"
+                    );
 
-            imgUrl = HTMLDivElement.querySelector("img")?.src ?? "Not Found";
+                imgUrl =
+                    HTMLDivElement.querySelector("img")?.src ?? "Not Found";
 
-            const img = imgUrl;
+                const img = imgUrl;
 
-            const title: string =
-                HTMLDivElement.querySelector(
-                    ".gs-c-promo-heading__title"
-                )?.textContent?.trim() ?? "Not Found";
+                const url: string = HTMLDivElement.querySelector("a")?.href
+                    ? `https://bbc.co.uk${
+                          HTMLDivElement.querySelector("a")?.href
+                      }`
+                    : "Not Found";
 
-            const url: string = HTMLDivElement.querySelector("a")?.href
-                ? `https://bbc.co.uk${HTMLDivElement.querySelector("a")?.href}`
-                : "Not Found";
+                const date: string = dateGenerator(
+                    HTMLDivElement.querySelector("time")?.getAttribute(
+                        "datetime"
+                    )
+                );
 
-            const date: string = dateGenerator(
-                HTMLDivElement.querySelector("time")?.getAttribute("datetime")
-            );
+                const live =
+                    HTMLDivElement.querySelector("a")?.href.split("/")[2] ??
+                    "Not Found";
 
-            const live =
-                HTMLDivElement.querySelector("a")?.href.split("/")[2] ??
-                "Not Found";
-
-            if (!articleTitles.includes(title) && live !== "live") {
-                articleTitles.push(title);
-                articles.push({
-                    title,
-                    url,
-                    img,
-                    date,
-                });
+                if (!articleTitles.includes(title) && live !== "live") {
+                    articleTitles.push(title);
+                    articles.push({
+                        title,
+                        url,
+                        img,
+                        date,
+                    });
+                }
             }
         });
         storage.write("NEWS", site, `${site}'s Latest News.`, articles);
