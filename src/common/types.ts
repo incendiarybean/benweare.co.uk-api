@@ -28,6 +28,7 @@ export interface MapStorage<StorageTypes> {
 
 export interface TTLValue<StorageTypes> {
     id: number;
+    timestamp: Date;
     value: StorageTypes;
     timer: ReturnType<typeof setTimeout>;
 }

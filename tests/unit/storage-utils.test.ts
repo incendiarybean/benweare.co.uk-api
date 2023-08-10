@@ -205,4 +205,48 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             expect(e.status).toEqual(404);
         }
     });
+
+    it("should return items in order of stored time", () => {
+        const storage = new ObjectStorage<TestType>();
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-1" }]
+        );
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-0" }]
+        );
+
+        // test-1 was stored first, so should be first in the array
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([{ message: "test-1" }, { message: "test-0" }]);
+
+        jest.runOnlyPendingTimers();
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-0" }]
+        );
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-1" }]
+        );
+
+        // test-0 was stored first, so should be first in the array
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([{ message: "test-0" }, { message: "test-1" }]);
+    });
 });

@@ -69,11 +69,12 @@ export class ObjectStorage<StorageTypes> {
             );
         }
 
+        // Return stored collection data, items organised by timestamp stored
         return {
             ...storedData,
-            items: Array.from(storedData.items.values()).map(
-                ({ value }) => value
-            ),
+            items: Array.from(storedData.items.values())
+                .sort((x, y) => x.timestamp.valueOf() - y.timestamp.valueOf())
+                .map(({ value }) => value),
         };
     };
 
@@ -142,6 +143,7 @@ export class ObjectStorage<StorageTypes> {
                 this.storage[namespace].get(collection)?.items.set(key, {
                     id: key,
                     value: item,
+                    timestamp: new Date(),
                     timer: setTimeout(
                         () => storedCollection.items.delete(key),
                         this.expiration

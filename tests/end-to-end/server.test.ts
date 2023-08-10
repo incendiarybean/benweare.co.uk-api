@@ -7,7 +7,7 @@ describe("Server should start correctly.", () => {
         const { HTTPServer } = require("../../src/server");
 
         jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
         const startValue = loggerSpy.mock.lastCall[0].split("] ")[1];
         expect(startValue).toEqual("Server is active on port: 8080");

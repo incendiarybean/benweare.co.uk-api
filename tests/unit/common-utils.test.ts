@@ -43,7 +43,7 @@ describe("Refresh & Retry utils should function as desired.", () => {
         retryHandler(testFunction, 2);
 
         jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
         expect(loggerErrorSpy.mock.calls.length).toEqual(2);
         expect(loggerErrorSpy.mock.calls).toEqual([

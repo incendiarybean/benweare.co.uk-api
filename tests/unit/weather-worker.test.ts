@@ -75,7 +75,7 @@ describe("Weather-Worker should collect weather as expected", () => {
         getWeather();
 
         jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
         expect(storageSpy.mock.calls.length).toEqual(1);
         expect(storageSpy.mock.calls.sort()).toEqual(
