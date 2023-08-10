@@ -22,7 +22,7 @@ export class ObjectStorage<StorageTypes> {
     constructor(expiration?: number) {
         this.storage = {};
         // Default expiration to 36 hours if not provided
-        this.expiration = expiration ?? 129600;
+        this.expiration = expiration ?? 129600 * 1000;
     }
 
     private createId = (value: string): number => {
@@ -58,6 +58,13 @@ export class ObjectStorage<StorageTypes> {
         if (!storedData) {
             throw new StorageError(
                 `Could not find collection: ${collection} in ${namespace}`,
+                { status: 404 }
+            );
+        }
+
+        if (storedData.items.size === 0) {
+            throw new StorageError(
+                `Could not find items in collection: ${collection} in ${namespace}`,
                 { status: 404 }
             );
         }

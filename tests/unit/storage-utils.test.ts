@@ -79,16 +79,43 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0's latest test.",
             [{ message: "test" }]
         );
-
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items.length
         ).toEqual(1);
 
         jest.runOnlyPendingTimers();
 
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_1",
+            "TEST_COLLECTION_1's latest test.",
+            [{ message: "test" }]
+        );
+
         expect(
-            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items.length
-        ).toEqual(0);
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_1").items.length
+        ).toEqual(1);
+    });
+
+    it("should report a 404 if all items have expired in collection", async () => {
+        const storage = new ObjectStorage<TestType>();
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test" }]
+        );
+
+        jest.runOnlyPendingTimers();
+
+        try {
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0");
+        } catch (e) {
+            expect(e.message).toEqual(
+                "Could not find items in collection: TEST_COLLECTION_0 in TEST_NAMESPACE_0"
+            );
+            expect(e.status).toEqual(404);
+        }
     });
 
     it("should be able to search a namespace to return a collection", async () => {
