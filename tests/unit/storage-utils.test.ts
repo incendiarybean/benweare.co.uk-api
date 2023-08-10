@@ -35,7 +35,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         expect(result[0].updated).toBeDefined();
     });
 
-    it("should overwrite current namespace/collection data with new items", () => {
+    it("should not overwrite current namespace/collection data with duplicate items", () => {
         const storage = new ObjectStorage<TestType>();
         storage.write(
             "TEST_NAMESPACE_0",
@@ -60,15 +60,35 @@ describe("The Storage-Utils should allow storage of items and access to stored i
 
         expect(storage.list("TEST_NAMESPACE_0").length).toEqual(2);
 
-        // Expect TEST_NAMESPACE_0 to be overwritten
+        // Expect TEST_NAMESPACE_0 to have an extra value
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "overwitten test" }]);
+        ).toEqual([{ message: "test" }, { message: "overwitten test" }]);
 
         // Expect TEST_NAMESPACE_0, TEST_COLLECTION_1 to be untouched
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_1").items
         ).toEqual([{ message: "test" }]);
+    });
+
+    it("should be able to handle specific item expiration", () => {
+        const storage = new ObjectStorage<TestType>();
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test" }]
+        );
+
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items.length
+        ).toEqual(1);
+
+        jest.runOnlyPendingTimers();
+
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items.length
+        ).toEqual(0);
     });
 
     it("should be able to search a namespace to return a collection", async () => {
@@ -120,6 +140,10 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         // Check that collection returned is expected and has 2 items
         const result1 = storage.search("TEST_NAMESPACE_1", "TEST_COLLECTION_0");
         expect(result1.items.length).toEqual(2);
+        expect(result1.items).toEqual([
+            { message: "test-0" },
+            { message: "test-1" },
+        ]);
         expect(result1.description).toEqual("TEST_COLLECTION_0's latest test.");
         expect(result1.updated).toBeDefined();
     });

@@ -26,7 +26,7 @@ const metOfficeOutput = [
     ],
 ];
 
-describe("weather-worker should collect weather as expected", () => {
+describe("Weather-Worker should collect weather as expected", () => {
     jest.mock("../../src/server", () => ({
         IO: {
             local: {
@@ -46,6 +46,7 @@ describe("weather-worker should collect weather as expected", () => {
         const storageSpy = jest.spyOn(storage, "write");
 
         await getMetOffice();
+
         expect(storageSpy.mock.calls.length).toEqual(1);
         expect(storageSpy.mock.calls).toEqual(metOfficeOutput);
     });
@@ -61,6 +62,7 @@ describe("weather-worker should collect weather as expected", () => {
         const storageSpy = jest.spyOn(storage, "write");
 
         getWeather();
+
         expect(storageSpy.mock.calls.length).toEqual(1);
         expect(storageSpy.mock.calls).toEqual(metOfficeDevOutput);
     });

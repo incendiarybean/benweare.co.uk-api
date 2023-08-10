@@ -1,48 +1,83 @@
-import {
-    StorageError,
-    type CollectionList,
-    type DataStorage,
-    type Store,
+import type {
+    CollectionList,
+    DataStorage,
+    MapStorage,
+    StorageErrorOptions,
+    Store,
+    TTLValue,
 } from "@common/types";
+
+export class StorageError extends Error {
+    public status: number | undefined;
+    constructor(message: string, options?: StorageErrorOptions) {
+        super(message);
+        this.status = options?.status;
+    }
+}
 
 export class ObjectStorage<StorageTypes> {
     private storage: Store<StorageTypes>;
+    private expiration: number;
 
-    constructor() {
+    constructor(expiration?: number) {
         this.storage = {};
+        // Default expiration to 36 hours if not provided
+        this.expiration = expiration ?? 129600;
     }
+
+    private createId = (value: string): number => {
+        let id = 0;
+        for (let i = 0; i < value.length; i++) {
+            const char = value.charCodeAt(i);
+            id = (id << 5) - id + char;
+            id = id & id;
+        }
+        return id;
+    };
 
     /**
      * Searches the given namespace for a matching collection name
-     * @param {string} namespace - Namespace of collection
-     * @param {string} collection - Name of collection to return
+     * @param {string} namespaceName - Name of Namespace to find collection
+     * @param {string} collectionName - Name of collection to return
      * @returns {DataStorage} - The returned collection from the namespace
      */
     public search = (
-        namespace: string,
-        collection: string
+        namespaceName: string,
+        collectionName: string
     ): DataStorage<StorageTypes> => {
-        if (!this.storage[namespace.toUpperCase()]) {
+        const namespace = namespaceName.toUpperCase();
+        const collection = collectionName.toUpperCase();
+
+        if (!this.storage[namespace]) {
             throw new StorageError(`Could not find namespace: ${namespace}`, {
                 status: 404,
             });
         }
-        if (!this.storage[namespace.toUpperCase()][collection.toUpperCase()]) {
+
+        const storedData = this.storage[namespace].get(collection);
+        if (!storedData) {
             throw new StorageError(
                 `Could not find collection: ${collection} in ${namespace}`,
                 { status: 404 }
             );
         }
 
-        return this.storage[namespace.toUpperCase()][collection.toUpperCase()];
+        return {
+            ...storedData,
+            items: Array.from(storedData.items.values()).map(
+                ({ value }) => value
+            ),
+        };
     };
 
     /**
      * Returns a list of available Collections within a namespace
-     * @param {string} namespace - The namespace of the collections
+     * @param {string} namespaceName - The Name of the Namespace to find the collections
      * @returns {CollectionList[]} A list of available Sub-Collections
      */
-    public list = (namespace: string): CollectionList[] => {
+    public list = (namespaceName: string): CollectionList[] => {
+        const namespace = namespaceName.toUpperCase();
+
         if (!this.storage[namespace]) {
             throw new StorageError(
                 `No items available in namespace: ${namespace}`,
@@ -50,8 +85,9 @@ export class ObjectStorage<StorageTypes> {
             );
         }
 
-        const items = { ...this.storage[namespace] };
-        return Object.entries(items).map(([key, { description, updated }]) => ({
+        // Get all entries in Map and return them formatted with the Key as the name
+        const items = Array.from(this.storage[namespace].entries());
+        return items.map(([key, { description, updated }]) => ({
             name: key,
             description,
             updated,
@@ -60,27 +96,51 @@ export class ObjectStorage<StorageTypes> {
 
     /**
      * Writes a collection of data to the given namespace
-     * @param {string} namespace - Namespace for collection to be stored in
+     * @param {string} namespaceName - Name of Namespace for collection to be stored in
      * @param {string} collectionName - Name of Collection
      * @param {string} description - Service description
      * @param {StorageTypes[]} items - Formatted data object
      */
     public write = (
-        namespace: string,
+        namespaceName: string,
         collectionName: string,
         description: string,
         items: StorageTypes[]
     ): void => {
-        if (!this.storage[namespace.toUpperCase()]) {
-            this.storage[namespace.toUpperCase()] = {};
+        const namespace = namespaceName.toUpperCase();
+        const collection = collectionName.toUpperCase();
+
+        if (!this.storage[namespace]) {
+            this.storage[namespace] = new Map<
+                string,
+                MapStorage<StorageTypes>
+            >();
         }
 
-        // TODO: Check if item exists and replace/ignore
-        // TODO: Add expiration to ensure that cleanup takes place
-        this.storage[namespace.toUpperCase()][collectionName.toUpperCase()] = {
-            items,
-            updated: new Date(),
-            description,
-        };
+        const storedData = this.storage[namespace].get(collection);
+        if (!storedData) {
+            this.storage[namespace].set(collection, {
+                items: new Map<number, TTLValue<StorageTypes>>(),
+                updated: new Date(),
+                description,
+            });
+        }
+
+        // For each collected item, check if it exists in the cache
+        // If it does not exist, add it to the cache and configure the TTL
+        items.forEach((item) => {
+            const key = this.createId(JSON.stringify(item));
+            const storedCollection = this.storage[namespace].get(collection);
+            if (storedCollection && !storedCollection.items.has(key)) {
+                this.storage[namespace].get(collection)?.items.set(key, {
+                    id: key,
+                    value: item,
+                    timer: setTimeout(
+                        () => storedCollection.items.delete(key),
+                        this.expiration
+                    ),
+                });
+            }
+        });
     };
 }

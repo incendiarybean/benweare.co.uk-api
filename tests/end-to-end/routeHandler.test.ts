@@ -1,6 +1,6 @@
 import request from "supertest";
 import { storage } from "../../src";
-import { StorageError } from "../../src/common/types";
+import { StorageError } from "../../src/common/utils/storage-utils";
 import { steamContent } from "../data/test-data";
 
 const mockAxios = globalThis.__mockAxios__;

@@ -20,26 +20,30 @@ export interface DataStorage<StorageTypes> {
     items: StorageTypes[];
 }
 
+export interface MapStorage<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: Map<number, TTLValue<StorageTypes>>;
+}
+
+export interface TTLValue<StorageTypes> {
+    id: number;
+    value: StorageTypes;
+    timer: ReturnType<typeof setTimeout>;
+}
+
 export interface Store<StorageTypes> {
-    [key: string]: {
-        [key: string]: {
-            updated: Date;
-            description: string;
-            items: StorageTypes[];
-        };
-    };
+    [key: string]: Map<string, MapStorage<StorageTypes>>;
+}
+
+export interface StoreMap<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: Map<number, TTLValue<StorageTypes>>;
 }
 
 export interface StorageErrorOptions extends ErrorOptions {
     status: number;
-}
-
-export class StorageError extends Error {
-    public status: number | undefined;
-    constructor(message: string, options?: StorageErrorOptions) {
-        super(message);
-        this.status = options?.status;
-    }
 }
 
 /* NEWS TYPES */

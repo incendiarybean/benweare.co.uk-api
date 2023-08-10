@@ -12,8 +12,8 @@ import { genericContent } from "../data/test-data";
 
 const mockAxios = globalThis.__mockAxios__;
 
-describe("refresh/retry utils should function as desired", () => {
-    it("should call a function using the staticRefresher method", async () => {
+describe("Refresh & Retry utils should function as desired.", () => {
+    it("should repeatedly call a function using the staticRefresher method", async () => {
         const loggerSpy = jest.spyOn(console, "debug");
 
         staticRefresher(
@@ -34,7 +34,7 @@ describe("refresh/retry utils should function as desired", () => {
         jest.clearAllTimers();
     });
 
-    it("should call a function and retry when it fails", async () => {
+    it("should repeatedly call a function when it fails a specific number of times", async () => {
         const loggerErrorSpy = jest.spyOn(console, "error");
 
         const testFunction = async () => {
@@ -53,8 +53,8 @@ describe("refresh/retry utils should function as desired", () => {
     });
 });
 
-describe("fetching news articles should collect and format correctly", () => {
-    it("should fetch and return an array of articles", async () => {
+describe("News articles should be fetched and formatted correctly", () => {
+    it("should fetch a webpage and return an array of articles", async () => {
         const genericData = genericContent();
         mockAxios
             .onGet("http://getGenericArticles.com")
@@ -74,7 +74,7 @@ describe("fetching news articles should collect and format correctly", () => {
     });
 });
 
-describe("fetching wiki functions should collect and format data correctly", () => {
+describe("Steam utils should fetch wiki data and format it correctly", () => {
     it("should return an array of achievements from the wiki page", async () => {
         const wikiData = await readFileSync("./tests/data/wiki.html");
         mockAxios.onGet("http://getWikiContent.com").replyOnce(200, wikiData);
@@ -97,7 +97,7 @@ describe("fetching wiki functions should collect and format data correctly", () 
     });
 });
 
-describe("date utils should return correct values", () => {
+describe("Date utils should return correct values", () => {
     it("should return whether a date parses correctly", () => {
         let result = dateParses("InvalidDate");
         expect(result).toEqual(false);

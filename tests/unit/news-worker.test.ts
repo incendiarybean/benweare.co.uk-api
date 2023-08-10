@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 
-describe("news-worker should collect news as expected", () => {
+describe("News-Worker should collect news as expected", () => {
     jest.mock("../../src/server", () => ({
         IO: {
             local: {
