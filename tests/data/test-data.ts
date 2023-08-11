@@ -122,7 +122,7 @@ export const metofficeContent = {
                         nightProbabilityOfSferics: 2,
                     },
                     {
-                        time: "2023-02-01T00:00Z",
+                        time: "2023-02-02T00:00Z",
                         midday10MWindSpeed: 3,
                         midnight10MWindSpeed: 4.67,
                         midday10MWindDirection: 156,

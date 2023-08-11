@@ -15,7 +15,7 @@ export const mockWeatherResponse: WeatherRecord[] = [
         maxFeels: "16º",
         maxTemp: "18º",
         maxWindSpeed: 3,
-        time: "01/02/2023",
+        time: "02/02/2023",
         weather: "rain",
         weatherDescription: "Light rain",
     },

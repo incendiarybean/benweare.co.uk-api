@@ -63,7 +63,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         // Expect TEST_NAMESPACE_0 to have an extra value
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "test" }, { message: "overwitten test" }]);
+        ).toEqual([{ message: "overwitten test" }, { message: "test" }]);
 
         // Expect TEST_NAMESPACE_0, TEST_COLLECTION_1 to be untouched
         expect(
@@ -168,8 +168,8 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         const result1 = storage.search("TEST_NAMESPACE_1", "TEST_COLLECTION_0");
         expect(result1.items.length).toEqual(2);
         expect(result1.items).toEqual([
-            { message: "test-0" },
             { message: "test-1" },
+            { message: "test-0" },
         ]);
         expect(result1.description).toEqual("TEST_COLLECTION_0's latest test.");
         expect(result1.updated).toBeDefined();
@@ -226,7 +226,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         // test-1 was stored first, so should be first in the array
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "test-1" }, { message: "test-0" }]);
+        ).toEqual([{ message: "test-0" }, { message: "test-1" }]);
 
         jest.runOnlyPendingTimers();
 
@@ -247,6 +247,71 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         // test-0 was stored first, so should be first in the array
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "test-0" }, { message: "test-1" }]);
+        ).toEqual([{ message: "test-1" }, { message: "test-0" }]);
+    });
+
+    it("should order items correctly, new values should be first in the list", async () => {
+        const storage = new ObjectStorage<TestType>();
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: "test-0" },
+                { message: "test-1" },
+                { message: "test-2" },
+                { message: "test-3" },
+                { message: "test-4" },
+            ].reverse()
+        );
+
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-0" },
+            { message: "test-1" },
+            { message: "test-2" },
+            { message: "test-3" },
+            { message: "test-4" },
+        ]);
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-5" }]
+        );
+
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-5" },
+            { message: "test-0" },
+            { message: "test-1" },
+            { message: "test-2" },
+            { message: "test-3" },
+            { message: "test-4" },
+        ]);
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: "test-7" }, { message: "test-6" }].reverse()
+        );
+
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-7" },
+            { message: "test-6" },
+            { message: "test-5" },
+            { message: "test-0" },
+            { message: "test-1" },
+            { message: "test-2" },
+            { message: "test-3" },
+            { message: "test-4" },
+        ]);
     });
 });

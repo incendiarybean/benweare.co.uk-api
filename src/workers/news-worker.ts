@@ -50,7 +50,12 @@ export const getRPSNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
+        storage.write(
+            "NEWS",
+            site,
+            `${site}'s Latest News.`,
+            [...articles].reverse()
+        );
         IO.local.emit("RELOAD_NEWS");
     });
 
@@ -95,7 +100,12 @@ export const getPCGamerNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
+        storage.write(
+            "NEWS",
+            site,
+            `${site}'s Latest News.`,
+            [...articles].reverse()
+        );
         IO.local.emit("RELOAD_NEWS");
     });
 
@@ -155,7 +165,12 @@ export const getUKNews = (): Promise<void> =>
                 }
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
+        storage.write(
+            "NEWS",
+            site,
+            `${site}'s Latest News.`,
+            [...articles].reverse()
+        );
         IO.local.emit("RELOAD_NEWS");
     });
 

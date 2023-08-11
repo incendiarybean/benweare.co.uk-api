@@ -74,7 +74,8 @@ export class ObjectStorage<StorageTypes> {
             ...storedData,
             items: Array.from(storedData.items.values())
                 .sort((x, y) => x.timestamp.valueOf() - y.timestamp.valueOf())
-                .map(({ value }) => value),
+                .map(({ value }) => value)
+                .reverse(),
         };
     };
 

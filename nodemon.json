@@ -4,5 +4,6 @@
     },
     "env": {
         "TS_NODE_PROJECT": "tsconfig.json"
-    }
+    },
+    "ignore": ["./tests/*"]
 }
