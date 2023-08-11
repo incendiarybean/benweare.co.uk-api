@@ -142,19 +142,35 @@ export class ObjectStorage<StorageTypes> {
 
         // For each collected item, check if it exists in the cache
         // If it does not exist, add it to the cache and configure the TTL
+        // If it exists, restart the timer
         items.forEach((item) => {
             const key = this.createId(JSON.stringify(item));
             const storedCollection = this.storage[namespace].get(collection);
-            if (storedCollection && !storedCollection.items.has(key)) {
-                this.storage[namespace].get(collection)?.items.set(key, {
-                    id: key,
-                    value: item,
-                    timestamp: new Date(),
-                    timer: setTimeout(
-                        () => storedCollection.items.delete(key),
-                        this.expiration
-                    ),
-                });
+            if (storedCollection) {
+                if (!storedCollection.items.has(key)) {
+                    this.storage[namespace].get(collection)?.items.set(key, {
+                        id: key,
+                        value: item,
+                        timestamp: new Date(),
+                        timer: setTimeout(
+                            () => storedCollection.items.delete(key),
+                            this.expiration
+                        ),
+                    });
+                } else {
+                    const existingItem = storedCollection.items.get(key);
+                    if (existingItem) {
+                        this.storage[namespace]
+                            .get(collection)
+                            ?.items.set(key, {
+                                ...existingItem,
+                                timer: setTimeout(
+                                    () => storedCollection.items.delete(key),
+                                    this.expiration
+                                ),
+                            });
+                    }
+                }
             }
         });
     };

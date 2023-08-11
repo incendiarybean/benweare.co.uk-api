@@ -266,6 +266,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             ].reverse()
         );
 
+        // We should expect the newest item to be first
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
@@ -280,9 +281,15 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-5" }]
+            [
+                { message: "test-5" },
+                { message: "test-0" },
+                { message: "test-1" },
+                { message: "test-2" },
+            ]
         );
 
+        // We should expect the newest item to be first
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
@@ -298,9 +305,15 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-7" }, { message: "test-6" }].reverse()
+            [
+                { message: "test-7" },
+                { message: "test-6" },
+                { message: "test-5" },
+                { message: "test-0" },
+            ].reverse()
         );
 
+        // We should expect the newest item to be first
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
