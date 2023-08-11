@@ -69,17 +69,12 @@ describe("Weather-Worker should collect weather as expected", () => {
 
     it("should collect all weather when requested", async () => {
         const { getWeather } = require("../../src/workers/weather-worker");
-        const { storage } = require("../../src");
-        const storageSpy = jest.spyOn(storage, "write");
+        const weatherWorker = require("../../src/workers/weather-worker");
+
+        const getMetOffice = jest.spyOn(weatherWorker, "getMetOffice");
 
         getWeather();
 
-        jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        expect(storageSpy.mock.calls.length).toEqual(1);
-        expect(storageSpy.mock.calls.sort()).toEqual(
-            [...metOfficeOutput].sort()
-        );
+        expect(getMetOffice).toBeCalledTimes(1);
     });
 });

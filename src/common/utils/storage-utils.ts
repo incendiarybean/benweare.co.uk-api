@@ -147,30 +147,22 @@ export class ObjectStorage<StorageTypes> {
             const key = this.createId(JSON.stringify(item));
             const storedCollection = this.storage[namespace].get(collection);
             if (storedCollection) {
-                if (!storedCollection.items.has(key)) {
-                    this.storage[namespace].get(collection)?.items.set(key, {
-                        id: key,
-                        value: item,
-                        timestamp: new Date(),
-                        timer: setTimeout(
-                            () => storedCollection.items.delete(key),
-                            this.expiration
-                        ),
-                    });
-                } else {
-                    const existingItem = storedCollection.items.get(key);
-                    if (existingItem) {
-                        this.storage[namespace]
-                            .get(collection)
-                            ?.items.set(key, {
-                                ...existingItem,
-                                timer: setTimeout(
-                                    () => storedCollection.items.delete(key),
-                                    this.expiration
-                                ),
-                            });
-                    }
+                const itemExists = storedCollection.items.get(key);
+                if (itemExists) {
+                    clearTimeout(
+                        this.storage[namespace].get(collection)?.items.get(key)
+                            ?.timer
+                    );
                 }
+                this.storage[namespace].get(collection)?.items.set(key, {
+                    id: key,
+                    value: item,
+                    timestamp: new Date(),
+                    timer: setTimeout(
+                        () => storedCollection.items.delete(key),
+                        this.expiration
+                    ),
+                });
             }
         });
     };

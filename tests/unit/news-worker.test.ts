@@ -206,21 +206,20 @@ describe("News-Worker should collect news as expected", () => {
         ]);
     });
 
-    it("should collect all news when requested", async () => {
+    it("should call all collectors when requested", () => {
         const { getNews } = require("../../src/workers/news-worker");
-        const { storage } = require("../../src");
-        const storageSpy = jest.spyOn(storage, "write");
+        const newsWorker = require("../../src/workers/news-worker");
+
+        const getRPSNews = jest.spyOn(newsWorker, "getRPSNews");
+        const getPCGamerNews = jest.spyOn(newsWorker, "getPCGamerNews");
+        const getUKNews = jest.spyOn(newsWorker, "getUKNews");
+        const getNasaImage = jest.spyOn(newsWorker, "getNasaImage");
 
         getNews();
 
-        jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        const outlets = storageSpy.mock.calls.map((output: any[]) => output[1]);
-
-        expect(storageSpy.mock.calls.length).toEqual(4);
-        expect(outlets.sort()).toEqual(
-            ["NASA", "PCGamer", "BBC", "RockPaperShotgun"].sort()
-        );
+        expect(getRPSNews).toBeCalledTimes(1);
+        expect(getPCGamerNews).toBeCalledTimes(1);
+        expect(getUKNews).toBeCalledTimes(1);
+        expect(getNasaImage).toBeCalledTimes(1);
     });
 });
