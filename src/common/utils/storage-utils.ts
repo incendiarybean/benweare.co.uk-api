@@ -25,6 +25,11 @@ export class ObjectStorage<StorageTypes> {
         this.expiration = expiration ?? 129600 * 1000;
     }
 
+    /**
+     * Used to generate an ID to use for finding duplicate stored items
+     * @param {string} value - String value of the Object to create an ID for
+     * @returns {number} - The ID of the object
+     */
     private createId = (value: string): number => {
         let id = 0;
         for (let i = 0; i < value.length; i++) {
