@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 
-// These mocks ensure that the real server, storage and refresher isn't used
+// These mocks ensure that the real server, storage and refresher will not be used
 jest.mock("../../src/server", () => ({
     IO: {
         local: {
@@ -15,12 +15,7 @@ jest.mock("../../src/common/utils/common-utils", () => ({
 jest.mock("../../src/common/utils/storage-utils", () => ({
     ObjectStorage: class TestObject {
         constructor() {}
-
-        list(...args) {}
-
         write(...args) {}
-
-        search(...args) {}
     },
 }));
 

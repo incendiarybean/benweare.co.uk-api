@@ -251,6 +251,12 @@ describe("The Storage-Utils should allow storage of items and access to stored i
     });
 
     it("should order items correctly, new values should be first in the list", async () => {
+        // NOTE:
+        // The TestType Objects supplied are reversed to when they are collected e.g.
+        // [newest item -> oldest item] -> [oldest item -> newest item]
+        // This is so when the Storage Write function adds a timestamp, the oldest collected item gets stamped first
+        // (Array.prototype.map works from left to right)
+
         const storage = new ObjectStorage<TestType>();
 
         storage.write(
@@ -258,23 +264,23 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
             [
-                { message: "test-0" },
+                { message: "test-0" }, // <-- last item on the page
                 { message: "test-1" },
                 { message: "test-2" },
                 { message: "test-3" },
-                { message: "test-4" },
-            ].reverse()
+                { message: "test-4" }, // <-- first item on the page
+            ]
         );
 
         // We should expect the newest item to be first
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
-            { message: "test-0" },
-            { message: "test-1" },
-            { message: "test-2" },
-            { message: "test-3" },
             { message: "test-4" },
+            { message: "test-3" },
+            { message: "test-2" },
+            { message: "test-1" },
+            { message: "test-0" }, // <-- oldest item should be last in array
         ]);
 
         storage.write(
@@ -282,10 +288,11 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
             [
-                { message: "test-5" },
-                { message: "test-0" },
-                { message: "test-1" },
+                { message: "test-1" }, // <-- last item on the page
                 { message: "test-2" },
+                { message: "test-3" },
+                { message: "test-4" },
+                { message: "test-5" }, // <-- newest item on the page
             ]
         );
 
@@ -294,11 +301,11 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
             { message: "test-5" },
-            { message: "test-0" },
-            { message: "test-1" },
-            { message: "test-2" },
-            { message: "test-3" },
             { message: "test-4" },
+            { message: "test-3" },
+            { message: "test-2" },
+            { message: "test-1" },
+            { message: "test-0" },
         ]);
 
         storage.write(
@@ -306,11 +313,12 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
             [
-                { message: "test-7" },
-                { message: "test-6" },
+                { message: "test-3" }, // <-- last item on the page
+                { message: "test-4" },
                 { message: "test-5" },
-                { message: "test-0" },
-            ].reverse()
+                { message: "test-6" },
+                { message: "test-7" }, // <-- newest item on the page
+            ]
         );
 
         // We should expect the newest item to be first
@@ -320,11 +328,11 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             { message: "test-7" },
             { message: "test-6" },
             { message: "test-5" },
-            { message: "test-0" },
-            { message: "test-1" },
-            { message: "test-2" },
-            { message: "test-3" },
             { message: "test-4" },
+            { message: "test-3" },
+            { message: "test-2" },
+            { message: "test-1" },
+            { message: "test-0" },
         ]);
     });
 });

@@ -133,8 +133,12 @@ export const getUKNews = (): Promise<void> =>
                         "data-src"
                     );
 
-                imgUrl =
-                    HTMLDivElement.querySelector("img")?.src ?? "Not Found";
+                if (imgUrl) {
+                    imgUrl = imgUrl.replace(/\{width}/g, "720");
+                } else {
+                    imgUrl =
+                        HTMLDivElement.querySelector("img")?.src || "Not Found";
+                }
 
                 const img = imgUrl;
 
