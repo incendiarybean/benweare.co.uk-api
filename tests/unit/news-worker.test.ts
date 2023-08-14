@@ -1,19 +1,30 @@
 import { JSDOM } from "jsdom";
 
-describe("News-Worker should collect news as expected", () => {
-    jest.mock("../../src/server", () => ({
-        IO: {
-            local: {
-                emit: (...args) => {},
-            },
+// These mocks ensure that the real server, storage and refresher isn't used
+jest.mock("../../src/server", () => ({
+    IO: {
+        local: {
+            emit: (...args) => {},
         },
-    }));
+    },
+}));
+jest.mock("../../src/common/utils/common-utils", () => ({
+    ...jest.requireActual("../../src/common/utils/common-utils"),
+    staticRefresher: (...args) => {},
+}));
+jest.mock("../../src/common/utils/storage-utils", () => ({
+    ObjectStorage: class TestObject {
+        constructor() {}
 
-    jest.mock("../../src/common/utils/common-utils", () => ({
-        ...jest.requireActual("../../src/common/utils/common-utils"),
-        staticRefresher: (...args) => {},
-    }));
+        list(...args) {}
 
+        write(...args) {}
+
+        search(...args) {}
+    },
+}));
+
+describe("News-Worker should collect news as expected", () => {
     it("should collect RPS news correctly", async () => {
         const { getRPSNews } = require("../../src/workers/news-worker");
         const { storage } = require("../../src");
@@ -38,6 +49,10 @@ describe("News-Worker should collect news as expected", () => {
     });
 
     it("should use default values for RPS content if missing", async () => {
+        const { getRPSNews } = require("../../src/workers/news-worker");
+        const { storage } = require("../../src");
+        const storageSpy = jest.spyOn(storage, "write");
+
         const commonUtils = require("../../src/common/utils/common-utils");
         const document = new JSDOM(`
             <li>
@@ -52,10 +67,6 @@ describe("News-Worker should collect news as expected", () => {
         jest.spyOn(commonUtils, "fetchArticles").mockResolvedValueOnce([
             document,
         ]);
-
-        const { getRPSNews } = require("../../src/workers/news-worker");
-        const { storage } = require("../../src");
-        const storageSpy = jest.spyOn(storage, "write");
 
         await getRPSNews();
 
@@ -94,6 +105,10 @@ describe("News-Worker should collect news as expected", () => {
     });
 
     it("should use default values for PCGamer content if missing", async () => {
+        const { getPCGamerNews } = require("../../src/workers/news-worker");
+        const { storage } = require("../../src");
+        const storageSpy = jest.spyOn(storage, "write");
+
         const commonUtils = require("../../src/common/utils/common-utils");
         const document = new JSDOM(`
             <li>
@@ -108,10 +123,6 @@ describe("News-Worker should collect news as expected", () => {
         jest.spyOn(commonUtils, "fetchArticles").mockResolvedValueOnce([
             document,
         ]);
-
-        const { getPCGamerNews } = require("../../src/workers/news-worker");
-        const { storage } = require("../../src");
-        const storageSpy = jest.spyOn(storage, "write");
 
         await getPCGamerNews();
 
@@ -150,6 +161,10 @@ describe("News-Worker should collect news as expected", () => {
     });
 
     it("should use default values for BBC content if missing", async () => {
+        const { getUKNews } = require("../../src/workers/news-worker");
+        const { storage } = require("../../src");
+        const storageSpy = jest.spyOn(storage, "write");
+
         const commonUtils = require("../../src/common/utils/common-utils");
         const document = new JSDOM(`
             <li>
@@ -164,10 +179,6 @@ describe("News-Worker should collect news as expected", () => {
         jest.spyOn(commonUtils, "fetchArticles").mockResolvedValueOnce([
             document,
         ]);
-
-        const { getUKNews } = require("../../src/workers/news-worker");
-        const { storage } = require("../../src");
-        const storageSpy = jest.spyOn(storage, "write");
 
         await getUKNews();
 
