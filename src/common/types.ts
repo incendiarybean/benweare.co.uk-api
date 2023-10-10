@@ -82,7 +82,7 @@ export interface WeatherFeatures {
 }
 
 export interface WeatherRecord {
-    time: string;
+    date: string;
     maxTemp: string;
     lowTemp: string;
     maxFeels: string;

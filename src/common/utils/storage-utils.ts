@@ -15,7 +15,7 @@ export class StorageError extends Error {
     }
 }
 
-export class ObjectStorage<StorageTypes> {
+export class ObjectStorage<StorageTypes extends { date: string }> {
     private storage: Store<StorageTypes>;
     private expiration: number;
 
@@ -30,7 +30,7 @@ export class ObjectStorage<StorageTypes> {
      * @param {string} value - String value of the Object to create an ID for
      * @returns {number} - The ID of the object
      */
-    private createId = (value: string): number => {
+    private createId = (value: any): number => {
         let id = 0;
         for (let i = 0; i < value.length; i++) {
             const char = value.charCodeAt(i);
@@ -74,13 +74,16 @@ export class ObjectStorage<StorageTypes> {
             );
         }
 
-        // Return stored collection data, items organised by timestamp stored
+        // Return stored collection data, items organised by timestamp
         return {
             ...storedData,
             items: Array.from(storedData.items.values())
-                .sort((x, y) => x.timestamp.valueOf() - y.timestamp.valueOf())
-                .map(({ value }) => value)
-                .reverse(),
+                .sort(
+                    (x, y) =>
+                        new Date(y.timestamp).valueOf() -
+                        new Date(x.timestamp).valueOf()
+                )
+                .map(({ value }) => value),
         };
     };
 
@@ -143,21 +146,36 @@ export class ObjectStorage<StorageTypes> {
         // For each collected item, check if it exists in the cache
         // If it does not exist, add it to the cache and configure the TTL
         // If it exists, restart the timer
-        items.forEach((item) => {
+        // TODO: Add in an ArticleNumber reset, as eventually this could cause an integer overflow?
+        items.forEach(({ date, ...item }) => {
             const key = this.createId(JSON.stringify(item));
             const storedCollection = this.storage[namespace].get(collection);
             if (storedCollection) {
-                const itemExists = storedCollection.items.get(key);
+                // We need to clear existing timeouts to stop the items expiring if they already exist
+                // We will simply clear the timeout and reallocate the value in the Map
+                const itemExists = storedCollection.items.has(key);
                 if (itemExists) {
                     clearTimeout(
                         this.storage[namespace].get(collection)?.items.get(key)
                             ?.timer
                     );
                 }
+
+                // Ensure there's some form of date
+                if (!date) {
+                    date = new Date().toISOString();
+                }
+
+                const value = {
+                    ...item,
+                    date,
+                } as StorageTypes;
+
+                // Finally, set the key & value
                 this.storage[namespace].get(collection)?.items.set(key, {
                     id: key,
-                    value: item,
-                    timestamp: new Date(),
+                    value,
+                    timestamp: new Date(date),
                     timer: setTimeout(
                         () => storedCollection.items.delete(key),
                         this.expiration

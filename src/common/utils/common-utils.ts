@@ -141,7 +141,7 @@ export const dateParses = (date: string): boolean =>
  */
 export const dateGenerator = (date: string | undefined | null): string => {
     if (!date || !dateParses(date)) {
-        return new Date().toLocaleDateString("en-UK");
+        return new Date().toISOString();
     }
-    return new Date(date).toLocaleDateString("en-UK");
+    return new Date(date).toISOString();
 };

@@ -73,7 +73,7 @@ export const getMetOffice = (): Promise<void> =>
                         maxWindSpeed: Math.round(timeSeries.midday10MWindSpeed),
                         weather: type,
                         weatherDescription: description,
-                        time: dateGenerator(timeSeries.time),
+                        date: dateGenerator(timeSeries.time),
                     };
                 }
             );

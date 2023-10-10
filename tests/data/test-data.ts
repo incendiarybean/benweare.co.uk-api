@@ -57,7 +57,7 @@ export const genericContent = () => {
 
 export const nasaContent = {
     copyright: "name",
-    date: "2023-02-01",
+    date: "2023-02-01T00:00:00.000Z",
     explanation: "Test Explanation",
     hdurl: "test-img.png",
     media_type: "image",

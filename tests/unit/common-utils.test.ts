@@ -107,12 +107,18 @@ describe("Date utils should return correct values", () => {
     });
 
     it("should create a valid UK date from existing/scratch", () => {
-        let result = dateGenerator("InvalidDate");
-        const today = new Date().toLocaleDateString("en-UK");
+        const today = new Date();
+        jest.setSystemTime(today);
 
-        expect(result).toEqual(today);
+        let result = new Date(dateGenerator("InvalidDate")).toLocaleString(
+            "en-UK"
+        );
 
-        result = dateGenerator(new Date().toString());
-        expect(result).toEqual(today);
+        expect(result).toEqual(today.toLocaleString("en-UK"));
+
+        result = new Date(dateGenerator(new Date().toString())).toLocaleString(
+            "en-UK"
+        );
+        expect(result).toEqual(today.toLocaleString("en-UK"));
     });
 });

@@ -2,6 +2,7 @@ import { ObjectStorage } from "../../src/common/utils/storage-utils";
 
 interface TestType {
     message: string;
+    date: string;
 }
 
 describe("The Storage-Utils should allow storage of items and access to stored items", () => {
@@ -22,7 +23,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         // Check that storage has been written to and is in correct namespace
@@ -41,21 +42,26 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         storage.write(
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_1",
             "TEST_COLLECTION_1's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         storage.write(
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "overwitten test" }]
+            [
+                {
+                    message: "overwitten test",
+                    date: new Date().toISOString(),
+                },
+            ]
         );
 
         expect(storage.list("TEST_NAMESPACE_0").length).toEqual(2);
@@ -63,12 +69,18 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         // Expect TEST_NAMESPACE_0 to have an extra value
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "overwitten test" }, { message: "test" }]);
+        ).toEqual([
+            { message: "test", date: new Date().toISOString() },
+            {
+                message: "overwitten test",
+                date: new Date().toISOString(),
+            },
+        ]);
 
         // Expect TEST_NAMESPACE_0, TEST_COLLECTION_1 to be untouched
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_1").items
-        ).toEqual([{ message: "test" }]);
+        ).toEqual([{ message: "test", date: new Date().toISOString() }]);
     });
 
     it("should be able to handle specific item expiration", () => {
@@ -77,7 +89,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items.length
@@ -89,7 +101,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_1",
             "TEST_COLLECTION_1's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         expect(
@@ -103,7 +115,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         jest.runOnlyPendingTimers();
@@ -127,10 +139,10 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
             [
-                { message: "test-0" },
-                { message: "test-1" },
-                { message: "test-2" },
-                { message: "test-3" },
+                { message: "test-3", date: new Date().toISOString() },
+                { message: "test-2", date: new Date().toISOString() },
+                { message: "test-1", date: new Date().toISOString() },
+                { message: "test-0", date: new Date().toISOString() },
             ]
         );
 
@@ -139,7 +151,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_1",
             "TEST_COLLECTION_1's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         // Collection in different namespace should be ignored
@@ -147,7 +159,10 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_1",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-0" }, { message: "test-1" }]
+            [
+                { message: "test-0", date: new Date().toISOString() },
+                { message: "test-1", date: new Date().toISOString() },
+            ]
         );
 
         // Check first namespace has 2 collections
@@ -168,8 +183,8 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         const result1 = storage.search("TEST_NAMESPACE_1", "TEST_COLLECTION_0");
         expect(result1.items.length).toEqual(2);
         expect(result1.items).toEqual([
-            { message: "test-1" },
-            { message: "test-0" },
+            { message: "test-0", date: new Date().toISOString() },
+            { message: "test-1", date: new Date().toISOString() },
         ]);
         expect(result1.description).toEqual("TEST_COLLECTION_0's latest test.");
         expect(result1.updated).toBeDefined();
@@ -192,7 +207,7 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_1",
             "TEST_COLLECTION_1's latest test.",
-            [{ message: "test" }]
+            [{ message: "test", date: new Date().toISOString() }]
         );
 
         // Check that error is thrown if it cannot find a collection to search within a namespace
@@ -213,20 +228,23 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-1" }]
+            [{ message: "test-1", date: new Date().toISOString() }]
         );
 
         storage.write(
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-0" }]
+            [{ message: "test-0", date: new Date().toISOString() }]
         );
 
         // test-1 was stored first, so should be first in the array
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "test-0" }, { message: "test-1" }]);
+        ).toEqual([
+            { message: "test-1", date: new Date().toISOString() },
+            { message: "test-0", date: new Date().toISOString() },
+        ]);
 
         jest.runOnlyPendingTimers();
 
@@ -234,29 +252,115 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-0" }]
+            [{ message: "test-0", date: new Date().toISOString() }]
         );
 
         storage.write(
             "TEST_NAMESPACE_0",
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
-            [{ message: "test-1" }]
+            [{ message: "test-1", date: new Date().toISOString() }]
         );
 
         // test-0 was stored first, so should be first in the array
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([{ message: "test-1" }, { message: "test-0" }]);
+        ).toEqual([
+            { message: "test-0", date: new Date().toISOString() },
+            { message: "test-1", date: new Date().toISOString() },
+        ]);
     });
 
     it("should order items correctly, new values should be first in the list", async () => {
-        // NOTE:
-        // The TestType Objects supplied are reversed to when they are collected e.g.
-        // [newest item -> oldest item] -> [oldest item -> newest item]
-        // This is so when the Storage Write function adds a timestamp, the oldest collected item gets stamped first
-        // (Array.prototype.map works from left to right)
+        const storage = new ObjectStorage<TestType>();
 
+        // Create dates, 1 minute apart from eachother
+        const startDate = new Date();
+        const dateArray = Array.from(Array(8).keys()).map((i) =>
+            new Date(
+                startDate.setMinutes(startDate.getMinutes() + 1)
+            ).toISOString()
+        );
+
+        // This shows that whatever order the items arrive in, they should return in order of timestamp
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: "test-3", date: dateArray[3] },
+                { message: "test-2", date: dateArray[2] },
+                { message: "test-4", date: dateArray[4] },
+                { message: "test-0", date: dateArray[0] },
+                { message: "test-1", date: dateArray[1] },
+            ]
+        );
+
+        // We should expect the newest item to be first
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-4", date: dateArray[4] },
+            { message: "test-3", date: dateArray[3] },
+            { message: "test-2", date: dateArray[2] },
+            { message: "test-1", date: dateArray[1] },
+            { message: "test-0", date: dateArray[0] },
+        ]);
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: "test-1", date: dateArray[1] }, // <-- last item on the page
+                { message: "test-2", date: dateArray[2] },
+                { message: "test-3", date: dateArray[3] },
+                { message: "test-4", date: dateArray[4] },
+                { message: "test-5", date: dateArray[5] }, // <-- newest item on the page
+            ]
+        );
+
+        // We should expect the newest item to be first
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-5", date: dateArray[5] },
+            { message: "test-4", date: dateArray[4] },
+            { message: "test-3", date: dateArray[3] },
+            { message: "test-2", date: dateArray[2] },
+            { message: "test-1", date: dateArray[1] },
+            { message: "test-0", date: dateArray[0] },
+        ]);
+
+        storage.write(
+            "TEST_NAMESPACE_0",
+            "TEST_COLLECTION_0",
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: "test-3", date: dateArray[3] }, // <-- last item on the page
+                { message: "test-4", date: dateArray[4] },
+                { message: "test-5", date: dateArray[5] },
+                { message: "test-6", date: dateArray[6] },
+                { message: "test-7", date: dateArray[7] }, // <-- newest item on the page
+            ]
+        );
+
+        // We should expect the newest item to be first
+        expect(
+            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
+        ).toEqual([
+            { message: "test-7", date: dateArray[7] },
+            { message: "test-6", date: dateArray[6] },
+            { message: "test-5", date: dateArray[5] },
+            { message: "test-4", date: dateArray[4] },
+            { message: "test-3", date: dateArray[3] },
+            { message: "test-2", date: dateArray[2] },
+            { message: "test-1", date: dateArray[1] },
+            { message: "test-0", date: dateArray[0] },
+        ]);
+    });
+
+    it("should order items correctly, and add a date if it's missing", async () => {
         const storage = new ObjectStorage<TestType>();
 
         storage.write(
@@ -264,11 +368,12 @@ describe("The Storage-Utils should allow storage of items and access to stored i
             "TEST_COLLECTION_0",
             "TEST_COLLECTION_0's latest test.",
             [
-                { message: "test-0" }, // <-- last item on the page
-                { message: "test-1" },
-                { message: "test-2" },
-                { message: "test-3" },
-                { message: "test-4" }, // <-- first item on the page
+                //@ts-ignore
+                { message: "test-0" },
+                { message: "test-1", date: new Date().toISOString() },
+                { message: "test-2", date: new Date().toISOString() },
+                { message: "test-3", date: new Date().toISOString() },
+                { message: "test-4", date: new Date().toISOString() },
             ]
         );
 
@@ -276,63 +381,11 @@ describe("The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
         ).toEqual([
-            { message: "test-4" },
-            { message: "test-3" },
-            { message: "test-2" },
-            { message: "test-1" },
-            { message: "test-0" }, // <-- oldest item should be last in array
-        ]);
-
-        storage.write(
-            "TEST_NAMESPACE_0",
-            "TEST_COLLECTION_0",
-            "TEST_COLLECTION_0's latest test.",
-            [
-                { message: "test-1" }, // <-- last item on the page
-                { message: "test-2" },
-                { message: "test-3" },
-                { message: "test-4" },
-                { message: "test-5" }, // <-- newest item on the page
-            ]
-        );
-
-        // We should expect the newest item to be first
-        expect(
-            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([
-            { message: "test-5" },
-            { message: "test-4" },
-            { message: "test-3" },
-            { message: "test-2" },
-            { message: "test-1" },
-            { message: "test-0" },
-        ]);
-
-        storage.write(
-            "TEST_NAMESPACE_0",
-            "TEST_COLLECTION_0",
-            "TEST_COLLECTION_0's latest test.",
-            [
-                { message: "test-3" }, // <-- last item on the page
-                { message: "test-4" },
-                { message: "test-5" },
-                { message: "test-6" },
-                { message: "test-7" }, // <-- newest item on the page
-            ]
-        );
-
-        // We should expect the newest item to be first
-        expect(
-            storage.search("TEST_NAMESPACE_0", "TEST_COLLECTION_0").items
-        ).toEqual([
-            { message: "test-7" },
-            { message: "test-6" },
-            { message: "test-5" },
-            { message: "test-4" },
-            { message: "test-3" },
-            { message: "test-2" },
-            { message: "test-1" },
-            { message: "test-0" },
+            { message: "test-0", date: new Date().toISOString() },
+            { message: "test-1", date: new Date().toISOString() },
+            { message: "test-2", date: new Date().toISOString() },
+            { message: "test-3", date: new Date().toISOString() },
+            { message: "test-4", date: new Date().toISOString() },
         ]);
     });
 });

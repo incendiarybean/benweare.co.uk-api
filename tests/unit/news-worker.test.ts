@@ -14,8 +14,9 @@ jest.mock("../../src/common/utils/common-utils", () => ({
 }));
 jest.mock("../../src/common/utils/storage-utils", () => ({
     ObjectStorage: class TestObject {
-        constructor() {}
-        write(...args) {}
+        write(...args) {
+            // Do nothing
+        }
     },
 }));
 
@@ -34,7 +35,7 @@ describe("News-Worker should collect news as expected", () => {
             "RockPaperShotgun's Latest News.",
             [
                 {
-                    date: "01/02/2023",
+                    date: "2023-02-01T15:46:04.563Z",
                     img: "test-img.png",
                     title: "Test Title",
                     url: "/test",
@@ -69,7 +70,7 @@ describe("News-Worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString("en-UK"),
+                date: new Date().toISOString(),
                 img: "Not Found",
                 url: "Not Found",
             },
@@ -90,7 +91,7 @@ describe("News-Worker should collect news as expected", () => {
             "PCGamer's Latest News.",
             [
                 {
-                    date: "01/02/2023",
+                    date: "2023-02-01T15:46:04.563Z",
                     img: "test-img.png",
                     title: "Test Title",
                     url: "/test",
@@ -125,7 +126,7 @@ describe("News-Worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString("en-UK"),
+                date: new Date().toISOString(),
                 img: "Not Found",
                 url: "Not Found",
             },
@@ -146,7 +147,7 @@ describe("News-Worker should collect news as expected", () => {
             "BBC's Latest News.",
             [
                 {
-                    date: "01/02/2023",
+                    date: "2023-02-01T15:46:04.563Z",
                     img: "test-img.png",
                     title: "Test Title",
                     url: "https://bbc.co.uk/test",
@@ -181,7 +182,7 @@ describe("News-Worker should collect news as expected", () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: "Test Title",
-                date: new Date().toLocaleDateString("en-UK"),
+                date: new Date().toISOString(),
                 img: "Not Found",
                 url: "Not Found",
             },
@@ -202,7 +203,7 @@ describe("News-Worker should collect news as expected", () => {
             "NASA Daily Image.",
             [
                 {
-                    date: "01/02/2023",
+                    date: "2023-02-01T00:00:00.000Z",
                     description: "Test Explanation",
                     img: "test-image.png",
                     title: "Test Title",

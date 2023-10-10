@@ -12,8 +12,9 @@ jest.mock("../../src/common/utils/common-utils", () => ({
 }));
 jest.mock("../../src/common/utils/storage-utils", () => ({
     ObjectStorage: class TestObject {
-        constructor() {}
-        write(...args) {}
+        write(...args) {
+            // Do nothing
+        }
     },
 }));
 
@@ -37,7 +38,7 @@ describe("Weather-Worker should collect weather as expected", () => {
                         lowTemp: "14º",
                         maxTemp: "20º",
                         maxWindSpeed: 3,
-                        time: "01/02/2023",
+                        date: "2023-02-01T00:00:00.000Z",
                         weather: "cloud",
                         weatherDescription: "Cloudy",
                     },
@@ -46,7 +47,7 @@ describe("Weather-Worker should collect weather as expected", () => {
                         maxFeels: "16º",
                         maxTemp: "18º",
                         maxWindSpeed: 3,
-                        time: "02/02/2023",
+                        date: "2023-02-02T00:00:00.000Z",
                         weather: "rain",
                         weatherDescription: "Light rain",
                     },
@@ -76,7 +77,7 @@ describe("Weather-Worker should collect weather as expected", () => {
                         lowTemp: "14º",
                         maxTemp: "20º",
                         maxWindSpeed: 3,
-                        time: "01/02/2023",
+                        date: "2023-02-01T00:00:00.000Z",
                         weather: "cloud",
                         weatherDescription: "Cloudy",
                     },
@@ -85,7 +86,7 @@ describe("Weather-Worker should collect weather as expected", () => {
                         maxFeels: "16º",
                         maxTemp: "18º",
                         maxWindSpeed: 3,
-                        time: "02/02/2023",
+                        date: "2023-02-02T00:00:00.000Z",
                         weather: "rain",
                         weatherDescription: "Light rain",
                     },
