@@ -70,9 +70,14 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test', date: new Date().toISOString() },
+            {
+                message: 'test',
+                id: -2105250601,
+                date: new Date().toISOString(),
+            },
             {
                 message: 'overwitten test',
+                id: -279093068,
                 date: new Date().toISOString(),
             },
         ]);
@@ -80,7 +85,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         // Expect TEST_NAMESPACE_0, TEST_COLLECTION_1 to be untouched
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_1').items
-        ).toEqual([{ message: 'test', date: new Date().toISOString() }]);
+        ).toEqual([
+            {
+                message: 'test',
+                id: -2105250601,
+                date: new Date().toISOString(),
+            },
+        ]);
     });
 
     it('should be able to handle specific item expiration', () => {
@@ -183,8 +194,16 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         const result1 = storage.search('TEST_NAMESPACE_1', 'TEST_COLLECTION_0');
         expect(result1.items.length).toEqual(2);
         expect(result1.items).toEqual([
-            { message: 'test-0', date: new Date().toISOString() },
-            { message: 'test-1', date: new Date().toISOString() },
+            {
+                message: 'test-0',
+                id: -215976262,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-1',
+                id: -215975301,
+                date: new Date().toISOString(),
+            },
         ]);
         expect(result1.description).toEqual("TEST_COLLECTION_0's latest test.");
         expect(result1.updated).toBeDefined();
@@ -242,8 +261,16 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-1', date: new Date().toISOString() },
-            { message: 'test-0', date: new Date().toISOString() },
+            {
+                message: 'test-1',
+                id: -215975301,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-0',
+                id: -215976262,
+                date: new Date().toISOString(),
+            },
         ]);
 
         jest.runOnlyPendingTimers();
@@ -266,8 +293,16 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-0', date: new Date().toISOString() },
-            { message: 'test-1', date: new Date().toISOString() },
+            {
+                message: 'test-0',
+                id: -215976262,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-1',
+                id: -215975301,
+                date: new Date().toISOString(),
+            },
         ]);
     });
 
@@ -300,11 +335,11 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-4', date: dateArray[4] },
-            { message: 'test-3', date: dateArray[3] },
-            { message: 'test-2', date: dateArray[2] },
-            { message: 'test-1', date: dateArray[1] },
-            { message: 'test-0', date: dateArray[0] },
+            { message: 'test-4', id: -215972418, date: dateArray[4] },
+            { message: 'test-3', id: -215973379, date: dateArray[3] },
+            { message: 'test-2', id: -215974340, date: dateArray[2] },
+            { message: 'test-1', id: -215975301, date: dateArray[1] },
+            { message: 'test-0', id: -215976262, date: dateArray[0] },
         ]);
 
         storage.write(
@@ -324,12 +359,12 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-5', date: dateArray[5] },
-            { message: 'test-4', date: dateArray[4] },
-            { message: 'test-3', date: dateArray[3] },
-            { message: 'test-2', date: dateArray[2] },
-            { message: 'test-1', date: dateArray[1] },
-            { message: 'test-0', date: dateArray[0] },
+            { message: 'test-5', id: -215971457, date: dateArray[5] },
+            { message: 'test-4', id: -215972418, date: dateArray[4] },
+            { message: 'test-3', id: -215973379, date: dateArray[3] },
+            { message: 'test-2', id: -215974340, date: dateArray[2] },
+            { message: 'test-1', id: -215975301, date: dateArray[1] },
+            { message: 'test-0', id: -215976262, date: dateArray[0] },
         ]);
 
         storage.write(
@@ -349,14 +384,14 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-7', date: dateArray[7] },
-            { message: 'test-6', date: dateArray[6] },
-            { message: 'test-5', date: dateArray[5] },
-            { message: 'test-4', date: dateArray[4] },
-            { message: 'test-3', date: dateArray[3] },
-            { message: 'test-2', date: dateArray[2] },
-            { message: 'test-1', date: dateArray[1] },
-            { message: 'test-0', date: dateArray[0] },
+            { message: 'test-7', id: -215969535, date: dateArray[7] },
+            { message: 'test-6', id: -215970496, date: dateArray[6] },
+            { message: 'test-5', id: -215971457, date: dateArray[5] },
+            { message: 'test-4', id: -215972418, date: dateArray[4] },
+            { message: 'test-3', id: -215973379, date: dateArray[3] },
+            { message: 'test-2', id: -215974340, date: dateArray[2] },
+            { message: 'test-1', id: -215975301, date: dateArray[1] },
+            { message: 'test-0', id: -215976262, date: dateArray[0] },
         ]);
     });
 
@@ -381,11 +416,31 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-0', date: new Date().toISOString() },
-            { message: 'test-1', date: new Date().toISOString() },
-            { message: 'test-2', date: new Date().toISOString() },
-            { message: 'test-3', date: new Date().toISOString() },
-            { message: 'test-4', date: new Date().toISOString() },
+            {
+                message: 'test-0',
+                id: -215976262,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-1',
+                id: -215975301,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-2',
+                id: -215974340,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-3',
+                id: -215973379,
+                date: new Date().toISOString(),
+            },
+            {
+                message: 'test-4',
+                id: -215972418,
+                date: new Date().toISOString(),
+            },
         ]);
     });
 });
