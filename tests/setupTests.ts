@@ -1,12 +1,12 @@
-import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import {
     bbcContent,
     metofficeContent,
     nasaContent,
     pcgContent,
     rpsContent,
-} from "./data/test-data";
+} from './data/test-data';
 
 const mockAxios = new MockAdapter(axios);
 globalThis.__mockAxios__ = mockAxios;
@@ -19,15 +19,15 @@ beforeAll(async () => {
     // Configure mocked web requests
     console.info(`[${new Date()}] Configuring Mock Axios requests...`);
     mockAxios
-        .onGet("https://www.bbc.co.uk/news/england")
+        .onGet('https://www.bbc.co.uk/news/england')
         .reply(200, bbcContent());
 
     mockAxios
-        .onGet("https://www.rockpapershotgun.com/latest")
+        .onGet('https://www.rockpapershotgun.com/latest')
         .reply(200, rpsContent());
 
     mockAxios
-        .onGet("https://www.pcgamer.com/uk/news/")
+        .onGet('https://www.pcgamer.com/uk/news/')
         .reply(200, pcgContent());
 
     mockAxios
@@ -40,9 +40,9 @@ beforeAll(async () => {
         .onGet(
             `https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily?${new URLSearchParams(
                 {
-                    includeLocationName: "true",
-                    latitude: process.env.LATITUDE ?? "",
-                    longitude: process.env.LONGITUDE ?? "",
+                    includeLocationName: 'true',
+                    latitude: process.env.LATITUDE ?? '',
+                    longitude: process.env.LONGITUDE ?? '',
                 }
             ).toString()}`
         )
@@ -51,7 +51,7 @@ beforeAll(async () => {
 
 afterEach(() => {
     // Reset Environment after each test
-    process.env.NODE_ENV = "test";
+    process.env.NODE_ENV = 'test';
 
     jest.clearAllMocks();
     jest.resetAllMocks();

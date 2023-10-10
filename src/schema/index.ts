@@ -1,29 +1,29 @@
-import { OpenAPIV3 } from "openapi-types";
-import * as SchemaJSON from "./schema.json";
+import { OpenAPIV3 } from 'openapi-types';
+import * as SchemaJSON from './schema.json';
 
 export const getServers = () => {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
         return [
             {
-                url: "https://www.benweare.co.uk/",
-                description: "Production Build",
+                url: 'https://www.benweare.co.uk/',
+                description: 'Production Build',
             },
         ];
     }
     return [
         {
             url: !process.env.PORT
-                ? "http://localhost/"
+                ? 'http://localhost/'
                 : `http://localhost:${process.env.PORT}`,
-            description: "Local build",
+            description: 'Local build',
         },
         {
-            url: "https://benweare-dev.herokuapp.com/",
-            description: "Heroku-Dev",
+            url: 'https://benweare-dev.herokuapp.com/',
+            description: 'Heroku-Dev',
         },
         {
-            url: "http://dev.benweare.co.uk/",
-            description: "Heroku-Dev",
+            url: 'http://dev.benweare.co.uk/',
+            description: 'Heroku-Dev',
         },
     ];
 };

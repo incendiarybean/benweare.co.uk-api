@@ -1,7 +1,7 @@
-import type { Request, Response } from "express";
-import express from "express";
-import OpenApiSchema from "@schema";
-import { storage } from "..";
+import type { Request, Response } from 'express';
+import express from 'express';
+import OpenApiSchema from '@schema';
+import { storage } from '..';
 
 const router = express.Router();
 
@@ -10,13 +10,13 @@ const router = express.Router();
 /*--------------*/
 
 router.get(
-    "/api/forecasts/:outlet/timeseries",
+    '/api/forecasts/:outlet/timeseries',
     (req: Request, res: Response) => {
         try {
             return res.json({
-                items: storage.search("WEATHER", req.params.outlet).items,
+                items: storage.search('WEATHER', req.params.outlet).items,
                 description:
-                    OpenApiSchema.paths["/api/forecasts/{outlet}/timeseries"]
+                    OpenApiSchema.paths['/api/forecasts/{outlet}/timeseries']
                         ?.get?.summary,
                 timestamp: new Date(),
                 link: {
@@ -30,12 +30,12 @@ router.get(
     }
 );
 
-router.get("/api/forecasts/:outlet", (req: Request, res: Response) => {
+router.get('/api/forecasts/:outlet', (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.search("WEATHER", req.params.outlet),
+            response: storage.search('WEATHER', req.params.outlet),
             description:
-                OpenApiSchema.paths["/api/forecasts/{outlet}"]?.get?.summary,
+                OpenApiSchema.paths['/api/forecasts/{outlet}']?.get?.summary,
             timestamp: new Date(),
             link: {
                 action: req.method,
@@ -47,11 +47,11 @@ router.get("/api/forecasts/:outlet", (req: Request, res: Response) => {
     }
 });
 
-router.get("/api/forecasts", (req: Request, res: Response) => {
+router.get('/api/forecasts', (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.list("WEATHER"),
-            description: OpenApiSchema.paths["/api/forecasts"]?.get?.summary,
+            response: storage.list('WEATHER'),
+            description: OpenApiSchema.paths['/api/forecasts']?.get?.summary,
             timestamp: new Date(),
             link: {
                 action: req.method,

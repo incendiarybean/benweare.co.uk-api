@@ -1,6 +1,6 @@
-import { readFileSync } from "fs";
+import { readFileSync } from 'fs';
 
-const template = readFileSync("./tests/data/default.html", "utf8");
+const template = readFileSync('./tests/data/default.html', 'utf8');
 
 const replacer = (
     input: string,
@@ -8,7 +8,7 @@ const replacer = (
     divider: string,
     title: string,
     image: string,
-    innerDiv: string = ""
+    innerDiv: string = ''
 ) => {
     const output = input
         .replace(/to-replace-article-container/g, container)
@@ -23,62 +23,62 @@ const replacer = (
 export const rpsContent = () => {
     return replacer(
         template,
-        "articles",
-        "li",
-        "title",
-        "thumbnail_image",
-        " <div>Test Title</div>"
+        'articles',
+        'li',
+        'title',
+        'thumbnail_image',
+        ' <div>Test Title</div>'
     );
 };
 
 export const pcgContent = () => {
     return replacer(
         template,
-        "news/news/latest",
-        "listingResult",
-        "article-name",
-        "article-lead-image-wrap"
+        'news/news/latest',
+        'listingResult',
+        'article-name',
+        'article-lead-image-wrap'
     );
 };
 
 export const bbcContent = () => {
     return replacer(
         template,
-        "topos-component",
-        "gs-t-News",
-        "gs-c-promo-heading__title",
-        ""
+        'topos-component',
+        'gs-t-News',
+        'gs-c-promo-heading__title',
+        ''
     );
 };
 
 export const genericContent = () => {
-    return replacer(template, "container", "article", "title", "image");
+    return replacer(template, 'container', 'article', 'title', 'image');
 };
 
 export const nasaContent = {
-    copyright: "name",
-    date: "2023-02-01T00:00:00.000Z",
-    explanation: "Test Explanation",
-    hdurl: "test-img.png",
-    media_type: "image",
-    service_version: "v1",
-    title: "Test Title",
-    url: "test-image.png",
+    copyright: 'name',
+    date: '2023-02-01T00:00:00.000Z',
+    explanation: 'Test Explanation',
+    hdurl: 'test-img.png',
+    media_type: 'image',
+    service_version: 'v1',
+    title: 'Test Title',
+    url: 'test-image.png',
 };
 
 export const metofficeContent = {
-    type: "FeatureCollection",
+    type: 'FeatureCollection',
     features: [
         {
-            type: "Feature",
+            type: 'Feature',
             geometry: {},
             properties: {
-                location: { name: "testing" },
+                location: { name: 'testing' },
                 requestPointDistance: 12,
-                modelRunDate: "2023-02-01T08:00Z",
+                modelRunDate: '2023-02-01T08:00Z',
                 timeSeries: [
                     {
-                        time: "2023-02-01T00:00Z",
+                        time: '2023-02-01T00:00Z',
                         midday10MWindSpeed: 2.83,
                         midnight10MWindSpeed: 2.93,
                         midday10MWindDirection: 256,
@@ -122,7 +122,7 @@ export const metofficeContent = {
                         nightProbabilityOfSferics: 2,
                     },
                     {
-                        time: "2023-02-02T00:00Z",
+                        time: '2023-02-02T00:00Z',
                         midday10MWindSpeed: 3,
                         midnight10MWindSpeed: 4.67,
                         midday10MWindDirection: 156,
@@ -173,30 +173,30 @@ export const metofficeContent = {
 
 export const steamContent = {
     game: {
-        gameName: "Video Game Name",
-        gameVersion: "1",
+        gameName: 'Video Game Name',
+        gameVersion: '1',
         availableGameStats: {
             achievements: [
                 {
-                    name: "1",
+                    name: '1',
                     defaultvalue: 0,
-                    displayName: "Test Achievement",
+                    displayName: 'Test Achievement',
                     hidden: 0,
-                    description: "New Achievement!",
-                    icon: "steamIcon",
-                    icongray: "steamIconGray",
+                    description: 'New Achievement!',
+                    icon: 'steamIcon',
+                    icongray: 'steamIconGray',
                 },
             ],
-            stats: [{ name: "version", defaultvalue: 0, displayName: "" }],
+            stats: [{ name: 'version', defaultvalue: 0, displayName: '' }],
         },
     },
 };
 
 export const steamUserContent = {
     playerstats: {
-        steamID: "SteamUserID",
-        gameName: "Video Game Name",
-        achievements: [{ apiname: "1", achieved: 1, unlocktime: 1657572168 }],
+        steamID: 'SteamUserID',
+        gameName: 'Video Game Name',
+        achievements: [{ apiname: '1', achieved: 1, unlocktime: 1657572168 }],
         success: true,
     },
 };

@@ -1,34 +1,34 @@
-import axios from "axios";
-import type { AxiosResponse } from "axios";
+import axios from 'axios';
+import type { AxiosResponse } from 'axios';
 import {
     mockWeatherResponse,
     weatherCodes,
-} from "@common/resources/weather-resources";
+} from '@common/resources/weather-resources';
 import type {
     WeatherConfig,
     WeatherRequestHeaders,
     WeatherTimeSeries,
-} from "@common/types";
+} from '@common/types';
 import {
     dateGenerator,
     retryHandler,
     staticRefresher,
-} from "@common/utils/common-utils";
-import { IO } from "@server";
-import { storage } from "..";
+} from '@common/utils/common-utils';
+import { IO } from '@server';
+import { storage } from '..';
 
 const config: WeatherConfig = {
-    method: "GET",
-    url: "https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily",
+    method: 'GET',
+    url: 'https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily',
     qs: {
-        includeLocationName: "true",
-        latitude: process.env.LATITUDE ?? "",
-        longitude: process.env.LONGITUDE ?? "",
+        includeLocationName: 'true',
+        latitude: process.env.LATITUDE ?? '',
+        longitude: process.env.LONGITUDE ?? '',
     },
     headers: {
-        "x-ibm-client-id": process.env.MET_CLIENT_ID ?? "",
-        "x-ibm-client-secret": process.env.MET_API_SECRET ?? "",
-        accept: "application/json",
+        'x-ibm-client-id': process.env.MET_CLIENT_ID ?? '',
+        'x-ibm-client-secret': process.env.MET_API_SECRET ?? '',
+        accept: 'application/json',
     },
 };
 
@@ -80,21 +80,21 @@ export const getMetOffice = (): Promise<void> =>
         }
 
         storage.write(
-            "WEATHER",
-            "MetOffice",
+            'WEATHER',
+            'MetOffice',
             `Weather in ${features[0].properties.location.name}`,
             series
         );
-        IO.local.emit("RELOAD_WEATHER");
+        IO.local.emit('RELOAD_WEATHER');
     });
 
 export const getWeather = (): void => {
     // This is to stop overrunning MetOffice API allowances
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
         console.info(`[${new Date()}] Using Development MetOffice weather...`);
         storage.write(
-            "WEATHER",
-            "MetOffice",
+            'WEATHER',
+            'MetOffice',
             `Weather in development`,
             mockWeatherResponse
         );
@@ -103,4 +103,4 @@ export const getWeather = (): void => {
     retryHandler(getMetOffice, 2);
 };
 
-staticRefresher(900000, getWeather, "Weather");
+staticRefresher(900000, getWeather, 'Weather');

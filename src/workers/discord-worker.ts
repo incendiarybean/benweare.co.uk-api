@@ -11,20 +11,20 @@ import {
     REST,
     Routes,
     SlashCommandBuilder,
-} from "discord.js";
-import { die } from "@common/resources/discord-resources";
+} from 'discord.js';
+import { die } from '@common/resources/discord-resources';
 import type {
     CheckDiscordVoiceTarget,
     CreateDiscordPlayer,
     DiscordUsernameOptions,
-} from "@common/types";
+} from '@common/types';
 import {
     AudioPlayerStatus,
     VoiceConnectionStatus,
     createAudioPlayer,
     createAudioResource,
     joinVoiceChannel,
-} from "@discordjs/voice";
+} from '@discordjs/voice';
 
 /*--------------*/
 /*    CONFIG    */
@@ -49,35 +49,35 @@ export const client = new Client({
 
 const commands = [
     new SlashCommandBuilder()
-        .setName("assist")
-        .setDescription("You following to assist?"),
+        .setName('assist')
+        .setDescription('You following to assist?'),
     new SlashCommandBuilder()
-        .setName("cry")
-        .setDescription("Gonna cry?")
+        .setName('cry')
+        .setDescription('Gonna cry?')
         .addUserOption((option) =>
-            option.setName("username").setDescription("who?").setRequired(true)
+            option.setName('username').setDescription('who?').setRequired(true)
         ),
     new SlashCommandBuilder()
-        .setName("roll")
-        .setDescription("Roll a dice!")
+        .setName('roll')
+        .setDescription('Roll a dice!')
         .addStringOption((option) =>
             option
-                .setName("faces")
-                .setDescription("The number of Die faces")
+                .setName('faces')
+                .setDescription('The number of Die faces')
                 .setRequired(true)
                 .addChoices(
-                    { name: "6", value: "6" },
-                    { name: "9", value: "9" }
+                    { name: '6', value: '6' },
+                    { name: '9', value: '9' }
                 )
         ),
-    new SlashCommandBuilder().setName("rpg").setDescription("Oh no..."),
+    new SlashCommandBuilder().setName('rpg').setDescription('Oh no...'),
 ];
 
 const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_ENABLED } = process.env;
 
-const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN as string);
+const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN as string);
 
-if (DISCORD_ENABLED && ![undefined, "test"].includes(process.env.NODE_ENV)) {
+if (DISCORD_ENABLED && ![undefined, 'test'].includes(process.env.NODE_ENV)) {
     rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID as string), {
         body: commands,
     })
@@ -97,7 +97,7 @@ export const checkVoiceTarget = (
     interaction: ChatInputCommandInteraction<CacheType>
 ): CheckDiscordVoiceTarget => {
     if (!interaction.guild) {
-        throw new Error("Play only works while in a guild!");
+        throw new Error('Play only works while in a guild!');
     }
 
     const targetUser = interaction.guild.members.cache.get(interaction.user.id);
@@ -107,7 +107,7 @@ export const checkVoiceTarget = (
 
     const targetVoiceChannel = targetUser.voice.channelId;
     if (!targetVoiceChannel) {
-        throw new Error("Please join a voice channel!");
+        throw new Error('Please join a voice channel!');
     }
 
     return { targetUser, targetVoiceChannel, guild: interaction.guild };
@@ -138,7 +138,7 @@ export const assist = async (
     interaction: ChatInputCommandInteraction<CacheType>
 ): Promise<void> => {
     try {
-        await interaction.reply("https://www.youtube.com/watch?v=CRzfZu0GH14");
+        await interaction.reply('https://www.youtube.com/watch?v=CRzfZu0GH14');
     } catch (e: any) {
         await interaction.reply({
             content: `Bot couldn't complete your request at this time. (${e.message})`,
@@ -158,11 +158,11 @@ export const cry = async (
                 embeds: [
                     {
                         image: {
-                            url: "https://media3.giphy.com/media/8JZxZgr39TLczSJQoS/giphy.gif",
+                            url: 'https://media3.giphy.com/media/8JZxZgr39TLczSJQoS/giphy.gif',
                         },
                     },
                 ],
-                allowedMentions: { parse: ["everyone"] },
+                allowedMentions: { parse: ['everyone'] },
             });
         }
     } catch (e: any) {
@@ -186,8 +186,8 @@ export const roll = async (
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-                .setCustomId("ClearDiceRoll")
-                .setLabel("Done!")
+                .setCustomId('ClearDiceRoll')
+                .setLabel('Done!')
                 .setStyle(ButtonStyle.Primary)
         );
 
@@ -211,10 +211,10 @@ export const rpg = async (
 
         const { connection, player } = createPlayer(guild, targetVoiceChannel);
 
-        await interaction.reply({ content: "BOOM!" });
+        await interaction.reply({ content: 'BOOM!' });
 
         connection.on(VoiceConnectionStatus.Ready, () => {
-            const resource = createAudioResource("./src/common/audio/rpg.mp3");
+            const resource = createAudioResource('./src/common/audio/rpg.mp3');
 
             resource.volume?.setVolume(1);
 

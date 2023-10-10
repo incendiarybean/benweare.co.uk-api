@@ -1,7 +1,7 @@
-import http from "http";
-import express from "express";
-import { Server } from "socket.io";
-import { contentHandler, headerHandler, routeHandler } from "@handlers/index";
+import http from 'http';
+import express from 'express';
+import { Server } from 'socket.io';
+import { contentHandler, headerHandler, routeHandler } from '@handlers/index';
 
 export const app = express();
 
@@ -18,7 +18,7 @@ export const HTTPServer = http
 
 export const IO = new Server(HTTPServer, {
     cors: {
-        methods: ["GET"],
+        methods: ['GET'],
     },
 });
 

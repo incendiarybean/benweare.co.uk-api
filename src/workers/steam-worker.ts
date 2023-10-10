@@ -1,6 +1,6 @@
-import axios from "axios";
-import type { Request } from "express";
-import { getWikiContent } from "@common/utils/common-utils";
+import axios from 'axios';
+import type { Request } from 'express';
+import { getWikiContent } from '@common/utils/common-utils';
 
 /**
  * This is purely for checking if the Steam API is functional
@@ -24,8 +24,8 @@ export const getGameData = async (req: Request) => {
     const gameId: string = req.query.gameId as string;
 
     if (!gameId) {
-        const error = new Error("No gameId provided!") as NodeJS.ErrnoException;
-        error.code = "422";
+        const error = new Error('No gameId provided!') as NodeJS.ErrnoException;
+        error.code = '422';
         throw error;
     }
 
@@ -61,9 +61,9 @@ export const getGameData = async (req: Request) => {
         return { achievements: steamAchievements, wiki };
     } catch (e: any) {
         const error = new Error(
-            "Could not process request"
+            'Could not process request'
         ) as NodeJS.ErrnoException;
-        error.code = "502";
+        error.code = '502';
         throw error;
     }
 };

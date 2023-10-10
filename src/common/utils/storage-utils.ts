@@ -5,7 +5,7 @@ import type {
     StorageErrorOptions,
     Store,
     TTLValue,
-} from "@common/types";
+} from '@common/types';
 
 export class StorageError extends Error {
     public status: number | undefined;
@@ -15,7 +15,7 @@ export class StorageError extends Error {
     }
 }
 
-export class ObjectStorage<StorageTypes extends { date: string }> {
+export class ObjectStorage<StorageTypes extends { date: string; id?: number }> {
     private storage: Store<StorageTypes>;
     private expiration: number;
 
@@ -169,6 +169,7 @@ export class ObjectStorage<StorageTypes extends { date: string }> {
                 const value = {
                     ...item,
                     date,
+                    id: key,
                 } as StorageTypes;
 
                 // Finally, set the key & value

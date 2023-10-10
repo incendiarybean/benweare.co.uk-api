@@ -1,6 +1,6 @@
-import type { AxiosResponse } from "axios";
-import axios from "axios";
-import { JSDOM } from "jsdom";
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
 
 /**
  * This function is wrapped in a setImmediate to schedule execution
@@ -63,7 +63,7 @@ export const fetchArticles = (
     containerSelector: string,
     splitSelector: string
 ): Promise<Element[]> =>
-    axios.get(url, { responseType: "text" }).then((response: AxiosResponse) => {
+    axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
         const { document } = new JSDOM(response.data).window;
         const HTMLArticles: Element[] = [];
         document
@@ -86,7 +86,7 @@ export const fetchArticles = (
  * @returns Element containing body
  */
 export const fetchWikiBody = (url: string) =>
-    axios.get(url, { responseType: "text" }).then((response: AxiosResponse) => {
+    axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
         const { document } = new JSDOM(response.data).window;
 
         const tables = document.querySelectorAll(
@@ -95,9 +95,9 @@ export const fetchWikiBody = (url: string) =>
 
         const wikiArticles: string[] = [];
         tables.forEach((table) => {
-            const rows = table.querySelectorAll("tr");
+            const rows = table.querySelectorAll('tr');
             rows.forEach((row) => {
-                wikiArticles.push(row.innerHTML.replaceAll(/\n/g, ""));
+                wikiArticles.push(row.innerHTML.replaceAll(/\n/g, ''));
             });
         });
         return wikiArticles;
@@ -114,9 +114,9 @@ export const getWikiContent = async (
     let wikiUrl;
 
     switch (gameId) {
-        case "250900":
+        case '250900':
             wikiUrl =
-                "https://bindingofisaacrebirth.fandom.com/wiki/Achievements";
+                'https://bindingofisaacrebirth.fandom.com/wiki/Achievements';
             break;
         default:
             return undefined;
@@ -132,7 +132,7 @@ export const getWikiContent = async (
  * @returns Boolean - Returns true/false depending if it parses correctly.
  */
 export const dateParses = (date: string): boolean =>
-    new Date(date).toString() !== "Invalid Date";
+    new Date(date).toString() !== 'Invalid Date';
 
 /**
  * This function takes a date string and tries to parse it

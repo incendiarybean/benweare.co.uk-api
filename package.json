@@ -20,7 +20,7 @@
     },
     "scripts": {
         "start": "node -r dotenv/config .",
-        "start-dev": "nodemon ./src/index.ts",
+        "offline": "nodemon ./src/index.ts",
         "build": "tsc -p ./ && tsc-alias -p ./tsconfig.json",
         "test": "jest ./* --silent --runInBand --collectCoverage",
         "test:unit": "jest ./tests/unit/* --silent --runInBand --collectCoverage"

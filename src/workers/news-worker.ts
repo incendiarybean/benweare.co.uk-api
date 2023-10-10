@@ -1,13 +1,13 @@
-import axios from "axios";
-import type { NasaArticle, NewsArticle, UndefinedNews } from "@common/types";
+import axios from 'axios';
+import type { NasaArticle, NewsArticle, UndefinedNews } from '@common/types';
 import {
     dateGenerator,
     fetchArticles,
     retryHandler,
     staticRefresher,
-} from "@common/utils/common-utils";
-import { IO } from "@server";
-import { storage } from "..";
+} from '@common/utils/common-utils';
+import { IO } from '@server';
+import { storage } from '..';
 
 /**
  * This function gets news for the given outlet
@@ -15,30 +15,30 @@ import { storage } from "..";
  */
 export const getRPSNews = (): Promise<void> =>
     fetchArticles(
-        "https://www.rockpapershotgun.com/latest",
-        ".articles",
-        "li"
+        'https://www.rockpapershotgun.com/latest',
+        '.articles',
+        'li'
     ).then((HTMLArticles: Element[]) => {
-        const site: string = "RockPaperShotgun";
+        const site: string = 'RockPaperShotgun';
         const articles: NewsArticle[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
             const title: UndefinedNews =
                 HTMLDivElement.querySelector(
-                    ".title"
+                    '.title'
                 )?.children[0].textContent?.trim();
             if (title) {
                 const url: string =
-                    HTMLDivElement.querySelector("a")?.href ?? "Not Found";
+                    HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
 
                 const img: string =
                     HTMLDivElement.querySelector(
-                        ".thumbnail_image"
-                    )?.getAttribute("src") ?? "Not Found";
+                        '.thumbnail_image'
+                    )?.getAttribute('src') ?? 'Not Found';
 
                 const date: string = dateGenerator(
-                    HTMLDivElement.querySelector("time")?.getAttribute(
-                        "datetime"
+                    HTMLDivElement.querySelector('time')?.getAttribute(
+                        'datetime'
                     )
                 );
 
@@ -50,8 +50,8 @@ export const getRPSNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
-        IO.local.emit("RELOAD_NEWS");
+        storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+        IO.local.emit('RELOAD_NEWS');
     });
 
 /**
@@ -60,31 +60,31 @@ export const getRPSNews = (): Promise<void> =>
  */
 export const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
-        "https://www.pcgamer.com/uk/news/",
+        'https://www.pcgamer.com/uk/news/',
         "[data-list='news/news/latest']",
-        ".listingResult"
+        '.listingResult'
     ).then((HTMLArticles: Element[]) => {
-        const site: string = "PCGamer";
+        const site: string = 'PCGamer';
         const articles: NewsArticle[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
             const title: UndefinedNews =
                 HTMLDivElement.querySelector(
-                    ".article-name"
+                    '.article-name'
                 )?.textContent?.trim();
             if (title) {
                 const url: string =
-                    HTMLDivElement.querySelector("a")?.href ?? "Not Found";
+                    HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
 
                 const img: string =
                     HTMLDivElement.querySelector(
-                        ".article-lead-image-wrap"
-                    )?.getAttribute("data-original") ?? "Not Found";
+                        '.article-lead-image-wrap'
+                    )?.getAttribute('data-original') ?? 'Not Found';
 
                 const date: string = dateGenerator(
                     HTMLDivElement.querySelector(
-                        ".relative-date"
-                    )?.getAttribute("datetime")
+                        '.relative-date'
+                    )?.getAttribute('datetime')
                 );
 
                 articles.push({
@@ -95,8 +95,8 @@ export const getPCGamerNews = (): Promise<void> =>
                 });
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
-        IO.local.emit("RELOAD_NEWS");
+        storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+        IO.local.emit('RELOAD_NEWS');
     });
 
 /**
@@ -105,50 +105,50 @@ export const getPCGamerNews = (): Promise<void> =>
  */
 export const getUKNews = (): Promise<void> =>
     fetchArticles(
-        "https://www.bbc.co.uk/news/england",
-        "#topos-component",
-        ".gs-t-News"
+        'https://www.bbc.co.uk/news/england',
+        '#topos-component',
+        '.gs-t-News'
     ).then((HTMLArticles: Element[]) => {
-        const site: string = "BBC";
+        const site: string = 'BBC';
         const articles: NewsArticle[] = [];
         const articleTitles: string[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
             const title: UndefinedNews = HTMLDivElement.querySelector(
-                ".gs-c-promo-heading__title"
+                '.gs-c-promo-heading__title'
             )?.textContent?.trim();
             if (title) {
                 let imgUrl: UndefinedNews =
-                    HTMLDivElement.querySelector("img")?.getAttribute(
-                        "data-src"
+                    HTMLDivElement.querySelector('img')?.getAttribute(
+                        'data-src'
                     );
 
                 if (imgUrl) {
-                    imgUrl = imgUrl.replace(/\{width}/g, "720");
+                    imgUrl = imgUrl.replace(/\{width}/g, '720');
                 } else {
                     imgUrl =
-                        HTMLDivElement.querySelector("img")?.src ?? "Not Found";
+                        HTMLDivElement.querySelector('img')?.src ?? 'Not Found';
                 }
 
                 const img = imgUrl;
 
-                const url: string = HTMLDivElement.querySelector("a")?.href
+                const url: string = HTMLDivElement.querySelector('a')?.href
                     ? `https://bbc.co.uk${
-                          HTMLDivElement.querySelector("a")?.href
+                          HTMLDivElement.querySelector('a')?.href
                       }`
-                    : "Not Found";
+                    : 'Not Found';
 
                 const date: string = dateGenerator(
-                    HTMLDivElement.querySelector("time")?.getAttribute(
-                        "datetime"
+                    HTMLDivElement.querySelector('time')?.getAttribute(
+                        'datetime'
                     )
                 );
 
                 const live =
-                    HTMLDivElement.querySelector("a")?.href.split("/")[2] ??
-                    "Not Found";
+                    HTMLDivElement.querySelector('a')?.href.split('/')[2] ??
+                    'Not Found';
 
-                if (!articleTitles.includes(title) && live !== "live") {
+                if (!articleTitles.includes(title) && live !== 'live') {
                     articleTitles.push(title);
                     articles.push({
                         title,
@@ -159,8 +159,8 @@ export const getUKNews = (): Promise<void> =>
                 }
             }
         });
-        storage.write("NEWS", site, `${site}'s Latest News.`, articles);
-        IO.local.emit("RELOAD_NEWS");
+        storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+        IO.local.emit('RELOAD_NEWS');
     });
 
 /**
@@ -173,7 +173,7 @@ export const getNasaImage = (): Promise<void> =>
             `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
         )
         .then(({ data }: { data: NasaArticle }) => {
-            const site: string = "NASA";
+            const site: string = 'NASA';
 
             const articles = [
                 {
@@ -184,7 +184,7 @@ export const getNasaImage = (): Promise<void> =>
                     date: dateGenerator(data.date),
                 },
             ];
-            storage.write("NEWS", site, "NASA Daily Image.", articles);
+            storage.write('NEWS', site, 'NASA Daily Image.', articles);
         });
 
 export const getNews = (): void => {
@@ -194,4 +194,4 @@ export const getNews = (): void => {
     retryHandler(getNasaImage, 5);
 };
 
-staticRefresher(480000, getNews, "News");
+staticRefresher(480000, getNews, 'News');

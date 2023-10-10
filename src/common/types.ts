@@ -1,11 +1,11 @@
-import type { AxiosRequestHeaders } from "axios";
+import type { AxiosRequestHeaders } from 'axios';
 import type {
     CacheType,
     CommandInteractionOption,
     Guild,
     GuildMember,
-} from "discord.js";
-import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
+} from 'discord.js';
+import type { AudioPlayer, VoiceConnection } from '@discordjs/voice';
 
 /* STORAGE TYPES */
 export interface CollectionList {
@@ -167,8 +167,8 @@ export interface WeatherConfig {
 }
 
 export type WeatherRequestHeaders = {
-    "x-ibm-client-id": string;
-    "x-ibm-client-secret": string;
+    'x-ibm-client-id': string;
+    'x-ibm-client-secret': string;
     accept: string;
 } & AxiosRequestHeaders;
 
