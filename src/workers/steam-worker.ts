@@ -1,6 +1,6 @@
-import axios from "axios";
-import type { Request } from "express";
-import { getWikiContent } from "@common/utils/common-utils";
+import axios from 'axios';
+import type { Request } from 'express';
+import { getWikiContent } from '@common/utils/common-utils';
 
 /**
  * This is purely for checking if the Steam API is functional
@@ -22,11 +22,10 @@ export const getGameData = async (req: Request) => {
     const { STEAM_API, STEAM_API_KEY } = process.env;
     const userId: string = req.query.userId as string;
     const gameId: string = req.query.gameId as string;
-    const key: string = (req.query.key || STEAM_API_KEY) as string;
 
     if (!gameId) {
-        const error = new Error("No gameId provided!") as NodeJS.ErrnoException;
-        error.code = "422";
+        const error = new Error('No gameId provided!') as NodeJS.ErrnoException;
+        error.code = '422';
         throw error;
     }
 
@@ -35,8 +34,8 @@ export const getGameData = async (req: Request) => {
         steamApiGameData -> Schema contains all available achievement data
         steamApiUserData -> Contains all user attained achievements
     */
-    const steamApiGameData = `${STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${key}&appid=${gameId}`;
-    const steamApiUserData = `${STEAM_API}/ISteamUserStats/GetPlayerAchievements/v0001?key=${key}&appid=${gameId}&steamid=${userId}`;
+    const steamApiGameData = `${STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${STEAM_API_KEY}&appid=${gameId}`;
+    const steamApiUserData = `${STEAM_API}/ISteamUserStats/GetPlayerAchievements/v0001?key=${STEAM_API_KEY}&appid=${gameId}&steamid=${userId}`;
     const fetchList = [steamApiGameData, ...(userId ? [steamApiUserData] : [])];
 
     try {
@@ -60,11 +59,11 @@ export const getGameData = async (req: Request) => {
             return { achievements: achievementList, wiki };
         }
         return { achievements: steamAchievements, wiki };
-    } catch (e) {
+    } catch (e: any) {
         const error = new Error(
-            "Could not process request"
+            'Could not process request'
         ) as NodeJS.ErrnoException;
-        error.code = "502";
+        error.code = '502';
         throw error;
     }
 };

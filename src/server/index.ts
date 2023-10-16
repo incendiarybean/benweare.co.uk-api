@@ -1,29 +1,24 @@
-import http from "http";
-import express from "express";
-import { Server } from "socket.io";
-import { contentHandler, headerHandler, routeHandler } from "@handlers/index";
+import http from 'http';
+import express from 'express';
+import { Server } from 'socket.io';
+import { contentHandler, headerHandler, routeHandler } from '@handlers/index';
 
 export const app = express();
 
 export const HTTPServer = http
     .createServer(app)
-    .listen(process.env.PORT || process.env.HTTPS || 8080, () => {
-        console.log(`[${new Date()}] ENV: ${process.env.NODE_ENV}`);
-        console.log(
+    .listen(process.env.PORT ?? 8080, () => {
+        console.info(`[${new Date()}] ENV: ${process.env.NODE_ENV}`);
+        console.info(
             `[${new Date()}] Server is active on port: ${
-                process.env.PORT || process.env.HTTPS || 8080
+                process.env.PORT ?? process.env.HTTPS ?? 8080
             }`
         );
     });
 
-HTTPServer.on("error", (err: Error) => {
-    console.log(`[${new Date()}] Server has failed to start.`);
-    throw new Error(err.message);
-});
-
 export const IO = new Server(HTTPServer, {
     cors: {
-        methods: ["GET"],
+        methods: ['GET'],
     },
 });
 

@@ -1,7 +1,7 @@
-import type { Request, Response } from "express";
-import express from "express";
-import OpenApiSchema from "@schema";
-import { storage } from "@workers/weather-worker";
+import type { Request, Response } from 'express';
+import express from 'express';
+import OpenApiSchema from '@schema';
+import { storage } from '..';
 
 const router = express.Router();
 
@@ -10,13 +10,13 @@ const router = express.Router();
 /*--------------*/
 
 router.get(
-    "/api/forecasts/:outlet/timeseries",
+    '/api/forecasts/:outlet/timeseries',
     (req: Request, res: Response) => {
         try {
             return res.json({
-                response: storage.findByName(req.params.outlet).items || [],
+                items: storage.search('WEATHER', req.params.outlet).items,
                 description:
-                    OpenApiSchema.paths["/api/forecasts/{outlet}/timeseries"]
+                    OpenApiSchema.paths['/api/forecasts/{outlet}/timeseries']
                         ?.get?.summary,
                 timestamp: new Date(),
                 link: {
@@ -25,17 +25,17 @@ router.get(
                 },
             });
         } catch (e: any) {
-            return res.status(502).json({ message: e.message });
+            return res.status(e.status ?? 502).json({ message: e.message });
         }
     }
 );
 
-router.get("/api/forecasts/:outlet", (req: Request, res: Response) => {
+router.get('/api/forecasts/:outlet', (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.findByName(req.params.outlet),
+            response: storage.search('WEATHER', req.params.outlet),
             description:
-                OpenApiSchema.paths["/api/forecasts/{outlet}"]?.get?.summary,
+                OpenApiSchema.paths['/api/forecasts/{outlet}']?.get?.summary,
             timestamp: new Date(),
             link: {
                 action: req.method,
@@ -43,15 +43,15 @@ router.get("/api/forecasts/:outlet", (req: Request, res: Response) => {
             },
         });
     } catch (e: any) {
-        return res.status(502).json({ message: e.message });
+        return res.status(e.status ?? 502).json({ message: e.message });
     }
 });
 
-router.get("/api/forecasts", (req: Request, res: Response) => {
+router.get('/api/forecasts', (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.read(["items"]),
-            description: OpenApiSchema.paths["/api/forecasts"]?.get?.summary,
+            response: storage.list('WEATHER'),
+            description: OpenApiSchema.paths['/api/forecasts']?.get?.summary,
             timestamp: new Date(),
             link: {
                 action: req.method,
@@ -59,7 +59,7 @@ router.get("/api/forecasts", (req: Request, res: Response) => {
             },
         });
     } catch (e: any) {
-        return res.status(502).json({ message: e.message });
+        return res.status(e.status ?? 502).json({ message: e.message });
     }
 });
 
