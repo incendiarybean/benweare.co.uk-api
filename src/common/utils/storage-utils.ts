@@ -35,7 +35,7 @@ export class ObjectStorage<StorageTypes extends { date: string; id?: number }> {
         for (let i = 0; i < value.length; i++) {
             const char = value.charCodeAt(i);
             id = (id << 5) - id + char;
-            id = id & id;
+            id |= 0;
         }
         return id;
     };
