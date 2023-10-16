@@ -30,18 +30,16 @@ client.on('messageCreate', async (interaction) => {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
-    switch (interaction.customId) {
-        case 'ClearDiceRoll':
-            try {
-                await interaction.message.delete();
-            } catch (e) {
-                interaction.reply({
-                    content:
-                        'Dismiss button has already been clicked, dismiss me!',
-                    ephemeral: true,
-                });
-            }
-            break;
+    if(interaction.customId === 'ClearDiceRoll') {
+        try {
+            await interaction.message.delete();
+        } catch (e) {
+            interaction.reply({
+                content:
+                    'Dismiss button has already been clicked, dismiss me!',
+                ephemeral: true,
+            });
+        }
     }
 });
 
