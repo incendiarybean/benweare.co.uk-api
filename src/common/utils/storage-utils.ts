@@ -15,7 +15,9 @@ export class StorageError extends Error {
     }
 }
 
-export class ObjectStorage<StorageTypes extends { date: string; id?: number }> {
+export class ObjectStorage<
+    StorageTypes extends { date: string; img?: string; id?: number }
+> {
     private storage: Store<StorageTypes>;
     private expiration: number;
 
@@ -148,7 +150,16 @@ export class ObjectStorage<StorageTypes extends { date: string; id?: number }> {
         // If it exists, restart the timer
         // TODO: Add in an ArticleNumber reset, as eventually this could cause an integer overflow?
         items.forEach(({ date, ...item }) => {
-            const key = this.createId(JSON.stringify(item));
+            // Remove image as image can change, but content might not
+            let key: number;
+            if (item.img) {
+                key = this.createId(
+                    JSON.stringify({ ...item, img: undefined })
+                );
+            } else {
+                key = this.createId(JSON.stringify(item));
+            }
+
             const storedCollection = this.storage[namespace].get(collection);
             if (storedCollection) {
                 // We need to clear existing timeouts to stop the items expiring if they already exist
