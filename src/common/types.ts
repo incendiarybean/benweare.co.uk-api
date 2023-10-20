@@ -1,22 +1,50 @@
-import type { AxiosRequestHeaders } from "axios";
+import type { AxiosRequestHeaders } from 'axios';
 import type {
     CacheType,
     CommandInteractionOption,
     Guild,
     GuildMember,
-} from "discord.js";
-import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
+} from 'discord.js';
+import type { AudioPlayer, VoiceConnection } from '@discordjs/voice';
 
-/* GLOBAL TYPES */
-export interface DataStorage {
+/* STORAGE TYPES */
+export interface CollectionList {
     name: string;
-    updated: Date;
     description: string;
-    items: WeatherTimeSeries[] | NewsArticle[];
+    updated: Date;
 }
 
-export interface FilterDataInput {
-    [key: string]: any;
+export interface DataStorage<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: StorageTypes[];
+}
+
+export interface MapStorage<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: Map<number, TTLValue<StorageTypes>>;
+}
+
+export interface TTLValue<StorageTypes> {
+    id: number;
+    timestamp: Date;
+    value: StorageTypes;
+    timer: ReturnType<typeof setTimeout>;
+}
+
+export interface Store<StorageTypes> {
+    [key: string]: Map<string, MapStorage<StorageTypes>>;
+}
+
+export interface StoreMap<StorageTypes> {
+    updated: Date;
+    description: string;
+    items: Map<number, TTLValue<StorageTypes>>;
+}
+
+export interface StorageErrorOptions extends ErrorOptions {
+    status: number;
 }
 
 /* NEWS TYPES */
@@ -51,6 +79,16 @@ export interface WeatherFeatures {
         modelRunDate: string;
         timeSeries: WeatherTimeSeries[];
     };
+}
+
+export interface WeatherRecord {
+    date: string;
+    maxTemp: string;
+    lowTemp: string;
+    maxFeels: string;
+    maxWindSpeed: number;
+    weather: string;
+    weatherDescription: string;
 }
 
 export interface WeatherTimeSeries {
@@ -129,8 +167,8 @@ export interface WeatherConfig {
 }
 
 export type WeatherRequestHeaders = {
-    "x-ibm-client-id": string;
-    "x-ibm-client-secret": string;
+    'x-ibm-client-id': string;
+    'x-ibm-client-secret': string;
     accept: string;
 } & AxiosRequestHeaders;
 

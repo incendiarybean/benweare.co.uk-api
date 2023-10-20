@@ -1,15 +1,15 @@
-import { ActivityType } from "discord.js";
-import { assist, client, cry, roll, rpg } from "@workers/discord-worker";
+import { ActivityType } from 'discord.js';
+import { assist, client, cry, roll, rpg } from '@workers/discord-worker';
 
 const { DISCORD_TOKEN, DISCORD_ENABLED } = process.env;
 
-client.on("ready", () => {
-    console.log(
+client.on('ready', () => {
+    console.info(
         `[${new Date()}] Discord Bot ${client.user?.tag} has logged in!`
     );
 
     if (client.user) {
-        client.user.setActivity("sitting here and taking it...", {
+        client.user.setActivity('sitting here and taking it...', {
             type: ActivityType.Competing,
         });
     }
@@ -18,7 +18,7 @@ client.on("ready", () => {
 /**
  * This block handles direct messages to the bot
  */
-client.on("messageCreate", async (interaction) => {
+client.on('messageCreate', async (interaction) => {
     if (!interaction.content) return;
 
     // TODO: Do something cool here!
@@ -27,49 +27,50 @@ client.on("messageCreate", async (interaction) => {
 /**
  * This block handles button commands to the bot
  */
-client.on("interactionCreate", async (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
-    switch (interaction.customId) {
-        case "ClearDiceRoll":
-            try {
-                await interaction.message.delete();
-            } catch (e) {
-                interaction.reply({
-                    content:
-                        "Dimiss button has already been clicked, dismiss me!",
-                    ephemeral: true,
-                });
-            }
-            break;
+    if(interaction.customId === 'ClearDiceRoll') {
+        try {
+            await interaction.message.delete();
+        } catch (e) {
+            interaction.reply({
+                content:
+                    'Dismiss button has already been clicked, dismiss me!',
+                ephemeral: true,
+            });
+        }
     }
 });
 
 /**
  * This block handles slash commands to the bot
  */
-client.on("interactionCreate", async (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
     switch (interaction.commandName) {
-        case "assist":
+        case 'assist':
             assist(interaction);
             break;
-        case "cry":
+        case 'cry':
             cry(interaction);
             break;
-        case "roll":
+        case 'roll':
             roll(interaction);
             break;
-        case "rpg":
+        case 'rpg':
             rpg(interaction);
             break;
     }
 });
 
 const discordRoutes = () => {
-    if (DISCORD_ENABLED) {
+    if (
+        DISCORD_ENABLED &&
+        ![undefined, 'test'].includes(process.env.NODE_ENV)
+    ) {
         client.login(DISCORD_TOKEN as string).catch((e) => {
-            console.log(`ERROR: ${e.toString()}`);
+            console.error(`ERROR: ${e.toString()}`);
         });
     }
 };

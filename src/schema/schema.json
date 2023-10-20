@@ -391,7 +391,7 @@
                     }
                 ],
                 "tags": ["Weather"],
-                "summary": "Retrieve a specific news outlet's weather.",
+                "summary": "Retrieve a specific weather outlet's timeseries.",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -424,12 +424,6 @@
                         "in": "query",
                         "name": "gameId",
                         "required": true
-                    },
-                    {
-                        "description": "Steam API key.",
-                        "in": "query",
-                        "name": "key",
-                        "required": false
                     },
                     {
                         "description": "Steam user ID.",
