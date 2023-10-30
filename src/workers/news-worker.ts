@@ -13,6 +13,50 @@ import { storage } from '..';
  * This function gets news for the given outlet
  * @returns void -> Writes data to storage object
  */
+export const getRegisterNews = (): Promise<void> =>
+    fetchArticles(
+        'https://www.theregister.com/security',
+        '#main-col',
+        'article'
+    ).then((HTMLArticles: Element[]) => {
+        const site: string = 'TheRegister';
+        const articles: NewsArticle[] = [];
+
+        HTMLArticles.forEach((HTMLDivElement) => {
+            const title: UndefinedNews =
+                HTMLDivElement.querySelector('h4')?.textContent?.trim();
+            if (title) {
+                const url: string = HTMLDivElement.querySelector('a')?.href
+                    ? `https://www.theregister.com${
+                          HTMLDivElement.querySelector('a')?.href
+                      }`
+                    : 'Not Found';
+
+                const epoch: string =
+                    HTMLDivElement.querySelector('.time_stamp')?.getAttribute(
+                        'data-epoch'
+                    ) ?? '0';
+
+                const epochDate = new Date(0);
+                epochDate.setUTCSeconds(parseInt(epoch, 10));
+
+                const date: string = dateGenerator(epochDate.toISOString());
+
+                articles.push({
+                    title,
+                    url,
+                    date,
+                });
+            }
+        });
+        storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+        IO.local.emit('RELOAD_NEWS');
+    });
+
+/**
+ * This function gets news for the given outlet
+ * @returns void -> Writes data to storage object
+ */
 export const getRPSNews = (): Promise<void> =>
     fetchArticles(
         'https://www.rockpapershotgun.com/latest',
@@ -190,6 +234,7 @@ export const getNasaImage = (): Promise<void> =>
 export const getNews = (): void => {
     retryHandler(getPCGamerNews, 5);
     retryHandler(getRPSNews, 5);
+    retryHandler(getRegisterNews, 5);
     retryHandler(getUKNews, 5);
     retryHandler(getNasaImage, 5);
 };

@@ -54,7 +54,7 @@ export interface NewsArticle {
     title: string;
     url: string;
     description?: string;
-    img: string;
+    img?: string;
     date: string;
 }
 
