@@ -1,4 +1,3 @@
-import type { AxiosRequestHeaders } from 'axios';
 import type {
     CacheType,
     CommandInteractionOption,
