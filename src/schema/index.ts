@@ -29,5 +29,6 @@ export const getServers = () => {
 };
 
 const OpenApiSchema = SchemaJSON as OpenAPIV3.Document;
+OpenApiSchema.info.version = process.env.npm_package_version ?? '0.0.0';
 OpenApiSchema.servers = getServers();
 export default OpenApiSchema;
