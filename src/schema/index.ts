@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { version } from '../../package.json';
 import * as SchemaJSON from './schema.json';
 
 export const getServers = () => {
@@ -29,5 +30,6 @@ export const getServers = () => {
 };
 
 const OpenApiSchema = SchemaJSON as OpenAPIV3.Document;
+OpenApiSchema.info.version = version;
 OpenApiSchema.servers = getServers();
 export default OpenApiSchema;
