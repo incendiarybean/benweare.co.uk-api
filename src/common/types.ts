@@ -170,7 +170,7 @@ export type WeatherRequestHeaders = {
     'x-ibm-client-id': string;
     'x-ibm-client-secret': string;
     accept: string;
-} & AxiosRequestHeaders;
+};
 
 export interface WeatherCodes {
     [index: number]: string[];
