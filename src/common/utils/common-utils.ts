@@ -39,7 +39,7 @@ export const retryHandler = (
     tries: number,
     counter?: number
 ): void => {
-    fn().catch((e: any) => {
+    fn().catch(() => {
         if (tries === 1) {
             return console.error(
                 `Function: ${fn.name} failed... (Tried ${counter} times).`

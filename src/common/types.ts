@@ -1,4 +1,3 @@
-import type { AxiosRequestHeaders } from 'axios';
 import type {
     CacheType,
     CommandInteractionOption,
@@ -54,7 +53,7 @@ export interface NewsArticle {
     title: string;
     url: string;
     description?: string;
-    img: string;
+    img?: string;
     date: string;
 }
 
@@ -170,7 +169,7 @@ export type WeatherRequestHeaders = {
     'x-ibm-client-id': string;
     'x-ibm-client-secret': string;
     accept: string;
-} & AxiosRequestHeaders;
+};
 
 export interface WeatherCodes {
     [index: number]: string[];
