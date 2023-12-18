@@ -21,6 +21,60 @@ jest.mock('../../src/common/utils/storage-utils', () => ({
 }));
 
 describe('News-Worker should collect news as expected', () => {
+    it('should collect The Register news correctly', async () => {
+        const { getRegisterNews } = require('../../src/workers/news-worker');
+        const { storage } = require('../../src');
+        const storageSpy = jest.spyOn(storage, 'write');
+
+        await getRegisterNews();
+
+        expect(storageSpy.mock.calls.length).toEqual(1);
+        expect(storageSpy.mock.calls[0]).toEqual([
+            'NEWS',
+            'TheRegister',
+            "TheRegister's Latest News.",
+            [
+                {
+                    date: '1970-01-01T00:00:00.000Z',
+                    title: 'Test Title',
+                    url: 'https://www.theregister.com/test',
+                },
+            ],
+        ]);
+    });
+
+    it('should use default values for The Register content if missing', async () => {
+        const { getRegisterNews } = require('../../src/workers/news-worker');
+        const { storage } = require('../../src');
+        const storageSpy = jest.spyOn(storage, 'write');
+
+        const commonUtils = require('../../src/common/utils/common-utils');
+        const document = new JSDOM(`
+            <li>
+                <article>
+                    <h4 class="title">
+                        Test Title
+                    </h4>
+                </article>
+            </li>
+        `).window.document;
+
+        jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
+            document,
+        ]);
+
+        await getRegisterNews();
+
+        expect(storageSpy.mock.calls.length).toEqual(1);
+        expect(storageSpy.mock.calls[0][3]).toEqual([
+            {
+                title: 'Test Title',
+                date: '1970-01-01T00:00:00.000Z',
+                url: 'Not Found',
+            },
+        ]);
+    });
+
     it('should collect RPS news correctly', async () => {
         const { getRPSNews } = require('../../src/workers/news-worker');
         const { storage } = require('../../src');
