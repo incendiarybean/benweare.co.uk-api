@@ -20,6 +20,10 @@ const replacer = (
     return output;
 };
 
+export const registerContent = () => {
+    return replacer(template, 'main-col', 'article', 'h4', 'thumbnail_image');
+};
+
 export const rpsContent = () => {
     return replacer(
         template,
