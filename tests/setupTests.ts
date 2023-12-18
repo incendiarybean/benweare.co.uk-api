@@ -5,6 +5,7 @@ import {
     metofficeContent,
     nasaContent,
     pcgContent,
+    registerContent,
     rpsContent,
 } from './data/test-data';
 
@@ -18,6 +19,10 @@ beforeAll(async () => {
 
     // Configure mocked web requests
     console.info(`[${new Date()}] Configuring Mock Axios requests...`);
+    mockAxios
+        .onGet('https://www.theregister.com/security')
+        .reply(200, registerContent());
+
     mockAxios
         .onGet('https://www.bbc.co.uk/news/england')
         .reply(200, bbcContent());
