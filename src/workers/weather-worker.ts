@@ -42,7 +42,7 @@ const fetchWeather = (
 
 /**
  * This function gets Weather for the given location
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getMetOffice = (): Promise<void> =>
     fetchWeather(

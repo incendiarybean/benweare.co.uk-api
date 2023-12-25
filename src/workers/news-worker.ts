@@ -11,7 +11,7 @@ import { storage } from '..';
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getRegisterNews = (): Promise<void> =>
     fetchArticles(
@@ -55,7 +55,7 @@ export const getRegisterNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getRPSNews = (): Promise<void> =>
     fetchArticles(
@@ -100,7 +100,7 @@ export const getRPSNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
@@ -145,7 +145,7 @@ export const getPCGamerNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getUKNews = (): Promise<void> =>
     fetchArticles(
@@ -176,11 +176,13 @@ export const getUKNews = (): Promise<void> =>
 
                 const img = imgUrl;
 
-                const url: string = HTMLDivElement.querySelector('a')?.href
-                    ? `https://bbc.co.uk${
-                          HTMLDivElement.querySelector('a')?.href
-                      }`
-                    : 'Not Found';
+                let url: string =
+                    HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
+                if (url.indexOf('https://')) {
+                    url = `https://www.bbc.co.uk${
+                        HTMLDivElement.querySelector('a')?.href
+                    }`;
+                }
 
                 const date: string = dateGenerator(
                     HTMLDivElement.querySelector('time')?.getAttribute(
@@ -209,7 +211,7 @@ export const getUKNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getNasaImage = (): Promise<void> =>
     axios
