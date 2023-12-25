@@ -148,7 +148,6 @@ export class ObjectStorage<
         // For each collected item, check if it exists in the cache
         // If it does not exist, add it to the cache and configure the TTL
         // If it exists, restart the timer
-        // TODO: Add in an ArticleNumber reset, as eventually this could cause an integer overflow?
         items.forEach(({ date, ...item }) => {
             // Remove image as image can change, but content might not
             let key: number;
