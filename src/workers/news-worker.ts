@@ -180,7 +180,7 @@ export const getUKNews = (): Promise<void> =>
                 let url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
 
-                if (url !== 'Not Found' && !url.includes('https://')) {
+                if (!url.includes('Not Found') && !url.includes('https://')) {
                     url = `https://www.bbc.co.uk${url}`;
                 }
 
