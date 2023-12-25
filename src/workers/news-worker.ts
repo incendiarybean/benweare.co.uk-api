@@ -11,7 +11,7 @@ import { storage } from '..';
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getRegisterNews = (): Promise<void> =>
     fetchArticles(
@@ -55,7 +55,7 @@ export const getRegisterNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getRPSNews = (): Promise<void> =>
     fetchArticles(
@@ -100,7 +100,7 @@ export const getRPSNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
@@ -145,7 +145,7 @@ export const getPCGamerNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getUKNews = (): Promise<void> =>
     fetchArticles(
@@ -161,6 +161,7 @@ export const getUKNews = (): Promise<void> =>
             const title: UndefinedNews = HTMLDivElement.querySelector(
                 '.gs-c-promo-heading__title'
             )?.textContent?.trim();
+
             if (title) {
                 let imgUrl: UndefinedNews =
                     HTMLDivElement.querySelector('img')?.getAttribute(
@@ -176,11 +177,12 @@ export const getUKNews = (): Promise<void> =>
 
                 const img = imgUrl;
 
-                const url: string = HTMLDivElement.querySelector('a')?.href
-                    ? `https://bbc.co.uk${
-                          HTMLDivElement.querySelector('a')?.href
-                      }`
-                    : 'Not Found';
+                let url: string =
+                    HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
+
+                if (!url.includes('Not Found') && !url.includes('https://')) {
+                    url = `https://www.bbc.co.uk${url}`;
+                }
 
                 const date: string = dateGenerator(
                     HTMLDivElement.querySelector('time')?.getAttribute(
@@ -209,7 +211,7 @@ export const getUKNews = (): Promise<void> =>
 
 /**
  * This function gets news for the given outlet
- * @returns void -> Writes data to storage object
+ * @returns {void} - Writes data to storage object
  */
 export const getNasaImage = (): Promise<void> =>
     axios

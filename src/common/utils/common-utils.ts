@@ -6,15 +6,15 @@ import { JSDOM } from 'jsdom';
  * This function is wrapped in a setImmediate to schedule execution
  * This will trigger at the end of the current event loop to ensure other processing is complete.
  * See: https://nodejs.org/en/docs/guides/timers-in-node/
- * @param timer Number - Number of MS before refresh.
- * @param trigger Function - Function to trigger on refresh.
- * @param functionName String - Name of function being refreshed.
+ * @param {number} timer - Number of milliseconds before refresh.
+ * @param {function} trigger - Function to trigger on refresh.
+ * @param {string} functionName - Name of function being refreshed.
  */
 export const staticRefresher = (
     timer: number,
-    trigger: Function,
+    trigger: () => void,
     functionName: string
-) => {
+): void => {
     setImmediate((): void => {
         console.info(
             `[${new Date()}] Initialising ${functionName} Refresher...`
@@ -30,12 +30,12 @@ export const staticRefresher = (
 /**
  * This utility is for catching failures in a function.
  * It will retry for a specified number of times.
- * @param {Function} fn - A function you want to retry after failure.
+ * @param {function} fn - A function you want to retry after failure.
  * @param {number} tries - The maximum tries before stopping.
  * @param {number} counter - The current counter for tries, do not supply this.
  */
 export const retryHandler = (
-    fn: Function,
+    fn: () => Promise<void>,
     tries: number,
     counter?: number
 ): void => {
@@ -53,10 +53,10 @@ export const retryHandler = (
 /**
  * This function retrieves a container element using containerSelector
  * It then splits the container element into children[] using splitSelector
- * @param url URL of the site you wish to fetch from
- * @param containerSelector QuerySelector you wish to grab articles from
- * @param splitSelector QuerySelector used to identify and split each article
- * @returns HTMLArticles[], an array of elements depending on your above selection
+ * @param {string} url - URL of the site you wish to fetch from
+ * @param {string} containerSelector - QuerySelector you wish to grab articles from
+ * @param {string} splitSelector - QuerySelector used to identify and split each article
+ * @returns {Element[]} - An array of elements depending on your above selection
  */
 export const fetchArticles = (
     url: string,
@@ -82,8 +82,8 @@ export const fetchArticles = (
 
 /**
  * This function retrieves the body of the provided page
- * @param url URL of the site you wish to fetch from
- * @returns Element containing body
+ * @param {string} url - URL of the site you wish to fetch from
+ * @returns {string[]} - An array of string table rows
  */
 export const fetchWikiBody = (url: string) =>
     axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
@@ -105,8 +105,8 @@ export const fetchWikiBody = (url: string) =>
 
 /**
  * This function scrapes a WIKI page depending on ID provided.
- * @param gameId - SteamID of game
- * @returns String of webpage Document
+ * @param {string} gameId - SteamID of game
+ * @returns {string } - Webpage Document
  */
 export const getWikiContent = async (
     gameId: string
@@ -128,16 +128,16 @@ export const getWikiContent = async (
 
 /**
  * This function is used to ensure the date is parsed correctly.
- * @param date String - Expects date in ISO format.
- * @returns Boolean - Returns true/false depending if it parses correctly.
+ * @param {string} date - Expects date in ISO format.
+ * @returns {boolean} - Returns true/false depending if it parses correctly.
  */
 export const dateParses = (date: string): boolean =>
     new Date(date).toString() !== 'Invalid Date';
 
 /**
  * This function takes a date string and tries to parse it
- * @param date String | undefined | null - Expects date in ISO format.
- * @returns String - Date string in en-UK format
+ * @param {string | undefined | null} date  - Expects date in ISO format.
+ * @returns {string} - A date string in en-UK format
  */
 export const dateGenerator = (date: string | undefined | null): string => {
     if (!date || !dateParses(date)) {
