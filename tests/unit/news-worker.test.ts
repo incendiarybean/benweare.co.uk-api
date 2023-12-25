@@ -204,7 +204,7 @@ describe('News-Worker should collect news as expected', () => {
                     date: '2023-02-01T15:46:04.563Z',
                     img: 'test-img.png',
                     title: 'Test Title',
-                    url: 'https://bbc.co.uk/test',
+                    url: 'https://www.bbc.co.uk/test',
                 },
             ],
         ]);

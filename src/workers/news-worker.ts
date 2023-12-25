@@ -161,6 +161,7 @@ export const getUKNews = (): Promise<void> =>
             const title: UndefinedNews = HTMLDivElement.querySelector(
                 '.gs-c-promo-heading__title'
             )?.textContent?.trim();
+
             if (title) {
                 let imgUrl: UndefinedNews =
                     HTMLDivElement.querySelector('img')?.getAttribute(
@@ -178,10 +179,9 @@ export const getUKNews = (): Promise<void> =>
 
                 let url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
-                if (url.indexOf('https://')) {
-                    url = `https://www.bbc.co.uk${
-                        HTMLDivElement.querySelector('a')?.href
-                    }`;
+
+                if (url !== 'Not Found' && !url.includes('https://')) {
+                    url = `https://www.bbc.co.uk${url}`;
                 }
 
                 const date: string = dateGenerator(
