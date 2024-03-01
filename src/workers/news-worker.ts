@@ -4,6 +4,7 @@ import {
     dateGenerator,
     fetchArticles,
     retryHandler,
+    sleep,
     staticRefresher,
 } from '@common/utils/common-utils';
 import { IO } from '@server';
@@ -105,7 +106,7 @@ export const getRPSNews = (): Promise<void> =>
 export const getPCGamerNews = (): Promise<void> =>
     fetchArticles(
         'https://www.pcgamer.com/uk/news/',
-        "[data-list='news/news/latest']",
+        "[data-list='home/latest']",
         '.listingResult'
     ).then((HTMLArticles: Element[]) => {
         const site: string = 'PCGamer';
@@ -116,6 +117,7 @@ export const getPCGamerNews = (): Promise<void> =>
                 HTMLDivElement.querySelector(
                     '.article-name'
                 )?.textContent?.trim();
+
             if (title) {
                 const url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
@@ -146,36 +148,31 @@ export const getPCGamerNews = (): Promise<void> =>
 /**
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
+ * 
+ * Note: This function is a tad messy due to BBC deciding to restructure their classes
+ *       They no longer provide timestamps for articles and have multiple titles (one being hidden?) in some cases
+ * 
+ * TODO: Adjust this function to be cleaner, it's currently a simple solution
  */
 export const getUKNews = (): Promise<void> =>
     fetchArticles(
         'https://www.bbc.co.uk/news/england',
-        '#topos-component',
-        '.gs-t-News'
+        '[role="list"]',
+        '[type="article"]'
     ).then((HTMLArticles: Element[]) => {
         const site: string = 'BBC';
         const articles: NewsArticle[] = [];
         const articleTitles: string[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
-            const title: UndefinedNews = HTMLDivElement.querySelector(
-                '.gs-c-promo-heading__title'
-            )?.textContent?.trim();
+            const titles = HTMLDivElement.querySelector(
+                '[role="text"]'
+            )?.childNodes;
+
+            const title = titles ? (titles[1] ? titles[1].textContent?.trim() : titles[0].textContent?.trim()) : undefined;
 
             if (title) {
-                let imgUrl: UndefinedNews =
-                    HTMLDivElement.querySelector('img')?.getAttribute(
-                        'data-src'
-                    );
-
-                if (imgUrl) {
-                    imgUrl = imgUrl.replace(/\{width}/g, '720');
-                } else {
-                    imgUrl =
-                        HTMLDivElement.querySelector('img')?.src ?? 'Not Found';
-                }
-
-                const img = imgUrl;
+                let img: UndefinedNews = HTMLDivElement.querySelector('img')?.src ?? 'Not Found'
 
                 let url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
@@ -184,11 +181,10 @@ export const getUKNews = (): Promise<void> =>
                     url = `https://www.bbc.co.uk${url}`;
                 }
 
-                const date: string = dateGenerator(
-                    HTMLDivElement.querySelector('time')?.getAttribute(
-                        'datetime'
-                    )
-                );
+                // This has to be included as the BBC no longer provides timestamps in their articles
+                // So we have to index by order of collection, rather than date of post
+                sleep(1);
+                const date = new Date().toISOString();
 
                 const live =
                     HTMLDivElement.querySelector('a')?.href.split('/')[2] ??
