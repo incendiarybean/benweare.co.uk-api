@@ -168,8 +168,8 @@ export const getUKNews = (): Promise<void> =>
             const titles = HTMLDivElement.querySelector(
                 '[role="text"]'
             )?.childNodes;
-            
-            const title = titles ? (titles[1] ? titles[1].textContent : titles[0].textContent) : undefined;
+
+            const title = titles ? (titles[1] ? titles[1].textContent?.trim() : titles[0].textContent?.trim()) : undefined;
 
             if (title) {
                 let img: UndefinedNews = HTMLDivElement.querySelector('img')?.src ?? 'Not Found'
@@ -184,7 +184,7 @@ export const getUKNews = (): Promise<void> =>
                 // This has to be included as the BBC no longer provides timestamps in their articles
                 // So we have to index by order of collection, rather than date of post
                 sleep(1);
-                const date = new Date().toString();
+                const date = new Date().toISOString();
 
                 const live =
                     HTMLDivElement.querySelector('a')?.href.split('/')[2] ??

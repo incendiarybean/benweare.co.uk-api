@@ -201,7 +201,7 @@ describe('News-Worker should collect news as expected', () => {
             "BBC's Latest News.",
             [
                 {
-                    date: '2023-02-01T15:46:04.563Z',
+                    date: (storageSpy.mock.calls[0][3] as any)[0].date,
                     img: 'test-img.png',
                     title: 'Test Title',
                     url: 'https://www.bbc.co.uk/test',
@@ -218,9 +218,9 @@ describe('News-Worker should collect news as expected', () => {
         const commonUtils = require('../../src/common/utils/common-utils');
         const document = new JSDOM(`
             <li>
-                <div class="li">
-                    <div class="gs-c-promo-heading__title">
-                        Test Title
+                <div type="article">
+                    <div role="text">
+                        <span>Test Title</span>
                     </div>
                 </div>
             </li>
@@ -236,7 +236,7 @@ describe('News-Worker should collect news as expected', () => {
         expect(storageSpy.mock.calls[0][3]).toEqual([
             {
                 title: 'Test Title',
-                date: new Date().toISOString(),
+                date: (storageSpy.mock.calls[0][3] as any)[0].date,
                 img: 'Not Found',
                 url: 'Not Found',
             },

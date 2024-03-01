@@ -38,7 +38,7 @@ export const rpsContent = () => {
 export const pcgContent = () => {
     return replacer(
         template,
-        'news/news/latest',
+        'home/latest',
         'listingResult',
         'article-name',
         'article-lead-image-wrap'
@@ -48,9 +48,9 @@ export const pcgContent = () => {
 export const bbcContent = () => {
     return replacer(
         template,
-        'topos-component',
-        'gs-t-News',
-        'gs-c-promo-heading__title',
+        'list',
+        'article',
+        'text',
         ''
     );
 };
