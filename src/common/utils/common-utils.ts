@@ -3,6 +3,13 @@ import axios from 'axios';
 import { JSDOM } from 'jsdom';
 
 /**
+ * 
+ * @param {number} ms - Number of milliseconds to wait for.
+ * @returns {Promise<void>} - A resolution when timer has waited for the allotted time.
+ */
+export const sleep = async(ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
  * This function is wrapped in a setImmediate to schedule execution
  * This will trigger at the end of the current event loop to ensure other processing is complete.
  * See: https://nodejs.org/en/docs/guides/timers-in-node/
@@ -39,12 +46,13 @@ export const retryHandler = (
     tries: number,
     counter?: number
 ): void => {
-    fn().catch(() => {
+    fn().catch((e) => {
         if (tries === 1) {
             return console.error(
                 `Function: ${fn.name} failed... (Tried ${counter} times).`
             );
         }
+        console.debug(e);
         console.error(`Function: ${fn.name} failed... Retrying.`);
         return retryHandler(fn, tries - 1, counter ?? tries);
     });
