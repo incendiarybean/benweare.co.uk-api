@@ -10,9 +10,11 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         const storage = new ObjectStorage<TestType>();
 
         try {
-            storage.list('TEST');
+            storage.collections('TEST');
         } catch (e) {
-            expect(e.message).toEqual('No items available in namespace: TEST');
+            expect(e.message).toEqual(
+                'No collections available in namespace: TEST'
+            );
             expect(e.status).toEqual(404);
         }
     });
@@ -27,7 +29,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         // Check that storage has been written to and is in correct namespace
-        const result = storage.list('TEST_NAMESPACE_0');
+        const result = storage.collections('TEST_NAMESPACE_0');
         expect(result.length).toEqual(1);
         expect(result[0].description).toEqual(
             "TEST_COLLECTION_0's latest test."
@@ -64,7 +66,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             ]
         );
 
-        expect(storage.list('TEST_NAMESPACE_0').length).toEqual(2);
+        expect(storage.collections('TEST_NAMESPACE_0').length).toEqual(2);
 
         // Expect TEST_NAMESPACE_0 to have an extra value
         expect(
@@ -177,7 +179,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         // Check first namespace has 2 collections
-        const list0Result = storage.list('TEST_NAMESPACE_0');
+        const list0Result = storage.collections('TEST_NAMESPACE_0');
         expect(list0Result.length).toEqual(2);
 
         // Check that collection returned is expected and has 4 items
@@ -187,7 +189,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(result0.updated).toBeDefined();
 
         // Check second namespace only has 1 collection
-        const list1Result = storage.list('TEST_NAMESPACE_1');
+        const list1Result = storage.collections('TEST_NAMESPACE_1');
         expect(list1Result.length).toEqual(1);
 
         // Check that collection returned is expected and has 2 items

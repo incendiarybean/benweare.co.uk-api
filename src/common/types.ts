@@ -1,10 +1,10 @@
+import type { AudioPlayer, VoiceConnection } from '@discordjs/voice';
 import type {
     CacheType,
     CommandInteractionOption,
     Guild,
     GuildMember,
 } from 'discord.js';
-import type { AudioPlayer, VoiceConnection } from '@discordjs/voice';
 
 /* STORAGE TYPES */
 export interface CollectionList {
@@ -22,11 +22,11 @@ export interface DataStorage<StorageTypes> {
 export interface MapStorage<StorageTypes> {
     updated: Date;
     description: string;
-    items: Map<number, TTLValue<StorageTypes>>;
+    items: Map<string, TTLValue<StorageTypes>>;
 }
 
 export interface TTLValue<StorageTypes> {
-    id: number;
+    id: string;
     timestamp: Date;
     value: StorageTypes;
     timer: ReturnType<typeof setTimeout>;
