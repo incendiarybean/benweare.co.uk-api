@@ -15,6 +15,7 @@ describe('Server should return expected responses from endpoints defined in rout
 
     beforeEach(() => {
         // Force system time for comparison
+        jest.useFakeTimers();
         jest.setSystemTime(testingDate);
     });
 

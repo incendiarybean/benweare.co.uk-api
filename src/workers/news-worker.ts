@@ -1,13 +1,13 @@
-import axios from 'axios';
 import type { NasaArticle, NewsArticle, UndefinedNews } from '@common/types';
 import {
     dateGenerator,
     fetchArticles,
     retryHandler,
-    sleep,
     staticRefresher,
 } from '@common/utils/common-utils';
+
 import { IO } from '@server';
+import axios from 'axios';
 import { storage } from '..';
 
 /**
@@ -117,7 +117,6 @@ export const getPCGamerNews = (): Promise<void> =>
                 HTMLDivElement.querySelector(
                     '.article-name'
                 )?.textContent?.trim();
-
             if (title) {
                 const url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
@@ -148,11 +147,6 @@ export const getPCGamerNews = (): Promise<void> =>
 /**
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
- * 
- * Note: This function is a tad messy due to BBC deciding to restructure their classes
- *       They no longer provide timestamps for articles and have multiple titles (one being hidden?) in some cases
- * 
- * TODO: Adjust this function to be cleaner, it's currently a simple solution
  */
 export const getUKNews = (): Promise<void> =>
     fetchArticles(
@@ -162,17 +156,16 @@ export const getUKNews = (): Promise<void> =>
     ).then((HTMLArticles: Element[]) => {
         const site: string = 'BBC';
         const articles: NewsArticle[] = [];
-        const articleTitles: string[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
-            const titles = HTMLDivElement.querySelector(
-                '[role="text"]'
-            )?.childNodes;
-
-            const title = titles ? (titles[1] ? titles[1].textContent?.trim() : titles[0].textContent?.trim()) : undefined;
-
+            // Latest News articles have a hidden span reporting the publishing time
+            // We only want latest articles, so only get Articles that have a second child element
+            const title: string | undefined =
+                HTMLDivElement.querySelector('[role="text"]')?.childNodes[1]
+                    ?.textContent ?? undefined;
             if (title) {
-                let img: UndefinedNews = HTMLDivElement.querySelector('img')?.src ?? 'Not Found'
+                let img: UndefinedNews =
+                    HTMLDivElement.querySelector('img')?.src ?? 'Not Found';
 
                 let url: string =
                     HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
@@ -181,24 +174,23 @@ export const getUKNews = (): Promise<void> =>
                     url = `https://www.bbc.co.uk${url}`;
                 }
 
-                // This has to be included as the BBC no longer provides timestamps in their articles
-                // So we have to index by order of collection, rather than date of post
-                sleep(1);
-                const date = new Date().toISOString();
+                const publishedTime: UndefinedNews =
+                    HTMLDivElement.querySelector('h3')?.firstChild?.textContent;
 
-                const live =
-                    HTMLDivElement.querySelector('a')?.href.split('/')[2] ??
-                    'Not Found';
-
-                if (!articleTitles.includes(title) && live !== 'live') {
-                    articleTitles.push(title);
-                    articles.push({
-                        title,
-                        url,
-                        img,
-                        date,
-                    });
+                // Assuming Latest News only has today's news (most probably)
+                // Parse the published date (e.g 12:00) to today's date/time
+                let date = new Date();
+                if (publishedTime?.match(/\d{1,2}:\d{1,2}/g)) {
+                    const [hours, minutes] = publishedTime.split(':');
+                    date.setHours(parseInt(hours), parseInt(minutes));
                 }
+
+                articles.push({
+                    title,
+                    url,
+                    img,
+                    date: date.toISOString(),
+                });
             }
         });
         storage.write('NEWS', site, `${site}'s Latest News.`, articles);
