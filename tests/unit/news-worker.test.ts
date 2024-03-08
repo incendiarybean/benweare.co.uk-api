@@ -31,8 +31,8 @@ describe('News-Worker should collect news as expected', () => {
         expect(storageSpy.mock.calls.length).toEqual(1);
         expect(storageSpy.mock.calls[0]).toEqual([
             'NEWS',
-            'TheRegister',
-            "TheRegister's Latest News.",
+            'The_Register',
+            "The_Register's Latest News.",
             [
                 {
                     date: '1970-01-01T00:00:00.000Z',
@@ -85,8 +85,8 @@ describe('News-Worker should collect news as expected', () => {
         expect(storageSpy.mock.calls.length).toEqual(1);
         expect(storageSpy.mock.calls[0]).toEqual([
             'NEWS',
-            'RockPaperShotgun',
-            "RockPaperShotgun's Latest News.",
+            'Rock_Paper_Shotgun',
+            "Rock_Paper_Shotgun's Latest News.",
             [
                 {
                     date: '2023-02-01T15:46:04.563Z',
@@ -241,6 +241,30 @@ describe('News-Worker should collect news as expected', () => {
                 url: 'Not Found',
             },
         ]);
+    });
+
+    it('should handle invalid titles for BBC if missing', async () => {
+        const { getUKNews } = require('../../src/workers/news-worker');
+        const { storage } = require('../../src');
+        const storageSpy = jest.spyOn(storage, 'write');
+
+        const commonUtils = require('../../src/common/utils/common-utils');
+        const document = new JSDOM(`
+            <li>
+                <div type="article">
+                    <div role="text"></div>
+                </div>
+            </li>
+        `).window.document;
+
+        jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
+            document,
+        ]);
+
+        await getUKNews();
+
+        expect(storageSpy.mock.calls.length).toEqual(1);
+        expect(storageSpy.mock.calls[0][3]).toEqual([]);
     });
 
     it('should collect the nasa daily image correctly', async () => {

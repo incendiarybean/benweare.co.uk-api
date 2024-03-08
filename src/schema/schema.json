@@ -39,7 +39,13 @@
             },
             "NewsOption": {
                 "type": "string",
-                "enum": ["bbc", "rockpapershotgun", "pcgamer", "nasa"]
+                "enum": [
+                    "bbc",
+                    "the_register",
+                    "rock_paper_shotgun",
+                    "pcgamer",
+                    "nasa"
+                ]
             },
             "Article": {
                 "type": "object",

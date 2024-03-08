@@ -1,5 +1,6 @@
-import { OpenAPIV3 } from 'openapi-types';
 import * as SchemaJSON from './schema.json';
+
+import { OpenAPIV3 } from 'openapi-types';
 
 export const getServers = () => {
     if (process.env.NODE_ENV === 'production') {
@@ -29,6 +30,6 @@ export const getServers = () => {
 };
 
 const OpenApiSchema = SchemaJSON as OpenAPIV3.Document;
-OpenApiSchema.info.version = process.env.npm_package_version ?? '0.0.0';
+OpenApiSchema.info.version = process.env.npm_package_version as string;
 OpenApiSchema.servers = getServers();
 export default OpenApiSchema;

@@ -187,12 +187,65 @@ describe('Server should return expected responses from endpoints defined in rout
             });
         });
 
+        it('should return all stored objects of NEWS with status 200', async () => {
+            // Mock the storage object
+            jest.spyOn(storage, 'items').mockReturnValueOnce([]);
+
+            const result = await request(app)
+                .get('/api/news/articles')
+                .set('x-forwarded-proto', 'https://test.com');
+            HTTPServer.close();
+
+            expect(result.status).toEqual(200);
+            expect(result.body).toEqual({
+                description: 'Retrieve all collected news articles.',
+                link: { action: 'GET', href: '/api/news/articles' },
+                response: [],
+                timestamp: testingDate.toISOString(),
+            });
+        });
+
+        it('should return the article associated with an ID with status 200', async () => {
+            // Mock the storage object
+            jest.spyOn(storage, 'itemById').mockReturnValueOnce({
+                title: 'Test',
+                url: 'Test URL',
+                img: 'Test IMG',
+                name: 'Test',
+                date: '1970-01-01T00:00:00.000Z',
+                id: 'test-test-test',
+            });
+
+            const result = await request(app)
+                .get('/api/news/articles/test-test-test')
+                .set('x-forwarded-proto', 'https://test.com');
+            HTTPServer.close();
+
+            expect(result.status).toEqual(200);
+            expect(result.body).toEqual({
+                description: 'Retrieve all collected news articles.',
+                link: {
+                    action: 'GET',
+                    href: '/api/news/articles/test-test-test',
+                },
+                response: {
+                    title: 'Test',
+                    url: 'Test URL',
+                    img: 'Test IMG',
+                    name: 'Test',
+                    date: '1970-01-01T00:00:00.000Z',
+                    id: 'test-test-test',
+                },
+                timestamp: testingDate.toISOString(),
+            });
+        });
+
         test.each([
             { path: '/api/news' },
             { path: '/api/news/outlet' },
             { path: '/api/news/outlet/articles' },
         ])(
-            'should return a 404 if the specified weather outlet collection is not found on route: $path',
+            'should return a 404 if the specified news outlet collection is not found on route: $path',
             async ({ path }) => {
                 jest.spyOn(storage, 'collections').mockImplementationOnce(
                     () => {
@@ -224,6 +277,8 @@ describe('Server should return expected responses from endpoints defined in rout
 
         it.each([
             { path: '/api/news' },
+            { path: '/api/news/articles' },
+            { path: '/api/news/articles/test-test-test' },
             { path: '/api/news/outlet' },
             { path: '/api/news/outlet/articles' },
         ])('should return a 502 if a server error occurs', async ({ path }) => {
@@ -231,6 +286,9 @@ describe('Server should return expected responses from endpoints defined in rout
                 new Error('Failed')
             );
             jest.spyOn(storage, 'search').mockImplementationOnce(
+                new Error('Failed')
+            );
+            jest.spyOn(storage, 'items').mockImplementationOnce(
                 new Error('Failed')
             );
 

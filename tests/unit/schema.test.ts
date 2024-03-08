@@ -67,4 +67,11 @@ describe('The Documentation/Schema should provide the correct hostnames dependan
             },
         ]);
     });
+
+    it('should default the version if it is not found', () => {
+        const OpenApiSchema = require('../../src/schema').default;
+        expect(OpenApiSchema.info.version).toEqual(
+            process.env.npm_package_version
+        );
+    });
 });

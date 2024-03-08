@@ -133,7 +133,7 @@ export class ObjectStorage<
      */
     public items = (
         namespaceName: string,
-        sort?: 'ASC' | 'DESC'
+        sort: 'ASC' | 'DESC' = 'DESC'
     ): StorageTypes[] => {
         const namespace = namespaceName.toUpperCase();
 
