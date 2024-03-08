@@ -10,9 +10,11 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         const storage = new ObjectStorage<TestType>();
 
         try {
-            storage.list('TEST');
+            storage.collections('TEST');
         } catch (e) {
-            expect(e.message).toEqual('No items available in namespace: TEST');
+            expect(e.message).toEqual(
+                'No collections available in namespace: TEST'
+            );
             expect(e.status).toEqual(404);
         }
     });
@@ -27,7 +29,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         // Check that storage has been written to and is in correct namespace
-        const result = storage.list('TEST_NAMESPACE_0');
+        const result = storage.collections('TEST_NAMESPACE_0');
         expect(result.length).toEqual(1);
         expect(result[0].description).toEqual(
             "TEST_COLLECTION_0's latest test."
@@ -64,7 +66,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             ]
         );
 
-        expect(storage.list('TEST_NAMESPACE_0').length).toEqual(2);
+        expect(storage.collections('TEST_NAMESPACE_0').length).toEqual(2);
 
         // Expect TEST_NAMESPACE_0 to have an extra value
         expect(
@@ -72,13 +74,15 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test',
-                id: -2105250601,
+                id: '4223-304-6000',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'overwitten test',
-                id: -279093068,
+                id: '1868-390-5790',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
         ]);
 
@@ -88,8 +92,9 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test',
-                id: -2105250601,
+                id: '4223-304-6000',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_1',
             },
         ]);
     });
@@ -177,7 +182,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         // Check first namespace has 2 collections
-        const list0Result = storage.list('TEST_NAMESPACE_0');
+        const list0Result = storage.collections('TEST_NAMESPACE_0');
         expect(list0Result.length).toEqual(2);
 
         // Check that collection returned is expected and has 4 items
@@ -187,7 +192,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(result0.updated).toBeDefined();
 
         // Check second namespace only has 1 collection
-        const list1Result = storage.list('TEST_NAMESPACE_1');
+        const list1Result = storage.collections('TEST_NAMESPACE_1');
         expect(list1Result.length).toEqual(1);
 
         // Check that collection returned is expected and has 2 items
@@ -196,13 +201,15 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(result1.items).toEqual([
             {
                 message: 'test-0',
-                id: -215976262,
+                id: '1931-507-3850',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: -215975301,
+                id: '1931-508-3460',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
         ]);
         expect(result1.description).toEqual("TEST_COLLECTION_0's latest test.");
@@ -263,13 +270,15 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-1',
-                id: -215975301,
+                id: '1931-508-3460',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-0',
-                id: -215976262,
+                id: '1931-507-3850',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
         ]);
 
@@ -295,13 +304,15 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-0',
-                id: -215976262,
+                id: '1931-507-3850',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: -215975301,
+                id: '1931-508-3460',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
         ]);
     });
@@ -335,11 +346,36 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-4', id: -215972418, date: dateArray[4] },
-            { message: 'test-3', id: -215973379, date: dateArray[3] },
-            { message: 'test-2', id: -215974340, date: dateArray[2] },
-            { message: 'test-1', id: -215975301, date: dateArray[1] },
-            { message: 'test-0', id: -215976262, date: dateArray[0] },
+            {
+                message: 'test-4',
+                id: '1931-511-2290',
+                date: dateArray[4],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-3',
+                id: '1931-510-2680',
+                date: dateArray[3],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-2',
+                id: '1931-509-3070',
+                date: dateArray[2],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-1',
+                id: '1931-508-3460',
+                date: dateArray[1],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-0',
+                id: '1931-507-3850',
+                date: dateArray[0],
+                name: 'TEST_COLLECTION_0',
+            },
         ]);
 
         storage.write(
@@ -359,12 +395,42 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-5', id: -215971457, date: dateArray[5] },
-            { message: 'test-4', id: -215972418, date: dateArray[4] },
-            { message: 'test-3', id: -215973379, date: dateArray[3] },
-            { message: 'test-2', id: -215974340, date: dateArray[2] },
-            { message: 'test-1', id: -215975301, date: dateArray[1] },
-            { message: 'test-0', id: -215976262, date: dateArray[0] },
+            {
+                message: 'test-5',
+                id: '1931-512-1900',
+                date: dateArray[5],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-4',
+                id: '1931-511-2290',
+                date: dateArray[4],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-3',
+                id: '1931-510-2680',
+                date: dateArray[3],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-2',
+                id: '1931-509-3070',
+                date: dateArray[2],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-1',
+                id: '1931-508-3460',
+                date: dateArray[1],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-0',
+                id: '1931-507-3850',
+                date: dateArray[0],
+                name: 'TEST_COLLECTION_0',
+            },
         ]);
 
         storage.write(
@@ -384,14 +450,54 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(
             storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0').items
         ).toEqual([
-            { message: 'test-7', id: -215969535, date: dateArray[7] },
-            { message: 'test-6', id: -215970496, date: dateArray[6] },
-            { message: 'test-5', id: -215971457, date: dateArray[5] },
-            { message: 'test-4', id: -215972418, date: dateArray[4] },
-            { message: 'test-3', id: -215973379, date: dateArray[3] },
-            { message: 'test-2', id: -215974340, date: dateArray[2] },
-            { message: 'test-1', id: -215975301, date: dateArray[1] },
-            { message: 'test-0', id: -215976262, date: dateArray[0] },
+            {
+                message: 'test-7',
+                id: '1931-514-1120',
+                date: dateArray[7],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-6',
+                id: '1931-513-1510',
+                date: dateArray[6],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-5',
+                id: '1931-512-1900',
+                date: dateArray[5],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-4',
+                id: '1931-511-2290',
+                date: dateArray[4],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-3',
+                id: '1931-510-2680',
+                date: dateArray[3],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-2',
+                id: '1931-509-3070',
+                date: dateArray[2],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-1',
+                id: '1931-508-3460',
+                date: dateArray[1],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-0',
+                id: '1931-507-3850',
+                date: dateArray[0],
+                name: 'TEST_COLLECTION_0',
+            },
         ]);
     });
 
@@ -418,29 +524,204 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-0',
-                id: -215976262,
+                id: '1931-507-3850',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: -215975301,
+                id: '1931-508-3460',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-2',
-                id: -215974340,
+                id: '1931-509-3070',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-3',
-                id: -215973379,
+                id: '1931-510-2680',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-4',
-                id: -215972418,
+                id: '1931-511-2290',
                 date: new Date().toISOString(),
+                name: 'TEST_COLLECTION_0',
             },
         ]);
+    });
+
+    it('should return all items in an ordered list', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        // Create dates, 1 minute apart from eachother
+        const startDate = new Date();
+        const dateArray = Array.from(Array(5).keys()).map((i) =>
+            new Date(
+                startDate.setMinutes(startDate.getMinutes() + 1)
+            ).toISOString()
+        );
+
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: 'test-0', date: dateArray[0] },
+                { message: 'test-1', date: dateArray[1] },
+                { message: 'test-2', date: dateArray[2] },
+            ]
+        );
+
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_1',
+            "TEST_COLLECTION_1's latest test.",
+            [
+                { message: 'test-3', date: dateArray[3] },
+                { message: 'test-4', date: dateArray[4] },
+            ]
+        );
+
+        // We should expect the newest item to be first
+        expect(storage.items('TEST_NAMESPACE_0')).toEqual([
+            {
+                message: 'test-4',
+                id: '1931-511-2290',
+                date: dateArray[4],
+                name: 'TEST_COLLECTION_1',
+            },
+            {
+                message: 'test-3',
+                id: '1931-510-2680',
+                date: dateArray[3],
+                name: 'TEST_COLLECTION_1',
+            },
+            {
+                message: 'test-2',
+                id: '1931-509-3070',
+                date: dateArray[2],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-1',
+                id: '1931-508-3460',
+                date: dateArray[1],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-0',
+                id: '1931-507-3850',
+                date: dateArray[0],
+                name: 'TEST_COLLECTION_0',
+            },
+        ]);
+
+        // We should expect the oldest item to be first
+        expect(storage.items('TEST_NAMESPACE_0', 'ASC')).toEqual([
+            {
+                message: 'test-0',
+                id: '1931-507-3850',
+                date: dateArray[0],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-1',
+                id: '1931-508-3460',
+                date: dateArray[1],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-2',
+                id: '1931-509-3070',
+                date: dateArray[2],
+                name: 'TEST_COLLECTION_0',
+            },
+            {
+                message: 'test-3',
+                id: '1931-510-2680',
+                date: dateArray[3],
+                name: 'TEST_COLLECTION_1',
+            },
+            {
+                message: 'test-4',
+                id: '1931-511-2290',
+                date: dateArray[4],
+                name: 'TEST_COLLECTION_1',
+            },
+        ]);
+    });
+
+    it('should report a 404 when no namespace is found when searching items', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        try {
+            storage.items('TEST_NAMESPACE_0');
+        } catch (e) {
+            expect(e.message).toEqual(
+                'No items available in namespace: TEST_NAMESPACE_0'
+            );
+            expect(e.status).toEqual(404);
+        }
+    });
+
+    it('should be able to find a specific item in a namespace by its ID', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        const date = new Date();
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: 'test-0', date: date.toISOString() },
+                { message: 'test-1', date: new Date().toISOString() },
+                { message: 'test-2', date: new Date().toISOString() },
+            ]
+        );
+
+        expect(storage.itemById('TEST_NAMESPACE_0', '1931-507-3850')).toEqual({
+            date: date.toISOString(),
+            id: '1931-507-3850',
+            message: 'test-0',
+            name: 'TEST_COLLECTION_0',
+        });
+    });
+
+    it('should report a 404 when no namespace is found when searching an item by its ID', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        try {
+            storage.itemById('TEST_NAMESPACE_0', '1931-507-3850');
+        } catch (e) {
+            expect(e.message).toEqual(
+                'Could not find namespace: TEST_NAMESPACE_0'
+            );
+            expect(e.status).toEqual(404);
+        }
+    });
+
+    it('should report a 404 when no item is found when searching an item by its ID', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            "TEST_COLLECTION_0's latest test.",
+            [{ message: 'test-1', date: new Date().toISOString() }]
+        );
+
+        try {
+            storage.itemById('TEST_NAMESPACE_0', '1931-507-3850');
+        } catch (e) {
+            expect(e.message).toEqual(
+                'Could not find item with ID: 1931-507-3850'
+            );
+            expect(e.status).toEqual(404);
+        }
     });
 });

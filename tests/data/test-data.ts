@@ -31,7 +31,7 @@ export const rpsContent = () => {
         'li',
         'title',
         'thumbnail_image',
-        ' <div>Test Title</div>'
+        '<div>Test Title</div>'
     );
 };
 
@@ -51,7 +51,8 @@ export const bbcContent = () => {
         'list',
         'article',
         'text',
-        ''
+        '',
+        '<span>Test Title</span>'
     );
 };
 

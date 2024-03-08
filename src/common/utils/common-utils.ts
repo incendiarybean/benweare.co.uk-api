@@ -1,13 +1,6 @@
 import type { AxiosResponse } from 'axios';
-import axios from 'axios';
 import { JSDOM } from 'jsdom';
-
-/**
- * 
- * @param {number} ms - Number of milliseconds to wait for.
- * @returns {Promise<void>} - A resolution when timer has waited for the allotted time.
- */
-export const sleep = async(ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+import axios from 'axios';
 
 /**
  * This function is wrapped in a setImmediate to schedule execution
@@ -80,7 +73,7 @@ export const fetchArticles = (
                 container
                     .querySelectorAll(splitSelector)
                     .forEach((article: Element, index: number) => {
-                        if (index < 12 && article.textContent) {
+                        if (article.textContent) {
                             HTMLArticles.push(article);
                         }
                     })

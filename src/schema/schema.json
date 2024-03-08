@@ -39,7 +39,13 @@
             },
             "NewsOption": {
                 "type": "string",
-                "enum": ["bbc", "rockpapershotgun", "pcgamer", "nasa"]
+                "enum": [
+                    "bbc",
+                    "the_register",
+                    "rock_paper_shotgun",
+                    "pcgamer",
+                    "nasa"
+                ]
             },
             "Article": {
                 "type": "object",
@@ -155,6 +161,23 @@
                                 }
                             },
                             {
+                                "type": "object",
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/NewsResponse"
+                                        }
+                                    },
+                                    "updated": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            {
                                 "type": "array",
                                 "items": {
                                     "$ref": "#/components/schemas/WeatherResponse"
@@ -257,6 +280,41 @@
                 ],
                 "tags": ["News"],
                 "summary": "Retrieve a specific news outlet.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/News"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/news/articles": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "Sort by ASC | DESC",
+                        "in": "query",
+                        "name": "sort"
+                    }
+                ],
+                "tags": ["News"],
+                "summary": "Retrieve all collected news articles.",
                 "responses": {
                     "200": {
                         "description": "Success",

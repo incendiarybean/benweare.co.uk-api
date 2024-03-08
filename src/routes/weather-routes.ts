@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
-import express from 'express';
+
 import OpenApiSchema from '@schema';
+import express from 'express';
 import { storage } from '..';
 
 const router = express.Router();
@@ -50,7 +51,7 @@ router.get('/api/forecasts/:outlet', (req: Request, res: Response) => {
 router.get('/api/forecasts', (req: Request, res: Response) => {
     try {
         return res.json({
-            response: storage.list('WEATHER'),
+            response: storage.collections('WEATHER'),
             description: OpenApiSchema.paths['/api/forecasts']?.get?.summary,
             timestamp: new Date(),
             link: {
