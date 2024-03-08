@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import {
     dateGenerator,
     dateParses,
@@ -8,14 +7,16 @@ import {
     retryHandler,
     staticRefresher,
 } from '../../src/common/utils/common-utils';
+
 import { genericContent } from '../data/test-data';
+import { readFileSync } from 'fs';
 
 const mockAxios = globalThis.__mockAxios__;
 
 describe('Refresh & Retry utils should function as desired.', () => {
     it('should repeatedly call a function using the staticRefresher method', async () => {
         const loggerSpy = jest.spyOn(console, 'debug');
-
+        jest.useFakeTimers();
         staticRefresher(
             500,
             () => {
@@ -108,6 +109,7 @@ describe('Date utils should return correct values', () => {
 
     it('should create a valid UK date from existing/scratch', () => {
         const today = new Date();
+        jest.useFakeTimers();
         jest.setSystemTime(today);
 
         let result = new Date(dateGenerator('InvalidDate')).toLocaleString(

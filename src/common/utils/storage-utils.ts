@@ -16,7 +16,12 @@ export class StorageError extends Error {
 }
 
 export class ObjectStorage<
-    StorageTypes extends { date: string; img?: string; id?: number }
+    StorageTypes extends {
+        date: string;
+        img?: string;
+        id?: string;
+        name?: string;
+    }
 > {
     private storage: Store<StorageTypes>;
     private expiration: number;
@@ -30,16 +35,24 @@ export class ObjectStorage<
     /**
      * Used to generate an ID to use for finding duplicate stored items
      * @param {string} value - String value of the Object to create an ID for
-     * @returns {number} - The ID of the object
+     * @returns {string} - The ID of the object
      */
-    private createId = (value: any): number => {
+    private createId = (value: any): string => {
         let id = 0;
         for (let i = 0; i < value.length; i++) {
             const char = value.charCodeAt(i);
             id = (id << 5) - id + char;
             id |= 0;
         }
-        return id;
+
+        // Force Id to be positive
+        id = id + 2147483647;
+
+        // Create an simple connected ID
+        const stringifiedId = id.toString().split('');
+        stringifiedId.splice(4, 0, '-');
+        stringifiedId.splice(8, 0, '-');
+        return stringifiedId.join('').padEnd(13, '0');
     };
 
     /**
@@ -94,7 +107,34 @@ export class ObjectStorage<
      * @param {string} namespaceName - The Name of the Namespace to find the collections
      * @returns {CollectionList[]} A list of available Sub-Collections
      */
-    public list = (namespaceName: string): CollectionList[] => {
+    public collections = (namespaceName: string): CollectionList[] => {
+        const namespace = namespaceName.toUpperCase();
+
+        if (!this.storage[namespace]) {
+            throw new StorageError(
+                `No collections available in namespace: ${namespace}`,
+                { status: 404 }
+            );
+        }
+
+        // Get all entries in Map and return them formatted with the Key as the name
+        const collections = Array.from(this.storage[namespace].entries());
+        return collections.map(([key, { description, updated }]) => ({
+            name: key,
+            description,
+            updated,
+        }));
+    };
+
+    /**
+     * Returns a list of available items within a collection in a desired namespace
+     * @param {string} namespaceName - The Name of the Namespace to find the collections
+     * @returns {StorageTypes[]} A list of items from all available collections in a namespace
+     */
+    public items = (
+        namespaceName: string,
+        sort: 'ASC' | 'DESC' = 'DESC'
+    ): StorageTypes[] => {
         const namespace = namespaceName.toUpperCase();
 
         if (!this.storage[namespace]) {
@@ -104,13 +144,54 @@ export class ObjectStorage<
             );
         }
 
-        // Get all entries in Map and return them formatted with the Key as the name
-        const items = Array.from(this.storage[namespace].entries());
-        return items.map(([key, { description, updated }]) => ({
-            name: key,
-            description,
-            updated,
-        }));
+        // Get all values in each Map and return them formatted into a single array
+        const collections = Array.from(this.storage[namespace].values());
+        let items = collections
+            .map(({ items }) => Array.from(items.values()))
+            .flat();
+
+        if (sort?.toUpperCase() === 'DESC') {
+            items = items.sort(
+                (x, y) =>
+                    new Date(y.timestamp).valueOf() -
+                    new Date(x.timestamp).valueOf()
+            );
+        }
+
+        if (sort?.toUpperCase() === 'ASC') {
+            items = items.sort(
+                (x, y) =>
+                    new Date(x.timestamp).valueOf() -
+                    new Date(y.timestamp).valueOf()
+            );
+        }
+
+        return items.map(({ value }) => value);
+    };
+
+    /**
+     * Searches the given namespace for a matching Item ID
+     * @param {string} namespaceName - Name of Namespace to find collection
+     * @param {string} id - ID of item to find in the namespace
+     * @returns {DataStorage} - The returned item matching the provided ID from the namespace
+     */
+    public itemById = (namespaceName: string, id: string): StorageTypes => {
+        const namespace = namespaceName.toUpperCase();
+
+        if (!this.storage[namespace]) {
+            throw new StorageError(`Could not find namespace: ${namespace}`, {
+                status: 404,
+            });
+        }
+
+        const item = this.items(namespace).find((value) => value.id === id);
+        if (!item) {
+            throw new StorageError(`Could not find item with ID: ${id}`, {
+                status: 404,
+            });
+        }
+
+        return item;
     };
 
     /**
@@ -139,7 +220,7 @@ export class ObjectStorage<
         const storedData = this.storage[namespace].get(collection);
         if (!storedData) {
             this.storage[namespace].set(collection, {
-                items: new Map<number, TTLValue<StorageTypes>>(),
+                items: new Map<string, TTLValue<StorageTypes>>(),
                 updated: new Date(),
                 description,
             });
@@ -150,7 +231,7 @@ export class ObjectStorage<
         // If it exists, restart the timer
         items.forEach(({ date, ...item }) => {
             // Remove image as image can change, but content might not
-            let key: number;
+            let key: string;
             if (item.img) {
                 key = this.createId(
                     JSON.stringify({ ...item, img: undefined })
@@ -178,6 +259,7 @@ export class ObjectStorage<
 
                 const value = {
                     ...item,
+                    name: collection,
                     date,
                     id: key,
                 } as StorageTypes;
