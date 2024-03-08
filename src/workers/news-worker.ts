@@ -20,7 +20,7 @@ export const getRegisterNews = (): Promise<void> =>
         '#main-col',
         'article'
     ).then((HTMLArticles: Element[]) => {
-        const site: string = 'TheRegister';
+        const site: string = 'The_Register';
         const articles: NewsArticle[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {
@@ -64,7 +64,7 @@ export const getRPSNews = (): Promise<void> =>
         '.articles',
         'li'
     ).then((HTMLArticles: Element[]) => {
-        const site: string = 'RockPaperShotgun';
+        const site: string = 'Rock_Paper_Shotgun';
         const articles: NewsArticle[] = [];
 
         HTMLArticles.forEach((HTMLDivElement) => {

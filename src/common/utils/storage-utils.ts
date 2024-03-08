@@ -150,7 +150,7 @@ export class ObjectStorage<
             .map(({ items }) => Array.from(items.values()))
             .flat();
 
-        if (sort?.toUpperCase() === 'ASC') {
+        if (sort?.toUpperCase() === 'DESC') {
             items = items.sort(
                 (x, y) =>
                     new Date(y.timestamp).valueOf() -
@@ -158,7 +158,7 @@ export class ObjectStorage<
             );
         }
 
-        if (sort?.toUpperCase() === 'DESC') {
+        if (sort?.toUpperCase() === 'ASC') {
             items = items.sort(
                 (x, y) =>
                     new Date(x.timestamp).valueOf() -
