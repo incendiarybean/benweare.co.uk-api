@@ -201,6 +201,43 @@ export const getUKNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
  */
+export const getArsTechnica = (): Promise<void> =>
+    fetchArticles(
+        'https://arstechnica.com/gadgets/',
+        '.listing-latest',
+        '.article'
+    ).then((HTMLArticles: Element[]) => {
+        const site: string = 'Ars_Technica';
+        const articles: NewsArticle[] = [];
+
+        HTMLArticles.forEach((HTMLDivElement) => {
+            const title: UndefinedNews =
+                HTMLDivElement.querySelector('h2')?.textContent?.trim();
+            if (title) {
+                const url: string =
+                    HTMLDivElement.querySelector('a')?.href ?? 'Not Found';
+
+                const date: string = dateGenerator(
+                    HTMLDivElement.querySelector('time')?.getAttribute(
+                        'datetime'
+                    )
+                );
+
+                articles.push({
+                    title,
+                    url,
+                    date,
+                });
+            }
+        });
+        storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+        IO.local.emit('RELOAD_NEWS');
+    });
+
+/**
+ * This function gets news for the given outlet
+ * @returns {void} - Writes data to storage object
+ */
 export const getNasaImage = (): Promise<void> =>
     axios
         .get(
@@ -225,6 +262,7 @@ export const getNews = (): void => {
     retryHandler(getPCGamerNews, 5);
     retryHandler(getRPSNews, 5);
     retryHandler(getRegisterNews, 5);
+    retryHandler(getArsTechnica, 5);
     retryHandler(getUKNews, 5);
     retryHandler(getNasaImage, 5);
 };

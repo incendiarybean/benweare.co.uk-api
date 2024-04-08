@@ -1,3 +1,5 @@
+import * as jsdom from 'jsdom';
+
 import type { AxiosResponse } from 'axios';
 import { JSDOM } from 'jsdom';
 import axios from 'axios';
@@ -65,7 +67,12 @@ export const fetchArticles = (
     splitSelector: string
 ): Promise<Element[]> =>
     axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
-        const { document } = new JSDOM(response.data).window;
+        // Create a virtual console to silence CSS parsing errors
+        const virtualConsole = new jsdom.VirtualConsole();
+        virtualConsole.on('error', () => {});
+
+        const { document } = new JSDOM(response.data, { virtualConsole })
+            .window;
         const HTMLArticles: Element[] = [];
         document
             .querySelectorAll(containerSelector)

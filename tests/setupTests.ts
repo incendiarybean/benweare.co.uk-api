@@ -1,5 +1,3 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import {
     bbcContent,
     metofficeContent,
@@ -8,6 +6,9 @@ import {
     registerContent,
     rpsContent,
 } from './data/test-data';
+
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
 const mockAxios = new MockAdapter(axios);
 globalThis.__mockAxios__ = mockAxios;

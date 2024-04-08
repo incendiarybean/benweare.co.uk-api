@@ -166,8 +166,7 @@ export interface WeatherConfig {
 }
 
 export type WeatherRequestHeaders = {
-    'x-ibm-client-id': string;
-    'x-ibm-client-secret': string;
+    apikey: string;
     accept: string;
 };
 

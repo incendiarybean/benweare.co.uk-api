@@ -1,17 +1,18 @@
-import http from 'http';
-import express from 'express';
-import { Server } from 'socket.io';
 import { contentHandler, headerHandler, routeHandler } from '@handlers/index';
+
+import { Server } from 'socket.io';
+import express from 'express';
+import http from 'http';
 
 export const app = express();
 
 export const HTTPServer = http
     .createServer(app)
-    .listen(process.env.PORT ?? 8080, () => {
+    .listen(process.env.PORT ?? 8000, () => {
         console.info(`[${new Date()}] ENV: ${process.env.NODE_ENV}`);
         console.info(
             `[${new Date()}] Server is active on port: ${
-                process.env.PORT ?? process.env.HTTPS ?? 8080
+                process.env.PORT ?? process.env.HTTPS ?? 8000
             }`
         );
     });
