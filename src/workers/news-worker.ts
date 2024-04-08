@@ -201,7 +201,7 @@ export const getUKNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
  */
-export const getArsTechnica = (): Promise<void> =>
+export const getArsTechnicaNews = (): Promise<void> =>
     fetchArticles(
         'https://arstechnica.com/gadgets/',
         '.listing-latest',
@@ -262,7 +262,7 @@ export const getNews = (): void => {
     retryHandler(getPCGamerNews, 5);
     retryHandler(getRPSNews, 5);
     retryHandler(getRegisterNews, 5);
-    retryHandler(getArsTechnica, 5);
+    retryHandler(getArsTechnicaNews, 5);
     retryHandler(getUKNews, 5);
     retryHandler(getNasaImage, 5);
 };
