@@ -13,6 +13,16 @@ import { readFileSync } from 'fs';
 
 const mockAxios = globalThis.__mockAxios__;
 
+// These mocks ensure that the real server will not be used
+jest.mock('../../src/server', () => ({
+    IO: {
+        local: {
+            emit: (...args) => {},
+        },
+    },
+}));
+jest.mock('../../src', () => ({}));
+
 describe('Refresh & Retry utils should function as desired.', () => {
     it('should repeatedly call a function using the staticRefresher method', async () => {
         const loggerSpy = jest.spyOn(console, 'debug');
@@ -62,16 +72,19 @@ describe('News articles should be fetched and formatted correctly', () => {
             .replyOnce(200, genericData);
 
         const result = await fetchArticles(
+            'generic_article',
             'http://getGenericArticles.com',
             '.container',
             '.article'
         );
 
         expect(result).toBeDefined();
-        expect(result.length).toEqual(1);
-        expect(result[0].querySelector('.title')?.textContent?.trim()).toEqual(
-            'Test Title'
-        );
+        expect(result.unformattedArticles.length).toEqual(1);
+        expect(
+            result.unformattedArticles[0]
+                .querySelector('.title')
+                ?.textContent?.trim()
+        ).toEqual('Test Title');
     });
 });
 

@@ -64,9 +64,10 @@ describe('News-Worker should collect news as expected', () => {
                 </li>
             `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'The_Register',
+                unformattedArticles: [document],
+            });
 
             await getRegisterNews();
 
@@ -121,9 +122,10 @@ describe('News-Worker should collect news as expected', () => {
                 </li>
             `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'Rock_Paper_Shotgun',
+                unformattedArticles: [document],
+            });
 
             await getRPSNews();
 
@@ -179,9 +181,10 @@ describe('News-Worker should collect news as expected', () => {
             </li>
         `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'PCGamer',
+                unformattedArticles: [document],
+            });
 
             await getPCGamerNews();
 
@@ -237,9 +240,10 @@ describe('News-Worker should collect news as expected', () => {
             </li>
         `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'BBC',
+                unformattedArticles: [document],
+            });
 
             await getUKNews();
 
@@ -268,9 +272,10 @@ describe('News-Worker should collect news as expected', () => {
             </li>
         `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'BBC',
+                unformattedArticles: [document],
+            });
 
             await getUKNews();
 
@@ -280,7 +285,7 @@ describe('News-Worker should collect news as expected', () => {
     });
 
     describe('Ars Technica', () => {
-        it('should collect PCGamer news correctly', async () => {
+        it('should collect Ars Technica news correctly', async () => {
             const {
                 getArsTechnicaNews,
             } = require('../../src/workers/news-worker');
@@ -304,7 +309,7 @@ describe('News-Worker should collect news as expected', () => {
             ]);
         });
 
-        it('should use default values for PCGamer content if missing', async () => {
+        it('should use default values for Ars Technica content if missing', async () => {
             const {
                 getArsTechnicaNews,
             } = require('../../src/workers/news-worker');
@@ -322,9 +327,10 @@ describe('News-Worker should collect news as expected', () => {
             </li>
         `).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce([
-                document,
-            ]);
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'Ars_Technica',
+                unformattedArticles: [document],
+            });
 
             await getArsTechnicaNews();
 

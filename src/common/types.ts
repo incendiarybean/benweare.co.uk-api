@@ -6,6 +6,12 @@ import type {
     GuildMember,
 } from 'discord.js';
 
+/* COMMON TYPES */
+export type FetchArticleOutput = {
+    outlet: string;
+    unformattedArticles: Element[];
+};
+
 /* STORAGE TYPES */
 export interface CollectionList {
     name: string;

@@ -3,6 +3,16 @@ import { steamContent, steamUserContent } from '../data/test-data';
 
 const mockAxios = globalThis.__mockAxios__;
 
+// These mocks ensure that the real server will not be used
+jest.mock('../../src/server', () => ({
+    IO: {
+        local: {
+            emit: (...args) => {},
+        },
+    },
+}));
+jest.mock('../../src', () => ({}));
+
 describe('The Steam-Worker should correctly validate data and return it', () => {
     it('should return a valid object containing achievements without a steam userId', async () => {
         mockAxios

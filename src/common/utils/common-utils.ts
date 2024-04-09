@@ -1,8 +1,12 @@
 import * as jsdom from 'jsdom';
 
+import { FetchArticleOutput, NewsArticle } from '@common/types';
+
 import type { AxiosResponse } from 'axios';
+import { IO } from '@server';
 import { JSDOM } from 'jsdom';
 import axios from 'axios';
+import { storage } from '../..';
 
 /**
  * This function is wrapped in a setImmediate to schedule execution
@@ -62,10 +66,11 @@ export const retryHandler = (
  * @returns {Element[]} - An array of elements depending on your above selection
  */
 export const fetchArticles = (
+    name: string,
     url: string,
     containerSelector: string,
     splitSelector: string
-): Promise<Element[]> =>
+): Promise<FetchArticleOutput> =>
     axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
         // Create a virtual console to silence CSS parsing errors
         const virtualConsole = new jsdom.VirtualConsole();
@@ -79,14 +84,38 @@ export const fetchArticles = (
             .forEach((container: Element) =>
                 container
                     .querySelectorAll(splitSelector)
-                    .forEach((article: Element, index: number) => {
+                    .forEach((article: Element) => {
                         if (article.textContent) {
                             HTMLArticles.push(article);
                         }
                     })
             );
-        return HTMLArticles;
+
+        return {
+            outlet: name,
+            unformattedArticles: HTMLArticles,
+        };
     });
+
+/**
+ * This function runs each article through a manipulator to get the specific keys of information to save to the storage.
+ * @param {FetchArticleOutput} articleData - The output from the fetchArticles function
+ * @param {(articles: NewsArticle[], element: Element) => void} formatter - The formatter to run each element through to create a typeof NewsArticle.
+ */
+export const saveArticles = (
+    articleData: FetchArticleOutput,
+    manipulator: (articles: NewsArticle[], element: Element) => void
+): void => {
+    const site: string = articleData.outlet;
+    const articles: NewsArticle[] = [];
+
+    articleData.unformattedArticles.forEach((element) =>
+        manipulator(articles, element)
+    );
+
+    storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+    IO.local.emit('RELOAD_NEWS');
+};
 
 /**
  * This function retrieves the body of the provided page
