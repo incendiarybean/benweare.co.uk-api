@@ -53,14 +53,14 @@ export const getMetOffice = (): Promise<void> =>
     ).then((response) => {
         const { data } = response;
         const { features } = data;
-        let series = [];
-        if (features) {
-            series = features[0].properties.timeSeries.map(
-                (timeSeries: WeatherTimeSeries) => {
+        let series: any = [];
+        if (features[0]) {
+            const { timeSeries } = features[0].properties;
+            timeSeries.forEach((timeSeries: WeatherTimeSeries) => {
+                if (timeSeries.daySignificantWeatherCode) {
                     const [type, description] =
                         weatherCodes[timeSeries.daySignificantWeatherCode];
-
-                    return {
+                    series.push({
                         maxTemp: `${Math.round(
                             timeSeries.dayMaxScreenTemperature
                         )}º`,
@@ -74,9 +74,9 @@ export const getMetOffice = (): Promise<void> =>
                         weather: type,
                         weatherDescription: description,
                         date: dateGenerator(timeSeries.time),
-                    };
+                    });
                 }
-            );
+            });
         }
 
         storage.write(
