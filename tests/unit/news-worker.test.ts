@@ -375,20 +375,20 @@ describe('News-Worker should collect news as expected', () => {
         const { getNews } = require('../../src/workers/news-worker');
         const newsWorker = require('../../src/workers/news-worker');
 
-        const getRPSNews = jest.spyOn(newsWorker, 'getRPSNews');
-        const getRegisterNews = jest.spyOn(newsWorker, 'getRegisterNews');
-        const getPCGamerNews = jest.spyOn(newsWorker, 'getPCGamerNews');
-        const getUKNews = jest.spyOn(newsWorker, 'getUKNews');
         const getArsTechnicaNews = jest.spyOn(newsWorker, 'getArsTechnicaNews');
         const getNasaImage = jest.spyOn(newsWorker, 'getNasaImage');
+        const getPCGamerNews = jest.spyOn(newsWorker, 'getPCGamerNews');
+        const getRPSNews = jest.spyOn(newsWorker, 'getRPSNews');
+        const getRegisterNews = jest.spyOn(newsWorker, 'getRegisterNews');
+        const getUKNews = jest.spyOn(newsWorker, 'getUKNews');
 
         getNews();
 
-        expect(getRPSNews).toBeCalledTimes(1);
-        expect(getRegisterNews).toBeCalledTimes(1);
-        expect(getPCGamerNews).toBeCalledTimes(1);
-        expect(getUKNews).toBeCalledTimes(1);
         expect(getArsTechnicaNews).toBeCalledTimes(1);
         expect(getNasaImage).toBeCalledTimes(1);
+        expect(getPCGamerNews).toBeCalledTimes(1);
+        expect(getRPSNews).toBeCalledTimes(1);
+        expect(getRegisterNews).toBeCalledTimes(1);
+        expect(getUKNews).toBeCalledTimes(1);
     });
 });
