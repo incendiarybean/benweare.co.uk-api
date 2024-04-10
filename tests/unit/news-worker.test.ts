@@ -277,13 +277,7 @@ describe('News-Worker should collect news as expected', () => {
             await getRegisterNews();
 
             expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: '1970-01-01T00:00:00.000Z',
-                    url: 'Not Found',
-                },
-            ]);
+            expect(storageSpy.mock.calls[0][3]).toEqual([]);
         });
     });
 

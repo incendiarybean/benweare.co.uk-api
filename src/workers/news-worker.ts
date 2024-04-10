@@ -170,18 +170,20 @@ export const getRegisterNews = (): Promise<void> =>
                           element.querySelector('a')?.href
                       }`
                     : 'Not Found';
-                const epoch: string =
-                    element
-                        .querySelector('.time_stamp')
-                        ?.getAttribute('data-epoch') ?? '0';
-                const epochDate = new Date(0);
-                epochDate.setUTCSeconds(parseInt(epoch, 10));
-                const date: string = dateGenerator(epochDate.toISOString());
-                articles.push({
-                    title,
-                    url,
-                    date,
-                });
+                const epoch: string | null | undefined = element
+                    .querySelector('.time_stamp')
+                    ?.getAttribute('data-epoch');
+
+                if (epoch) {
+                    const epochDate = new Date(0);
+                    epochDate.setUTCSeconds(parseInt(epoch, 10));
+                    const date: string = dateGenerator(epochDate.toISOString());
+                    articles.push({
+                        title,
+                        url,
+                        date,
+                    });
+                }
             }
         })
     );
