@@ -246,4 +246,4 @@ export const getNews = (): void => {
     retryHandler(getUKNews, 5);
 };
 
-staticRefresher(480000, getNews, 'News');
+staticRefresher(240000, getNews);

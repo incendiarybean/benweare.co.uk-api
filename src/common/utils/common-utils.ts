@@ -16,14 +16,10 @@ import { storage } from '../..';
  * @param {function} trigger - Function to trigger on refresh.
  * @param {string} functionName - Name of function being refreshed.
  */
-export const staticRefresher = (
-    timer: number,
-    trigger: () => void,
-    functionName: string
-): void => {
+export const staticRefresher = (timer: number, trigger: () => void): void => {
     setImmediate((): void => {
         console.info(
-            `[${new Date()}] Initialising ${functionName} Refresher...`
+            `[${new Date()}] Initialising ${trigger.name} Refresher...`
         );
 
         trigger();

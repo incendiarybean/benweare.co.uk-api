@@ -103,4 +103,4 @@ export const getWeather = (): void => {
     retryHandler(getMetOffice, 2);
 };
 
-staticRefresher(900000, getWeather, 'Weather');
+staticRefresher(900000, getWeather);

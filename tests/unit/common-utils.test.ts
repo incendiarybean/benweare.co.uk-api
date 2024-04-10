@@ -27,13 +27,10 @@ describe('Refresh & Retry utils should function as desired.', () => {
     it('should repeatedly call a function using the staticRefresher method', async () => {
         const loggerSpy = jest.spyOn(console, 'debug');
         jest.useFakeTimers();
-        staticRefresher(
-            500,
-            () => {
-                console.debug('Testing Refresh Handler');
-            },
-            'Testing staticRefresher'
-        );
+        const testingStaticRefresher = () => {
+            console.debug('Testing Refresh Handler');
+        };
+        staticRefresher(500, testingStaticRefresher);
         jest.advanceTimersToNextTimer();
         expect(loggerSpy.mock.calls.length).toBe(1);
         expect(loggerSpy).lastCalledWith('Testing Refresh Handler');
