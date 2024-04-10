@@ -56,6 +56,17 @@ export const bbcContent = () => {
     );
 };
 
+export const arsTechnicaContent = () => {
+    return replacer(
+        template,
+        'listing-latest',
+        'article',
+        'text',
+        '',
+        '<h2>Test Title</h2>'
+    );
+};
+
 export const genericContent = () => {
     return replacer(template, 'container', 'article', 'title', 'image');
 };

@@ -1,12 +1,12 @@
 {
     "name": "benweare.co.uk-server",
-    "version": "2.3.0",
+    "version": "2.3.2",
     "private": true,
     "main": "./build/index.js",
     "dependencies": {
         "@discordjs/voice": "^0.15.0",
         "axios": "^1.6.2",
-        "benweare.co.uk-client": "^1.5.0",
+        "benweare.co.uk-client": "^1.5.1",
         "cors": "^2.8.5",
         "discord.js": "^14.8.0",
         "dotenv": "^16.0.1",

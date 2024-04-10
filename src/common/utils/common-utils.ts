@@ -1,6 +1,12 @@
+import * as jsdom from 'jsdom';
+
+import { FetchArticleOutput, NewsArticle } from '@common/types';
+
 import type { AxiosResponse } from 'axios';
+import { IO } from '@server';
 import { JSDOM } from 'jsdom';
 import axios from 'axios';
+import { storage } from '../..';
 
 /**
  * This function is wrapped in a setImmediate to schedule execution
@@ -10,14 +16,10 @@ import axios from 'axios';
  * @param {function} trigger - Function to trigger on refresh.
  * @param {string} functionName - Name of function being refreshed.
  */
-export const staticRefresher = (
-    timer: number,
-    trigger: () => void,
-    functionName: string
-): void => {
+export const staticRefresher = (timer: number, trigger: () => void): void => {
     setImmediate((): void => {
         console.info(
-            `[${new Date()}] Initialising ${functionName} Refresher...`
+            `[${new Date()}] Initialising ${trigger.name} Refresher...`
         );
 
         trigger();
@@ -54,32 +56,63 @@ export const retryHandler = (
 /**
  * This function retrieves a container element using containerSelector
  * It then splits the container element into children[] using splitSelector
+ * @param {string} name - Name of the collected site
  * @param {string} url - URL of the site you wish to fetch from
  * @param {string} containerSelector - QuerySelector you wish to grab articles from
  * @param {string} splitSelector - QuerySelector used to identify and split each article
- * @returns {Element[]} - An array of elements depending on your above selection
+ * @returns {FetchArticleOutput} - An object containing the sitename and a collection of elements divided by your above selection
  */
 export const fetchArticles = (
+    name: string,
     url: string,
     containerSelector: string,
     splitSelector: string
-): Promise<Element[]> =>
+): Promise<FetchArticleOutput> =>
     axios.get(url, { responseType: 'text' }).then((response: AxiosResponse) => {
-        const { document } = new JSDOM(response.data).window;
+        // Create a virtual console to silence CSS parsing errors
+        const virtualConsole = new jsdom.VirtualConsole();
+        virtualConsole.on('error', () => {});
+
+        const { document } = new JSDOM(response.data, { virtualConsole })
+            .window;
         const HTMLArticles: Element[] = [];
         document
             .querySelectorAll(containerSelector)
             .forEach((container: Element) =>
                 container
                     .querySelectorAll(splitSelector)
-                    .forEach((article: Element, index: number) => {
+                    .forEach((article: Element) => {
                         if (article.textContent) {
                             HTMLArticles.push(article);
                         }
                     })
             );
-        return HTMLArticles;
+
+        return {
+            outlet: name,
+            unformattedArticles: HTMLArticles,
+        };
     });
+
+/**
+ * This function runs each article through a manipulator to get the specific keys of information to save to the storage.
+ * @param {FetchArticleOutput} articleData - The output from the fetchArticles function
+ * @param {(articles: NewsArticle[], element: Element) => void} manipulator - The formatter to run each element through to create a typeof NewsArticle.
+ */
+export const saveArticles = (
+    articleData: FetchArticleOutput,
+    manipulator: (articles: NewsArticle[], element: Element) => void
+): void => {
+    const site: string = articleData.outlet;
+    const articles: NewsArticle[] = [];
+
+    articleData.unformattedArticles.forEach((element) =>
+        manipulator(articles, element)
+    );
+
+    storage.write('NEWS', site, `${site}'s Latest News.`, articles);
+    IO.local.emit('RELOAD_NEWS');
+};
 
 /**
  * This function retrieves the body of the provided page

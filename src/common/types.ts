@@ -6,6 +6,12 @@ import type {
     GuildMember,
 } from 'discord.js';
 
+/* COMMON TYPES */
+export type FetchArticleOutput = {
+    outlet: string;
+    unformattedArticles: Element[];
+};
+
 /* STORAGE TYPES */
 export interface CollectionList {
     name: string;
@@ -166,8 +172,7 @@ export interface WeatherConfig {
 }
 
 export type WeatherRequestHeaders = {
-    'x-ibm-client-id': string;
-    'x-ibm-client-secret': string;
+    apikey: string;
     accept: string;
 };
 
