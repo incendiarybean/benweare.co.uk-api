@@ -19,33 +19,92 @@ import { storage } from '..';
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
  */
-export const getRegisterNews = (): Promise<void> =>
+export const getArsTechnicaNews = (): Promise<void> =>
     fetchArticles(
-        'The_Register',
-        'https://www.theregister.com/security',
-        '#main-col',
-        'article'
+        'Ars_Technica',
+        'https://arstechnica.com/gadgets/',
+        '.listing-latest',
+        '.article'
     ).then((output: FetchArticleOutput) =>
         saveArticles(output, (articles: NewsArticle[], element: Element) => {
             const title: UndefinedNews = element
-                .querySelector('h4')
+                .querySelector('h2')
                 ?.textContent?.trim();
             if (title) {
-                const url: string = element.querySelector('a')?.href
-                    ? `https://www.theregister.com${
-                          element.querySelector('a')?.href
-                      }`
-                    : 'Not Found';
-                const epoch: string =
-                    element
-                        .querySelector('.time_stamp')
-                        ?.getAttribute('data-epoch') ?? '0';
-                const epochDate = new Date(0);
-                epochDate.setUTCSeconds(parseInt(epoch, 10));
-                const date: string = dateGenerator(epochDate.toISOString());
+                const url: string =
+                    element.querySelector('a')?.href ?? 'Not Found';
+
+                const date: string = dateGenerator(
+                    element.querySelector('time')?.getAttribute('datetime')
+                );
+
                 articles.push({
                     title,
                     url,
+                    date,
+                });
+            }
+        })
+    );
+
+/**
+ * This function gets news for the given outlet
+ * @returns {void} - Writes data to storage object
+ */
+export const getNasaImage = (): Promise<void> =>
+    axios
+        .get(
+            `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
+        )
+        .then(({ data }: { data: NasaArticle }) => {
+            const site: string = 'NASA';
+
+            const articles = [
+                {
+                    title: data.title,
+                    url: data.url,
+                    description: data.explanation,
+                    img: data.url,
+                    date: dateGenerator(data.date),
+                },
+            ];
+            storage.write('NEWS', site, 'NASA Daily Image.', articles);
+        });
+
+/**
+ * This function gets news for the given outlet
+ * @returns {void} - Writes data to storage object
+ */
+export const getPCGamerNews = (): Promise<void> =>
+    fetchArticles(
+        'PCGamer',
+        'https://www.pcgamer.com/uk/news/',
+        "[data-list='home/latest']",
+        '.listingResult'
+    ).then((output: FetchArticleOutput) =>
+        saveArticles(output, (articles: NewsArticle[], element: Element) => {
+            const title: UndefinedNews = element
+                .querySelector('.article-name')
+                ?.textContent?.trim();
+            if (title) {
+                const url: string =
+                    element.querySelector('a')?.href ?? 'Not Found';
+
+                const img: string =
+                    element
+                        .querySelector('.article-lead-image-wrap')
+                        ?.getAttribute('data-original') ?? 'Not Found';
+
+                const date: string = dateGenerator(
+                    element
+                        .querySelector('.relative-date')
+                        ?.getAttribute('datetime')
+                );
+
+                articles.push({
+                    title,
+                    url,
+                    img,
                     date,
                 });
             }
@@ -94,36 +153,33 @@ export const getRPSNews = (): Promise<void> =>
  * This function gets news for the given outlet
  * @returns {void} - Writes data to storage object
  */
-export const getPCGamerNews = (): Promise<void> =>
+export const getRegisterNews = (): Promise<void> =>
     fetchArticles(
-        'PCGamer',
-        'https://www.pcgamer.com/uk/news/',
-        "[data-list='home/latest']",
-        '.listingResult'
+        'The_Register',
+        'https://www.theregister.com/security',
+        '#main-col',
+        'article'
     ).then((output: FetchArticleOutput) =>
         saveArticles(output, (articles: NewsArticle[], element: Element) => {
             const title: UndefinedNews = element
-                .querySelector('.article-name')
+                .querySelector('h4')
                 ?.textContent?.trim();
             if (title) {
-                const url: string =
-                    element.querySelector('a')?.href ?? 'Not Found';
-
-                const img: string =
+                const url: string = element.querySelector('a')?.href
+                    ? `https://www.theregister.com${
+                          element.querySelector('a')?.href
+                      }`
+                    : 'Not Found';
+                const epoch: string =
                     element
-                        .querySelector('.article-lead-image-wrap')
-                        ?.getAttribute('data-original') ?? 'Not Found';
-
-                const date: string = dateGenerator(
-                    element
-                        .querySelector('.relative-date')
-                        ?.getAttribute('datetime')
-                );
-
+                        .querySelector('.time_stamp')
+                        ?.getAttribute('data-epoch') ?? '0';
+                const epochDate = new Date(0);
+                epochDate.setUTCSeconds(parseInt(epoch, 10));
+                const date: string = dateGenerator(epochDate.toISOString());
                 articles.push({
                     title,
                     url,
-                    img,
                     date,
                 });
             }
@@ -179,69 +235,13 @@ export const getUKNews = (): Promise<void> =>
         })
     );
 
-/**
- * This function gets news for the given outlet
- * @returns {void} - Writes data to storage object
- */
-export const getArsTechnicaNews = (): Promise<void> =>
-    fetchArticles(
-        'Ars_Technica',
-        'https://arstechnica.com/gadgets/',
-        '.listing-latest',
-        '.article'
-    ).then((output: FetchArticleOutput) =>
-        saveArticles(output, (articles: NewsArticle[], element: Element) => {
-            const title: UndefinedNews = element
-                .querySelector('h2')
-                ?.textContent?.trim();
-            if (title) {
-                const url: string =
-                    element.querySelector('a')?.href ?? 'Not Found';
-
-                const date: string = dateGenerator(
-                    element.querySelector('time')?.getAttribute('datetime')
-                );
-
-                articles.push({
-                    title,
-                    url,
-                    date,
-                });
-            }
-        })
-    );
-
-/**
- * This function gets news for the given outlet
- * @returns {void} - Writes data to storage object
- */
-export const getNasaImage = (): Promise<void> =>
-    axios
-        .get(
-            `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
-        )
-        .then(({ data }: { data: NasaArticle }) => {
-            const site: string = 'NASA';
-
-            const articles = [
-                {
-                    title: data.title,
-                    url: data.url,
-                    description: data.explanation,
-                    img: data.url,
-                    date: dateGenerator(data.date),
-                },
-            ];
-            storage.write('NEWS', site, 'NASA Daily Image.', articles);
-        });
-
 export const getNews = (): void => {
+    retryHandler(getArsTechnicaNews, 5);
+    retryHandler(getNasaImage, 5);
     retryHandler(getPCGamerNews, 5);
     retryHandler(getRPSNews, 5);
     retryHandler(getRegisterNews, 5);
-    retryHandler(getArsTechnicaNews, 5);
     retryHandler(getUKNews, 5);
-    retryHandler(getNasaImage, 5);
 };
 
 staticRefresher(480000, getNews, 'News');

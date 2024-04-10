@@ -60,10 +60,11 @@ export const retryHandler = (
 /**
  * This function retrieves a container element using containerSelector
  * It then splits the container element into children[] using splitSelector
+ * @param {string} name - Name of the collected site
  * @param {string} url - URL of the site you wish to fetch from
  * @param {string} containerSelector - QuerySelector you wish to grab articles from
  * @param {string} splitSelector - QuerySelector used to identify and split each article
- * @returns {Element[]} - An array of elements depending on your above selection
+ * @returns {FetchArticleOutput} - An object containing the sitename and a collection of elements divided by your above selection
  */
 export const fetchArticles = (
     name: string,
@@ -100,7 +101,7 @@ export const fetchArticles = (
 /**
  * This function runs each article through a manipulator to get the specific keys of information to save to the storage.
  * @param {FetchArticleOutput} articleData - The output from the fetchArticles function
- * @param {(articles: NewsArticle[], element: Element) => void} formatter - The formatter to run each element through to create a typeof NewsArticle.
+ * @param {(articles: NewsArticle[], element: Element) => void} manipulator - The formatter to run each element through to create a typeof NewsArticle.
  */
 export const saveArticles = (
     articleData: FetchArticleOutput,

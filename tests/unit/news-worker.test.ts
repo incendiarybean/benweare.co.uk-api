@@ -21,61 +21,146 @@ jest.mock('../../src/common/utils/storage-utils', () => ({
 }));
 
 describe('News-Worker should collect news as expected', () => {
-    describe('The Register', () => {
-        it('should collect The Register news correctly', async () => {
+    describe('Ars Technica', () => {
+        it('should collect Ars Technica news correctly', async () => {
             const {
-                getRegisterNews,
+                getArsTechnicaNews,
             } = require('../../src/workers/news-worker');
             const { storage } = require('../../src');
             const storageSpy = jest.spyOn(storage, 'write');
 
-            await getRegisterNews();
+            await getArsTechnicaNews();
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0]).toEqual([
                 'NEWS',
-                'The_Register',
-                "The_Register's Latest News.",
+                'Ars_Technica',
+                "Ars_Technica's Latest News.",
                 [
                     {
-                        date: '1970-01-01T00:00:00.000Z',
+                        date: '2023-02-01T15:46:04.563Z',
                         title: 'Test Title',
-                        url: 'https://www.theregister.com/test',
+                        url: '/test',
                     },
                 ],
             ]);
         });
 
-        it('should use default values for The Register content if missing', async () => {
+        it('should use default values for Ars Technica content if missing', async () => {
             const {
-                getRegisterNews,
+                getArsTechnicaNews,
             } = require('../../src/workers/news-worker');
             const { storage } = require('../../src');
             const storageSpy = jest.spyOn(storage, 'write');
 
             const commonUtils = require('../../src/common/utils/common-utils');
             const document = new JSDOM(`
-                <li>
-                    <article>
-                        <h4 class="title">
-                            Test Title
-                        </h4>
-                    </article>
-                </li>
-            `).window.document;
+            <li>
+                <div class="article">
+                    <h2>
+                        Test Title
+                    </h2>
+                </div>
+            </li>
+        `).window.document;
 
             jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'The_Register',
+                outlet: 'Ars_Technica',
                 unformattedArticles: [document],
             });
 
-            await getRegisterNews();
+            await getArsTechnicaNews();
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0][3]).toEqual([
                 {
                     title: 'Test Title',
-                    date: '1970-01-01T00:00:00.000Z',
+                    date: new Date().toISOString(),
+                    url: 'Not Found',
+                },
+            ]);
+        });
+    });
+
+    describe('NASA', () => {
+        it('should collect the nasa daily image correctly', async () => {
+            const { getNasaImage } = require('../../src/workers/news-worker');
+            const { storage } = require('../../src');
+            const storageSpy = jest.spyOn(storage, 'write');
+
+            await getNasaImage();
+
+            expect(storageSpy.mock.calls.length).toEqual(1);
+            expect(storageSpy.mock.calls[0]).toEqual([
+                'NEWS',
+                'NASA',
+                'NASA Daily Image.',
+                [
+                    {
+                        date: '2023-02-01T00:00:00.000Z',
+                        description: 'Test Explanation',
+                        img: 'test-image.png',
+                        title: 'Test Title',
+                        url: 'test-image.png',
+                    },
+                ],
+            ]);
+        });
+    });
+
+    describe('PC Gamer', () => {
+        it('should collect PCGamer news correctly', async () => {
+            const { getPCGamerNews } = require('../../src/workers/news-worker');
+            const { storage } = require('../../src');
+            const storageSpy = jest.spyOn(storage, 'write');
+
+            await getPCGamerNews();
+
+            expect(storageSpy.mock.calls.length).toEqual(1);
+            expect(storageSpy.mock.calls[0]).toEqual([
+                'NEWS',
+                'PCGamer',
+                "PCGamer's Latest News.",
+                [
+                    {
+                        date: '2023-02-01T15:46:04.563Z',
+                        img: 'test-img.png',
+                        title: 'Test Title',
+                        url: '/test',
+                    },
+                ],
+            ]);
+        });
+
+        it('should use default values for PCGamer content if missing', async () => {
+            const { getPCGamerNews } = require('../../src/workers/news-worker');
+            const { storage } = require('../../src');
+            const storageSpy = jest.spyOn(storage, 'write');
+
+            const commonUtils = require('../../src/common/utils/common-utils');
+            const document = new JSDOM(`
+            <li>
+                <div class="li">
+                    <div class="article-name">
+                        Test Title
+                    </div>
+                </div>
+            </li>
+        `).window.document;
+
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'PCGamer',
+                unformattedArticles: [document],
+            });
+
+            await getPCGamerNews();
+
+            expect(storageSpy.mock.calls.length).toEqual(1);
+            expect(storageSpy.mock.calls[0][3]).toEqual([
+                {
+                    title: 'Test Title',
+                    date: new Date().toISOString(),
+                    img: 'Not Found',
                     url: 'Not Found',
                 },
             ]);
@@ -141,59 +226,61 @@ describe('News-Worker should collect news as expected', () => {
         });
     });
 
-    describe('PC Gamer', () => {
-        it('should collect PCGamer news correctly', async () => {
-            const { getPCGamerNews } = require('../../src/workers/news-worker');
+    describe('The Register', () => {
+        it('should collect The Register news correctly', async () => {
+            const {
+                getRegisterNews,
+            } = require('../../src/workers/news-worker');
             const { storage } = require('../../src');
             const storageSpy = jest.spyOn(storage, 'write');
 
-            await getPCGamerNews();
+            await getRegisterNews();
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0]).toEqual([
                 'NEWS',
-                'PCGamer',
-                "PCGamer's Latest News.",
+                'The_Register',
+                "The_Register's Latest News.",
                 [
                     {
-                        date: '2023-02-01T15:46:04.563Z',
-                        img: 'test-img.png',
+                        date: '1970-01-01T00:00:00.000Z',
                         title: 'Test Title',
-                        url: '/test',
+                        url: 'https://www.theregister.com/test',
                     },
                 ],
             ]);
         });
 
-        it('should use default values for PCGamer content if missing', async () => {
-            const { getPCGamerNews } = require('../../src/workers/news-worker');
+        it('should use default values for The Register content if missing', async () => {
+            const {
+                getRegisterNews,
+            } = require('../../src/workers/news-worker');
             const { storage } = require('../../src');
             const storageSpy = jest.spyOn(storage, 'write');
 
             const commonUtils = require('../../src/common/utils/common-utils');
             const document = new JSDOM(`
-            <li>
-                <div class="li">
-                    <div class="article-name">
-                        Test Title
-                    </div>
-                </div>
-            </li>
-        `).window.document;
+                <li>
+                    <article>
+                        <h4 class="title">
+                            Test Title
+                        </h4>
+                    </article>
+                </li>
+            `).window.document;
 
             jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'PCGamer',
+                outlet: 'The_Register',
                 unformattedArticles: [document],
             });
 
-            await getPCGamerNews();
+            await getRegisterNews();
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0][3]).toEqual([
                 {
                     title: 'Test Title',
-                    date: new Date().toISOString(),
-                    img: 'Not Found',
+                    date: '1970-01-01T00:00:00.000Z',
                     url: 'Not Found',
                 },
             ]);
@@ -281,93 +368,6 @@ describe('News-Worker should collect news as expected', () => {
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0][3]).toEqual([]);
-        });
-    });
-
-    describe('Ars Technica', () => {
-        it('should collect Ars Technica news correctly', async () => {
-            const {
-                getArsTechnicaNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
-
-            await getArsTechnicaNews();
-
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'Ars_Technica',
-                "Ars_Technica's Latest News.",
-                [
-                    {
-                        date: '2023-02-01T15:46:04.563Z',
-                        title: 'Test Title',
-                        url: '/test',
-                    },
-                ],
-            ]);
-        });
-
-        it('should use default values for Ars Technica content if missing', async () => {
-            const {
-                getArsTechnicaNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
-
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
-            <li>
-                <div class="article">
-                    <h2>
-                        Test Title
-                    </h2>
-                </div>
-            </li>
-        `).window.document;
-
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'Ars_Technica',
-                unformattedArticles: [document],
-            });
-
-            await getArsTechnicaNews();
-
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: new Date().toISOString(),
-                    url: 'Not Found',
-                },
-            ]);
-        });
-    });
-
-    describe('NASA', () => {
-        it('should collect the nasa daily image correctly', async () => {
-            const { getNasaImage } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
-
-            await getNasaImage();
-
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'NASA',
-                'NASA Daily Image.',
-                [
-                    {
-                        date: '2023-02-01T00:00:00.000Z',
-                        description: 'Test Explanation',
-                        img: 'test-image.png',
-                        title: 'Test Title',
-                        url: 'test-image.png',
-                    },
-                ],
-            ]);
         });
     });
 
