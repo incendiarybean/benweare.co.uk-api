@@ -10,7 +10,7 @@ describe('Server should start correctly.', () => {
         await new Promise((resolve) => setTimeout(resolve, 200));
 
         const startValue = loggerSpy.mock.lastCall[0].split('] ')[1];
-        expect(startValue).toEqual('Server is active on port: 8080');
+        expect(startValue).toEqual('Server is active on port: 8000');
 
         HTTPServer.close();
 

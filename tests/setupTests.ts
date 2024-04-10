@@ -1,6 +1,5 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import {
+    arsTechnicaContent,
     bbcContent,
     metofficeContent,
     nasaContent,
@@ -8,6 +7,9 @@ import {
     registerContent,
     rpsContent,
 } from './data/test-data';
+
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
 const mockAxios = new MockAdapter(axios);
 globalThis.__mockAxios__ = mockAxios;
@@ -36,6 +38,10 @@ beforeAll(async () => {
         .reply(200, pcgContent());
 
     mockAxios
+        .onGet('https://arstechnica.com/gadgets/')
+        .reply(200, arsTechnicaContent());
+
+    mockAxios
         .onGet(
             `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
         )
@@ -43,7 +49,7 @@ beforeAll(async () => {
 
     mockAxios
         .onGet(
-            `https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily?${new URLSearchParams(
+            `https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily?${new URLSearchParams(
                 {
                     includeLocationName: 'true',
                     latitude: process.env.LATITUDE ?? '',

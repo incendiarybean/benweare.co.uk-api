@@ -231,14 +231,9 @@ export class ObjectStorage<
         // If it exists, restart the timer
         items.forEach(({ date, ...item }) => {
             // Remove image as image can change, but content might not
-            let key: string;
-            if (item.img) {
-                key = this.createId(
-                    JSON.stringify({ ...item, img: undefined })
-                );
-            } else {
-                key = this.createId(JSON.stringify(item));
-            }
+            let key: string = this.createId(
+                JSON.stringify({ ...item, img: undefined })
+            );
 
             const storedCollection = this.storage[namespace].get(collection);
             if (storedCollection) {

@@ -1,9 +1,3 @@
-import axios from 'axios';
-import type { AxiosResponse } from 'axios';
-import {
-    mockWeatherResponse,
-    weatherCodes,
-} from '@common/resources/weather-resources';
 import type {
     WeatherConfig,
     WeatherRequestHeaders,
@@ -14,20 +8,26 @@ import {
     retryHandler,
     staticRefresher,
 } from '@common/utils/common-utils';
+import {
+    mockWeatherResponse,
+    weatherCodes,
+} from '@common/resources/weather-resources';
+
+import type { AxiosResponse } from 'axios';
 import { IO } from '@server';
+import axios from 'axios';
 import { storage } from '..';
 
 const config: WeatherConfig = {
     method: 'GET',
-    url: 'https://api-metoffice.apiconnect.ibmcloud.com/metoffice/production/v0/forecasts/point/daily',
+    url: 'https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily',
     qs: {
         includeLocationName: 'true',
         latitude: process.env.LATITUDE ?? '',
         longitude: process.env.LONGITUDE ?? '',
     },
     headers: {
-        'x-ibm-client-id': process.env.MET_CLIENT_ID ?? '',
-        'x-ibm-client-secret': process.env.MET_API_SECRET ?? '',
+        apikey: process.env.METOFFICE_API_TOKEN ?? '',
         accept: 'application/json',
     },
 };
@@ -103,4 +103,4 @@ export const getWeather = (): void => {
     retryHandler(getMetOffice, 2);
 };
 
-staticRefresher(900000, getWeather, 'Weather');
+staticRefresher(900000, getWeather);
