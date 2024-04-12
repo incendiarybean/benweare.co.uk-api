@@ -32,7 +32,7 @@ router.get('/api/news/articles', (req: Request, res: Response) => {
             | undefined;
 
         return res.json({
-            response: storage.items('NEWS', sort),
+            response: storage.list('NEWS', sort),
             description:
                 OpenApiSchema.paths['/api/news/articles']?.get?.summary,
             timestamp: new Date(),
