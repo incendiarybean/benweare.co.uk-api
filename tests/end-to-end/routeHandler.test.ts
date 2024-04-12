@@ -189,7 +189,7 @@ describe('Server should return expected responses from endpoints defined in rout
 
         it('should return all stored objects of NEWS with status 200', async () => {
             // Mock the storage object
-            jest.spyOn(storage, 'items').mockReturnValueOnce([]);
+            jest.spyOn(storage, 'list').mockReturnValueOnce({});
 
             const result = await request(app)
                 .get('/api/news/articles')
@@ -200,7 +200,7 @@ describe('Server should return expected responses from endpoints defined in rout
             expect(result.body).toEqual({
                 description: 'Retrieve all collected news articles.',
                 link: { action: 'GET', href: '/api/news/articles' },
-                response: [],
+                response: {},
                 timestamp: testingDate.toISOString(),
             });
         });
@@ -288,7 +288,7 @@ describe('Server should return expected responses from endpoints defined in rout
             jest.spyOn(storage, 'search').mockImplementationOnce(
                 new Error('Failed')
             );
-            jest.spyOn(storage, 'items').mockImplementationOnce(
+            jest.spyOn(storage, 'list').mockImplementationOnce(
                 new Error('Failed')
             );
 
