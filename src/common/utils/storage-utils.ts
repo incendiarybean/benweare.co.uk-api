@@ -127,14 +127,14 @@ export class ObjectStorage<
     };
 
     /**
-     * Returns a list of available items within a collection in a desired namespace
+     * Returns an object containing all of the available items within a collection in a desired namespace
      * @param {string} namespaceName - The Name of the Namespace to find the collections
-     * @returns {StorageTypes[]} A list of items from all available collections in a namespace
+     * @returns {DataStorage<StorageTypes>} An object containing list of items from all available collections in a namespace
      */
-    public items = (
+    public list = (
         namespaceName: string,
         sort: 'ASC' | 'DESC' = 'DESC'
-    ): StorageTypes[] => {
+    ): DataStorage<StorageTypes> => {
         const namespace = namespaceName.toUpperCase();
 
         if (!this.storage[namespace]) {
@@ -166,7 +166,10 @@ export class ObjectStorage<
             );
         }
 
-        return items.map(({ value }) => value);
+        return {
+            items: items.map(({ value }) => value),
+            description: `All items available in namespace: ${namespace}`,
+        };
     };
 
     /**
@@ -184,7 +187,9 @@ export class ObjectStorage<
             });
         }
 
-        const item = this.items(namespace).find((value) => value.id === id);
+        const item = this.list(namespace).items.find(
+            (value) => value.id === id
+        );
         if (!item) {
             throw new StorageError(`Could not find item with ID: ${id}`, {
                 status: 404,
