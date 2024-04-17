@@ -588,79 +588,85 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         // We should expect the newest item to be first
-        expect(storage.items('TEST_NAMESPACE_0')).toEqual([
-            {
-                message: 'test-4',
-                id: '1931-511-2290',
-                date: dateArray[4],
-                name: 'TEST_COLLECTION_1',
-            },
-            {
-                message: 'test-3',
-                id: '1931-510-2680',
-                date: dateArray[3],
-                name: 'TEST_COLLECTION_1',
-            },
-            {
-                message: 'test-2',
-                id: '1931-509-3070',
-                date: dateArray[2],
-                name: 'TEST_COLLECTION_0',
-            },
-            {
-                message: 'test-1',
-                id: '1931-508-3460',
-                date: dateArray[1],
-                name: 'TEST_COLLECTION_0',
-            },
-            {
-                message: 'test-0',
-                id: '1931-507-3850',
-                date: dateArray[0],
-                name: 'TEST_COLLECTION_0',
-            },
-        ]);
+        expect(storage.list('TEST_NAMESPACE_0')).toEqual({
+            description: 'All items available in namespace: TEST_NAMESPACE_0',
+            items: [
+                {
+                    message: 'test-4',
+                    id: '1931-511-2290',
+                    date: dateArray[4],
+                    name: 'TEST_COLLECTION_1',
+                },
+                {
+                    message: 'test-3',
+                    id: '1931-510-2680',
+                    date: dateArray[3],
+                    name: 'TEST_COLLECTION_1',
+                },
+                {
+                    message: 'test-2',
+                    id: '1931-509-3070',
+                    date: dateArray[2],
+                    name: 'TEST_COLLECTION_0',
+                },
+                {
+                    message: 'test-1',
+                    id: '1931-508-3460',
+                    date: dateArray[1],
+                    name: 'TEST_COLLECTION_0',
+                },
+                {
+                    message: 'test-0',
+                    id: '1931-507-3850',
+                    date: dateArray[0],
+                    name: 'TEST_COLLECTION_0',
+                },
+            ],
+        });
 
         // We should expect the oldest item to be first
-        expect(storage.items('TEST_NAMESPACE_0', 'ASC')).toEqual([
-            {
-                message: 'test-0',
-                id: '1931-507-3850',
-                date: dateArray[0],
-                name: 'TEST_COLLECTION_0',
-            },
-            {
-                message: 'test-1',
-                id: '1931-508-3460',
-                date: dateArray[1],
-                name: 'TEST_COLLECTION_0',
-            },
-            {
-                message: 'test-2',
-                id: '1931-509-3070',
-                date: dateArray[2],
-                name: 'TEST_COLLECTION_0',
-            },
-            {
-                message: 'test-3',
-                id: '1931-510-2680',
-                date: dateArray[3],
-                name: 'TEST_COLLECTION_1',
-            },
-            {
-                message: 'test-4',
-                id: '1931-511-2290',
-                date: dateArray[4],
-                name: 'TEST_COLLECTION_1',
-            },
-        ]);
+        expect(storage.list('TEST_NAMESPACE_0', 'ASC')).toEqual({
+            description: 'All items available in namespace: TEST_NAMESPACE_0',
+            items: [
+                {
+                    message: 'test-0',
+                    id: '1931-507-3850',
+                    date: dateArray[0],
+                    name: 'TEST_COLLECTION_0',
+                },
+                {
+                    message: 'test-1',
+                    id: '1931-508-3460',
+                    date: dateArray[1],
+                    name: 'TEST_COLLECTION_0',
+                },
+                {
+                    message: 'test-2',
+                    id: '1931-509-3070',
+                    date: dateArray[2],
+                    name: 'TEST_COLLECTION_0',
+                },
+                {
+                    message: 'test-3',
+                    id: '1931-510-2680',
+                    date: dateArray[3],
+                    name: 'TEST_COLLECTION_1',
+                },
+                {
+                    message: 'test-4',
+                    id: '1931-511-2290',
+                    date: dateArray[4],
+                    name: 'TEST_COLLECTION_1',
+                },
+            ],
+        });
     });
 
     it('should report a 404 when no namespace is found when searching items', () => {
         const storage = new ObjectStorage<TestType>();
 
         try {
-            storage.items('TEST_NAMESPACE_0');
+            storage.list('TEST_NAMESPACE_0');
         } catch (e) {
             expect(e.message).toEqual(
                 'No items available in namespace: TEST_NAMESPACE_0'

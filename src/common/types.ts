@@ -20,7 +20,7 @@ export interface CollectionList {
 }
 
 export interface DataStorage<StorageTypes> {
-    updated: Date;
+    updated?: Date;
     description: string;
     items: StorageTypes[];
 }
