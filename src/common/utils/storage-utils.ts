@@ -21,7 +21,7 @@ export class ObjectStorage<
         img?: string;
         id?: string;
         name?: string;
-    }
+    },
 > {
     private storage: Store<StorageTypes>;
     private expiration: number;

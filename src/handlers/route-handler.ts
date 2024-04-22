@@ -1,11 +1,11 @@
-import express from "express";
+import express from 'express';
 import {
     baseRoutes,
     discordRoutes,
     newsRoutes,
     steamRoutes,
     weatherRoutes,
-} from "@routes/index";
+} from '@routes/index';
 
 const router = express.Router();
 
