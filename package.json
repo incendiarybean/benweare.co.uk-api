@@ -1,20 +1,12 @@
 {
     "name": "benweare.co.uk-server",
-<<<<<<< HEAD
     "version": "2.3.5",
-=======
-    "version": "2.3.4",
->>>>>>> 4d13398 (DEV -> PROD: News Feed enhancements (#65))
     "private": true,
     "main": "./build/index.js",
     "dependencies": {
         "@discordjs/voice": "^0.15.0",
         "axios": "^1.6.2",
-<<<<<<< HEAD
         "benweare.co.uk-client": "^1.5.3",
-=======
-        "benweare.co.uk-client": "^1.5.2",
->>>>>>> 4d13398 (DEV -> PROD: News Feed enhancements (#65))
         "cors": "^2.8.5",
         "discord.js": "^14.8.0",
         "dotenv": "^16.0.1",
