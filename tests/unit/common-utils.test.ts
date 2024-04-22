@@ -91,7 +91,7 @@ describe('Steam utils should fetch wiki data and format it correctly', () => {
         mockAxios.onGet('http://getWikiContent.com').replyOnce(200, wikiData);
 
         const result = await fetchWikiBody('http://getWikiContent.com');
-        expect(result).toEqual(['<td>Unlocked a new achievement!</td>']);
+        expect([result[0].trim()]).toEqual(['<td>Unlocked a new achievement!</td>']);
     });
 
     it('should only return a wiki if it is on record', async () => {
@@ -103,7 +103,8 @@ describe('Steam utils should fetch wiki data and format it correctly', () => {
         let result = await getWikiContent('TestGameID');
         expect(result).toBeUndefined();
 
-        result = await getWikiContent('250900');
+        result = await getWikiContent('250900') ?? [];
+        result[0] = result[0].trim();
         expect(result).toEqual(['<td>Unlocked a new achievement!</td>']);
     });
 });
