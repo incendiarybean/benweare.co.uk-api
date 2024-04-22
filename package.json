@@ -24,8 +24,8 @@
         "build": "tsc -p ./ && tsc-alias -p ./tsconfig.json",
         "test": "jest ./* --silent --runInBand --collectCoverage",
         "test:unit": "jest ./tests/unit/* --silent --runInBand --collectCoverage",
-        "lint": "prettier ./src ./tests -c",
-        "lint-fix": "prettier ./src ./tests -w"
+        "lint": "prettier . -c",
+        "lint-fix": "prettier . -w"
     },
     "eslintConfig": {
         "extends": [

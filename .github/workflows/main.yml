@@ -20,16 +20,16 @@ jobs:
     build:
         runs-on: ubuntu-latest
         env:
-            REACT_APP_HOSTNAME: "TEST_VALUE"
-            REACT_APP_SOCKET_TOKEN: "TEST_VALUE"
+            REACT_APP_HOSTNAME: 'TEST_VALUE'
+            REACT_APP_SOCKET_TOKEN: 'TEST_VALUE'
         steps:
             - uses: actions/checkout@v3
 
             - name: ⚙️ Setup Node.js environment
               uses: actions/setup-node@v3
               with:
-                  node-version: "18.x"
-                  registry-url: "https://registry.npmjs.org"
+                  node-version: '18.x'
+                  registry-url: 'https://registry.npmjs.org'
 
             - name: ⚙️ Update to NPM 9.6.0
               run: |
