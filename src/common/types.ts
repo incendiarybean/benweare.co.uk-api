@@ -192,16 +192,15 @@ export interface CreateDiscordPlayer {
     player: AudioPlayer;
 }
 
-export type DiscordUsernameOptions =
-    | {
-          user: {
-              id: string;
-              bot: boolean;
-              system: boolean;
-              username: string;
-              discriminator: string;
-              avatar: string;
-              banner: undefined | string;
-              accentColor: undefined | string;
-          };
-      } & CommandInteractionOption<CacheType>;
+export type DiscordUsernameOptions = {
+    user: {
+        id: string;
+        bot: boolean;
+        system: boolean;
+        username: string;
+        discriminator: string;
+        avatar: string;
+        banner: undefined | string;
+        accentColor: undefined | string;
+    };
+} & CommandInteractionOption<CacheType>;
