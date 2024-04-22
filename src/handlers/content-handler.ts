@@ -1,21 +1,21 @@
-import path from "path";
-import absolutePath from "benweare.co.uk-client";
-import cors from "cors";
-import express from "express";
-import * as swaggerUi from "swagger-ui-slim";
-import OpenApiSchema from "@schema";
+import path from 'path';
+import absolutePath from 'benweare.co.uk-client';
+import cors from 'cors';
+import express from 'express';
+import * as swaggerUi from 'swagger-ui-slim';
+import OpenApiSchema from '@schema';
 
 const router = express.Router();
 
 // TODO -> Implement Authorisation headers
 export const origins = {
     development: [
-        "http://localhost:3000",
-        "http://dev.benweare.co.uk",
-        "https://dev.benweare.co.uk",
-        "https://tauri.localhost",
+        'http://localhost:3000',
+        'http://dev.benweare.co.uk',
+        'https://dev.benweare.co.uk',
+        'https://tauri.localhost',
     ],
-    production: ["https://benweare.co.uk", "https://tauri.localhost"],
+    production: ['https://benweare.co.uk', 'https://tauri.localhost'],
 };
 
 /**
@@ -25,10 +25,10 @@ export const origins = {
 router.use(
     cors({
         origin:
-            process.env.NODE_ENV !== "development"
+            process.env.NODE_ENV !== 'development'
                 ? [...origins.production]
                 : [...origins.development],
-        methods: "GET,HEAD",
+        methods: 'GET,HEAD',
     })
 );
 router.use(express.json());
@@ -38,11 +38,11 @@ router.use(express.json());
  */
 router.use(express.static(absolutePath));
 router.use(
-    "/favicon.ico",
+    '/favicon.ico',
     express.static(path.join(__dirname, `${absolutePath}/favicon.ico`))
 );
 router.use(
-    "/api/docs",
+    '/api/docs',
     swaggerUi.serve,
     swaggerUi.build(OpenApiSchema, {
         customSiteTitle: "Ben's API Docs",
