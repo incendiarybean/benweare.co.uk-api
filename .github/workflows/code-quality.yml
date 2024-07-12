@@ -1,0 +1,88 @@
+# This is a basic Jest workflow that is automatically triggered
+
+name: Lint and run Jest Tests
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    workflow_call:
+    push:
+        branches:
+            - '*'
+            - '!main'
+            - '!development'
+
+jobs:
+    lint-code:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: ⚙️ Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: ⚙️ Inspect NPM & Node Version
+              run: |
+                  echo Node Version: `node --version`
+                  echo NPM Version: `npm --version`
+
+            - name: 🧼 Run Linter
+              run: |
+                  npm install --quiet
+                  npm run lint
+
+    jest-test:
+        runs-on: ubuntu-latest
+        needs: [lint-code]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: ⚙️ Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: ⚙️ Inspect NPM & Node Version
+              run: |
+                  echo Node Version: `node --version`
+                  echo NPM Version: `npm --version`
+
+            - name: 🧪 Run Jest Tests
+              run: |
+                  npm install --quiet
+                  npm test
+
+    test-build:
+        runs-on: ubuntu-latest
+        needs: [jest-test]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: ⚙️ Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: ⚙️ Inspect NPM & Node Version
+              run: |
+                  echo Node Version: `node --version`
+                  echo NPM Version: `npm --version`
+
+            - name: 🔨 Check build success
+              run: |
+                  npm install --quiet
+                  npm run build
