@@ -312,14 +312,14 @@ describe('News-Worker should collect news as expected', () => {
 
             const commonUtils = require('../../src/common/utils/common-utils');
             const document = new JSDOM(`
-            <li>
-                <div type="article">
-                    <div role="text">
-                        <span>Test Title</span>
+                <li>
+                    <div type="article">
+                        <div role="text">
+                            <span>Test Title</span>
+                        </div>
                     </div>
-                </div>
-            </li>
-        `).window.document;
+                </li>
+            `).window.document;
 
             jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
                 outlet: 'BBC',
@@ -346,12 +346,12 @@ describe('News-Worker should collect news as expected', () => {
 
             const commonUtils = require('../../src/common/utils/common-utils');
             const document = new JSDOM(`
-            <li>
-                <div type="article">
-                    <div role="text"></div>
-                </div>
-            </li>
-        `).window.document;
+                <li>
+                    <div type="article">
+                        <div role="text"></div>
+                    </div>
+                </li>
+            `).window.document;
 
             jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
                 outlet: 'BBC',
@@ -362,6 +362,80 @@ describe('News-Worker should collect news as expected', () => {
 
             expect(storageSpy.mock.calls.length).toEqual(1);
             expect(storageSpy.mock.calls[0][3]).toEqual([]);
+        });
+
+        it('should handle datetime correctly', async () => {
+            const { getUKNews } = require('../../src/workers/news-worker');
+            const { storage } = require('../../src');
+            const storageSpy = jest.spyOn(storage, 'write');
+
+            const commonUtils = require('../../src/common/utils/common-utils');
+            const document1 = new JSDOM(`
+                <article
+                    type="article"
+                    class="article"
+                >
+                    <h3><span>11:00</span></h3>
+                    <img
+                        data-original="test-img.png"
+                        class=""
+                        src="test-img.png"
+                        data-src="test-img.png"
+                        alt="testing"
+                    />
+                    <h4
+                        role="text"
+                        class="text"
+                    >
+                        Test Title <span>Test Title</span>
+                    </h4>
+                </article>
+            `).window.document;
+
+            const document2 = new JSDOM(`
+                <article
+                    type="article"
+                    class="article"
+                >
+                    <h3><span>20:00</span></h3>
+                    <img
+                        data-original="test-img.png"
+                        class=""
+                        src="test-img.png"
+                        data-src="test-img.png"
+                        alt="testing"
+                    />
+                    <h4
+                        role="text"
+                        class="text"
+                    >
+                        Test Title <span>Test Title</span>
+                    </h4>
+                </article>
+            `).window.document;
+
+            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
+                outlet: 'BBC',
+                unformattedArticles: [document1, document2],
+            });
+
+            await getUKNews();
+
+            expect(storageSpy.mock.calls.length).toEqual(1);
+
+            const date = new Date();
+
+            // Non-future times are assumed to be today
+            expect(
+                (storageSpy.mock.calls[0][3] as any[])[0].date.split('T')[0]
+            ).toEqual(date.toISOString().split('T')[0]);
+
+            // Future times are assumed to be from yesterday
+            date.setDate(date.getDate() - 1);
+            date.setHours(20);
+            expect(
+                (storageSpy.mock.calls[0][3] as any[])[1].date.split('T')[0]
+            ).toEqual(date.toISOString().split('T')[0]);
         });
     });
 

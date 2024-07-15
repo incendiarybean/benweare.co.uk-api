@@ -230,7 +230,10 @@ export const getUKNews = (): Promise<void> =>
 
                     // If the article published hour/minute is ahead of current time, assume it was from yesterday
                     if (parseInt(hour) >= parseInt(currentHour)) {
-                        if (parseInt(minute) > parseInt(currentMinute)) {
+                        if (
+                            parseInt(hour) > parseInt(currentHour) ||
+                            parseInt(minute) > parseInt(currentMinute)
+                        ) {
                             date.setDate(date.getDate() - 1);
                         }
                     }
