@@ -223,8 +223,22 @@ export const getUKNews = (): Promise<void> =>
                 // Parse the published date (e.g 12:00) to today's date/time
                 let date = new Date();
                 if (publishedTime?.match(/\d{1,2}:\d{1,2}/g)) {
-                    const [hours, minutes] = publishedTime.split(':');
-                    date.setHours(parseInt(hours), parseInt(minutes));
+                    const [hour, minute] = publishedTime.split(':');
+                    const [currentHour, currentMinute] = date
+                        .toLocaleTimeString('en-UK')
+                        .split(':');
+
+                    // If the article published hour/minute is ahead of current time, assume it was from yesterday
+                    if (parseInt(hour) >= parseInt(currentHour)) {
+                        if (
+                            parseInt(hour) > parseInt(currentHour) ||
+                            parseInt(minute) > parseInt(currentMinute)
+                        ) {
+                            date.setDate(date.getDate() - 1);
+                        }
+                    }
+
+                    date.setHours(parseInt(hour), parseInt(minute));
                 }
 
                 articles.push({
