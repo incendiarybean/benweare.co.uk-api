@@ -5,19 +5,6 @@ interface TestType {
     date: string;
 }
 
-jest.mock('../../src/server', () => ({
-    IO: {
-        local: {
-            emit: (...args) => {},
-        },
-    },
-}));
-jest.mock('../../src/common/utils/common-utils', () => ({
-    ...jest.requireActual('../../src/common/utils/common-utils'),
-    staticRefresher: (...args) => {},
-}));
-jest.mock('../..', () => ({}));
-
 describe('The Storage-Utils should allow storage of items and access to stored items', () => {
     it('should throw a 404 if no items are found in namespace', () => {
         const storage = new ObjectStorage<TestType>();
