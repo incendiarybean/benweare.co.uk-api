@@ -226,16 +226,15 @@ export const getUKNews = (): Promise<void> =>
                 if (publishedTime?.match(/\d{1,2}:\d{1,2}/g)) {
                     const [hour, minute] = publishedTime.split(':');
 
+                    // Adjust for BST
                     if (isBritishSummerTime() === true) {
                         date.setHours(date.getHours() + 1);
                     }
 
+                    // If the article published time is ahead of current time, assume it was collected yesterday
                     const currentTime = date.getTime();
-
                     date.setHours(parseInt(hour), parseInt(minute));
                     const articleTime = date.getTime();
-
-                    // If the article published hour/minute is ahead of current time, assume it was from yesterday
                     if (articleTime > currentTime) {
                         date.setDate(date.getDate() - 1);
                     }
