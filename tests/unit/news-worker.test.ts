@@ -375,7 +375,7 @@ describe('News-Worker should collect news as expected', () => {
             const currentDate = new Date();
             currentDate.setMinutes(currentDate.getMinutes() - 3);
             const [currentHour, currentMinute] = currentDate
-                .toLocaleTimeString('en-UK')
+                .toLocaleTimeString('en-GB')
                 .split(':');
             const document1 = new JSDOM(`
                 <article
@@ -401,9 +401,10 @@ describe('News-Worker should collect news as expected', () => {
 
             // Second article should be from the "future"
             const futureDate = new Date();
-            futureDate.setHours(futureDate.getHours() + 1);
+
+            futureDate.setHours(futureDate.getHours() + 2);
             const [futureHour, futureMinute] = futureDate
-                .toLocaleTimeString('en-UK')
+                .toLocaleTimeString('en-GB')
                 .split(':');
             const document2 = new JSDOM(`
                 <article

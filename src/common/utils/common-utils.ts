@@ -171,11 +171,37 @@ export const dateParses = (date: string): boolean =>
 /**
  * This function takes a date string and tries to parse it
  * @param {string | undefined | null} date  - Expects date in ISO format.
- * @returns {string} - A date string in en-UK format
+ * @returns {string} - A date string in en-GB format
  */
 export const dateGenerator = (date: string | undefined | null): string => {
     if (!date || !dateParses(date)) {
         return new Date().toISOString();
     }
     return new Date(date).toISOString();
+};
+
+/**
+ * A function to check whether it is currently British Summer Time (GMT + 1)
+ * @returns {boolean} - Whether it is currently British Summer Time
+ */
+export const isBritishSummerTime = () => {
+    const currentDate = new Date();
+
+    // Get the start-date of BST
+    const startOfBST = new Date(currentDate.getFullYear(), 3, 1);
+    startOfBST.setDate(
+        startOfBST.getDate() -
+            (startOfBST.getDay() === 0 ? 7 : startOfBST.getDay())
+    );
+
+    // Get the end-date of BST
+    const endOfBST = new Date(currentDate.getFullYear(), 10, 1);
+    endOfBST.setDate(
+        endOfBST.getDate() - (endOfBST.getDay() === 0 ? 7 : endOfBST.getDay())
+    );
+
+    return (
+        currentDate.getTime() >= startOfBST.getTime() &&
+        currentDate.getTime() <= endOfBST.getTime()
+    );
 };
