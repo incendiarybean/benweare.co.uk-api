@@ -56,17 +56,42 @@ export class ObjectStorage<
     };
 
     /**
+     * A function to reduce a response into an array of chunked values
+     * @param {any[]} arr - An array to chunk
+     * @param {number} chunkSize - The size of the chunk
+     * @returns {Array<any[]>} - An array of chunked arrays
+     */
+    public chunkResponse = (arr: any[], chunkSize: number): Array<any[]> =>
+        arr.reduce((result: any, value: any, index: number) => {
+            const chunkPosition = Math.floor(index / chunkSize);
+
+            if (!result[chunkPosition]) {
+                result[chunkPosition] = [];
+            }
+
+            result[chunkPosition].push(value);
+
+            return result;
+        }, []);
+
+    /**
      * Searches the given namespace for a matching collection name
      * @param {string} namespaceName - Name of Namespace to find collection
      * @param {string} collectionName - Name of collection to return
+     * @param {string} pageLimit - The page size limit
+     * @param {string} pageNumber - The number of the page to return
      * @returns {DataStorage} - The returned collection from the namespace
      */
     public search = (
         namespaceName: string,
-        collectionName: string
+        collectionName: string,
+        pageLimit?: string,
+        pageNumber?: string
     ): DataStorage<StorageTypes> => {
         const namespace = namespaceName.toUpperCase();
         const collection = collectionName.toUpperCase();
+        const page = parseInt(pageNumber ?? '0');
+        const limit = parseInt(pageLimit ?? '0');
 
         if (!this.storage[namespace]) {
             throw new StorageError(`Could not find namespace: ${namespace}`, {
@@ -89,16 +114,25 @@ export class ObjectStorage<
             );
         }
 
+        let items = Array.from(storedData.items.values()).sort(
+            (x, y) =>
+                new Date(y.timestamp).valueOf() -
+                new Date(x.timestamp).valueOf()
+        );
+
+        if (limit) {
+            items = this.chunkResponse(items, limit)[page];
+            if (!items) {
+                throw new StorageError(`No items found on page: ${page}`, {
+                    status: 404,
+                });
+            }
+        }
+
         // Return stored collection data, items organised by timestamp
         return {
             ...storedData,
-            items: Array.from(storedData.items.values())
-                .sort(
-                    (x, y) =>
-                        new Date(y.timestamp).valueOf() -
-                        new Date(x.timestamp).valueOf()
-                )
-                .map(({ value }) => value),
+            items: items.map(({ value }) => value),
         };
     };
 
@@ -118,7 +152,7 @@ export class ObjectStorage<
         }
 
         // Get all entries in Map and return them formatted with the Key as the name
-        const collections = Array.from(this.storage[namespace].entries());
+        let collections = Array.from(this.storage[namespace].entries());
         return collections.map(([key, { description, updated }]) => ({
             name: key,
             description,
@@ -129,13 +163,20 @@ export class ObjectStorage<
     /**
      * Returns an object containing all of the available items within a collection in a desired namespace
      * @param {string} namespaceName - The Name of the Namespace to find the collections
+     * @param {'ASC' | 'DESC' | undefined} sort - The direction to sort by
+     * @param {string} pageLimit - The page size limit
+     * @param {string} pageNumber - The number of the page to return
      * @returns {DataStorage<StorageTypes>} An object containing list of items from all available collections in a namespace
      */
     public list = (
         namespaceName: string,
-        sort: 'ASC' | 'DESC' = 'DESC'
+        sort: 'ASC' | 'DESC' = 'DESC',
+        pageLimit?: string,
+        pageNumber?: string
     ): DataStorage<StorageTypes> => {
         const namespace = namespaceName.toUpperCase();
+        const page = parseInt(pageNumber ?? '0');
+        const limit = parseInt(pageLimit ?? '0');
 
         if (!this.storage[namespace]) {
             throw new StorageError(
@@ -164,6 +205,15 @@ export class ObjectStorage<
                     new Date(x.timestamp).valueOf() -
                     new Date(y.timestamp).valueOf()
             );
+        }
+
+        if (limit) {
+            items = this.chunkResponse(items, limit)[page];
+            if (!items) {
+                throw new StorageError(`No items found on page: ${page}`, {
+                    status: 404,
+                });
+            }
         }
 
         return {

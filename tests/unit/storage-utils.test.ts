@@ -5,6 +5,19 @@ interface TestType {
     date: string;
 }
 
+jest.mock('../../src/server', () => ({
+    IO: {
+        local: {
+            emit: (...args) => {},
+        },
+    },
+}));
+jest.mock('../../src/common/utils/common-utils', () => ({
+    ...jest.requireActual('../../src/common/utils/common-utils'),
+    staticRefresher: (...args) => {},
+}));
+jest.mock('../..', () => ({}));
+
 describe('The Storage-Utils should allow storage of items and access to stored items', () => {
     it('should throw a 404 if no items are found in namespace', () => {
         const storage = new ObjectStorage<TestType>();
@@ -727,6 +740,85 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             expect(e.message).toEqual(
                 'Could not find item with ID: 1931-507-3850'
             );
+            expect(e.status).toEqual(404);
+        }
+    });
+
+    it('should chunk a response as required', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        const items = storage.chunkResponse(
+            [
+                { message: 'test-1', date: new Date().toISOString() },
+                { message: 'test-2', date: new Date().toISOString() },
+                { message: 'test-3', date: new Date().toISOString() },
+            ],
+            1
+        );
+
+        expect(items.length).toEqual(3);
+        expect(items[0].length).toEqual(1);
+        expect(items[0]).toEqual([
+            { message: 'test-1', date: new Date().toISOString() },
+        ]);
+    });
+
+    it('should paginate correctly', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        const date = new Date();
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: 'test-0', date: date.toISOString() },
+                { message: 'test-1', date: new Date().toISOString() },
+                { message: 'test-2', date: new Date().toISOString() },
+            ]
+        );
+
+        const result = storage.search(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            '1'
+        );
+        expect(result.items).toEqual([
+            {
+                date: date.toISOString(),
+                id: '1931-507-3850',
+                message: 'test-0',
+                name: 'TEST_COLLECTION_0',
+            },
+        ]);
+    });
+
+    it('should return an error if no results were found for that page', () => {
+        const storage = new ObjectStorage<TestType>();
+
+        const date = new Date();
+        storage.write(
+            'TEST_NAMESPACE_0',
+            'TEST_COLLECTION_0',
+            "TEST_COLLECTION_0's latest test.",
+            [
+                { message: 'test-0', date: date.toISOString() },
+                { message: 'test-1', date: new Date().toISOString() },
+                { message: 'test-2', date: new Date().toISOString() },
+            ]
+        );
+
+        try {
+            storage.search('TEST_NAMESPACE_0', 'TEST_COLLECTION_0', '1', '10');
+        } catch (e) {
+            expect(e.message).toEqual('No items found on page: 10');
+            expect(e.status).toEqual(404);
+        }
+
+        try {
+            storage.list('TEST_NAMESPACE_0', 'ASC', '1', '10');
+        } catch (e) {
+            expect(e.message).toEqual('No items found on page: 10');
             expect(e.status).toEqual(404);
         }
     });
