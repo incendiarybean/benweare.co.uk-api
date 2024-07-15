@@ -370,12 +370,19 @@ describe('News-Worker should collect news as expected', () => {
             const storageSpy = jest.spyOn(storage, 'write');
 
             const commonUtils = require('../../src/common/utils/common-utils');
+
+            // First article should be within the last few minutes
+            const currentDate = new Date();
+            currentDate.setMinutes(currentDate.getMinutes() - 3);
+            const [currentHour, currentMinute] = currentDate
+                .toLocaleTimeString('en-UK')
+                .split(':');
             const document1 = new JSDOM(`
                 <article
                     type="article"
                     class="article"
                 >
-                    <h3><span>11:00</span></h3>
+                    <h3><span>${currentHour}:${currentMinute}</span></h3>
                     <img
                         data-original="test-img.png"
                         class=""
@@ -392,12 +399,18 @@ describe('News-Worker should collect news as expected', () => {
                 </article>
             `).window.document;
 
+            // Second article should be from the "future"
+            const futureDate = new Date();
+            futureDate.setHours(futureDate.getHours() + 1);
+            const [futureHour, futureMinute] = futureDate
+                .toLocaleTimeString('en-UK')
+                .split(':');
             const document2 = new JSDOM(`
                 <article
                     type="article"
                     class="article"
                 >
-                    <h3><span>20:00</span></h3>
+                    <h3><span>${futureHour}:${futureMinute}</span></h3>
                     <img
                         data-original="test-img.png"
                         class=""
