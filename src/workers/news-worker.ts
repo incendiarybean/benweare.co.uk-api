@@ -7,6 +7,7 @@ import type {
 import {
     dateGenerator,
     fetchArticles,
+    isBritishSummerTime,
     retryHandler,
     saveArticles,
     staticRefresher,
@@ -224,21 +225,20 @@ export const getUKNews = (): Promise<void> =>
                 let date = new Date();
                 if (publishedTime?.match(/\d{1,2}:\d{1,2}/g)) {
                     const [hour, minute] = publishedTime.split(':');
-                    const [currentHour, currentMinute] = date
-                        .toLocaleTimeString('en-UK')
-                        .split(':');
 
-                    // If the article published hour/minute is ahead of current time, assume it was from yesterday
-                    if (parseInt(hour) >= parseInt(currentHour)) {
-                        if (
-                            parseInt(hour) > parseInt(currentHour) ||
-                            parseInt(minute) > parseInt(currentMinute)
-                        ) {
-                            date.setDate(date.getDate() - 1);
-                        }
+                    if (isBritishSummerTime() === true) {
+                        date.setHours(date.getHours() + 1);
                     }
 
+                    const currentTime = date.getTime();
+
                     date.setHours(parseInt(hour), parseInt(minute));
+                    const articleTime = date.getTime();
+
+                    // If the article published hour/minute is ahead of current time, assume it was from yesterday
+                    if (articleTime > currentTime) {
+                        date.setDate(date.getDate() - 1);
+                    }
                 }
 
                 articles.push({
