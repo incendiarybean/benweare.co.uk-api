@@ -4,6 +4,7 @@ import {
     fetchArticles,
     fetchWikiBody,
     getWikiContent,
+    isBritishSummerTime,
     retryHandler,
     staticRefresher,
 } from '../../src/common/utils/common-utils';
@@ -126,14 +127,38 @@ describe('Date utils should return correct values', () => {
         jest.setSystemTime(today);
 
         let result = new Date(dateGenerator('InvalidDate')).toLocaleString(
-            'en-UK'
+            'en-GB'
         );
 
-        expect(result).toEqual(today.toLocaleString('en-UK'));
+        expect(result).toEqual(today.toLocaleString('en-GB'));
 
         result = new Date(dateGenerator(new Date().toString())).toLocaleString(
-            'en-UK'
+            'en-GB'
         );
-        expect(result).toEqual(today.toLocaleString('en-UK'));
+        expect(result).toEqual(today.toLocaleString('en-GB'));
+    });
+
+    it('should return whether it is currently British Summer Time', () => {
+        const result = isBritishSummerTime();
+        const currentDate = new Date();
+
+        // Get the start-date of BST
+        const startOfBST = new Date(currentDate.getFullYear(), 3, 1);
+        startOfBST.setDate(
+            startOfBST.getDate() -
+                (startOfBST.getDay() === 0 ? 7 : startOfBST.getDay())
+        );
+
+        // Get the end-date of BST
+        const endOfBST = new Date(currentDate.getFullYear(), 10, 1);
+        endOfBST.setDate(
+            endOfBST.getDate() -
+                (endOfBST.getDay() === 0 ? 7 : endOfBST.getDay())
+        );
+
+        expect(result).toEqual(
+            currentDate.getTime() >= startOfBST.getTime() &&
+                currentDate.getTime() <= endOfBST.getTime()
+        );
     });
 });
