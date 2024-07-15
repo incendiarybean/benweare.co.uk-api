@@ -224,6 +224,12 @@ export const getUKNews = (): Promise<void> =>
                 let date = new Date();
                 if (publishedTime?.match(/\d{1,2}:\d{1,2}/g)) {
                     const [hours, minutes] = publishedTime.split(':');
+
+                    // If the article published hour is ahead of current time, assume it was from yesterday
+                    if (parseInt(hours) > date.getHours()) {
+                        date.setDate(date.getDate() - 1);
+                    }
+
                     date.setHours(parseInt(hours), parseInt(minutes));
                 }
 
