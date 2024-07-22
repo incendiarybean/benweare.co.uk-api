@@ -25,7 +25,7 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: 💬 Submit Pull Request to main
-              if: github.ref == 'refs/heads/development'
+              if: github.ref == 'refs/heads/development' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
