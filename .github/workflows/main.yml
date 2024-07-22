@@ -35,9 +35,17 @@ jobs:
                   git config --global user.name "${{ github.actor }}"
                   git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
+
+                  npm install lodash@latest
+
+                  BRANCH_NAME="CHORE-TEST"
+                  git checkout -b $BRANCH_NAME
+                  git commit -am "CHORE: Test install update"
+                  git push origin $BRANCH_NAME
+
                   # Create PR on server repo
                   gh pr create \
                   --body "AUTOMATED: Merge Development to Main." \
                   --title "CHORE: DEV -> PROD" \
-                  --head "development" \
-                  --base "main"
+                  --head "$BRANCH_NAME" \
+                  --base "development"
