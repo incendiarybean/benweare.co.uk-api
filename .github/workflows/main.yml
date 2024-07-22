@@ -17,3 +17,24 @@ on:
 jobs:
     check-publish-ready:
         uses: ./.github/workflows/code-quality.yml
+
+    create-pull-request:
+        runs-on: ubuntu-latest
+        needs: [check-publish-ready]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: 💬 Submit Pull Request to main
+              #   if: github.ref == 'refs/heads/development'
+              run: |
+                  # Configure and clone
+                  git config --global user.name "${{ github.actor }}"
+                  git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+                  # Create PR on server repo
+                  gh pr create \
+                  --body "AUTOMATED: Merge Development to Main." \
+                  --title "CHORE: DEV -> PROD" \
+                  --head "development" \
+                  --base "main"
