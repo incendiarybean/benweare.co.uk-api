@@ -9,7 +9,6 @@ on:
         branches:
             - main
             - development
-            - '*'
     pull_request:
         branches:
             - main
@@ -27,7 +26,7 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: 💬 Submit Pull Request to main
-              #   if: github.ref == 'refs/heads/development'
+              if: github.ref == 'refs/heads/development'
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
@@ -35,17 +34,9 @@ jobs:
                   git config --global user.name "${{ github.actor }}"
                   git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
-
-                  npm install lodash@latest
-
-                  BRANCH_NAME="CHORE-TEST"
-                  git checkout -b $BRANCH_NAME
-                  git commit -am "CHORE: Test install update"
-                  git push origin $BRANCH_NAME
-
                   # Create PR on server repo
                   gh pr create \
                   --body "AUTOMATED: Merge Development to Main." \
                   --title "CHORE: DEV -> PROD" \
-                  --head "$BRANCH_NAME" \
-                  --base "development"
+                  --head "development" \
+                  --base "main"
