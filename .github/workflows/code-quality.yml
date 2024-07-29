@@ -6,6 +6,7 @@ name: Lint and run Jest Tests
 # or API.
 on:
     workflow_call:
+    push:
 
 jobs:
     lint-code:
