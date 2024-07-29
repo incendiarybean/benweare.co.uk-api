@@ -7,14 +7,24 @@ name: PR to Production
 on: deployment_status
 
 jobs:
-    check-publish-ready:
-        if: github.event.deployment_status.environment == 'benweare-dev' && github.event.deployment_status.state == 'success'
-        uses: ./.github/workflows/code-quality.yml
+    get-version:
+        runs-on: ubuntu-latest
+        outputs:
+            API_VERSION: ${{ steps.package-version.outputs.API_VERSION }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - id: package-version
+              run: echo "API_VERSION=$(jq -r .version package.json )" >> "$GITHUB_OUTPUT"
 
     create-pull-request:
         if: github.event.deployment_status.environment == 'benweare-dev' && github.event.deployment_status.state == 'success'
         runs-on: ubuntu-latest
-        needs: [check-publish-ready]
+        needs: [get-version]
+        env:
+            API_VERSION: ${{ needs.get-version.outputs.API_VERSION }}
 
         steps:
             - uses: actions/checkout@v4
@@ -29,7 +39,7 @@ jobs:
 
                   # Create PR on server repo
                   gh pr create \
-                  --body "AUTOMATED: Merge Development to Main." \
+                  --body "AUTOMATED: Merge Development ${{ env.API_VERSION }} to Main." \
                   --title "CHORE: DEV -> PROD" \
                   --head "development" \
                   --base "main"
