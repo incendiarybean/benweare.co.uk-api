@@ -1,9 +1,9 @@
-import path from 'path';
+import * as swaggerUi from 'swagger-ui-slim';
+
+import OpenApiSchema from '@schema';
 import absolutePath from 'benweare.co.uk-client';
 import cors from 'cors';
 import express from 'express';
-import * as swaggerUi from 'swagger-ui-slim';
-import OpenApiSchema from '@schema';
 
 const router = express.Router();
 
@@ -37,10 +37,7 @@ router.use(express.json());
  * This sets the path of the client module as static files
  */
 router.use(express.static(absolutePath));
-router.use(
-    '/favicon.ico',
-    express.static(path.join(__dirname, `${absolutePath}/favicon.ico`))
-);
+
 router.use(
     '/api/docs',
     swaggerUi.serve,

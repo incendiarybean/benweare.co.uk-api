@@ -40,6 +40,6 @@ jobs:
                   # Create PR on server repo
                   gh pr create \
                   --body "AUTOMATED: Merge Development ${{ env.API_VERSION }} to Main." \
-                  --title "CHORE: DEV -> PROD" \
+                  --title "CHORE: ${{ env.API_VERSION }} DEV -> PROD" \
                   --head "development" \
                   --base "main"
