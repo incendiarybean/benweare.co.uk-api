@@ -311,6 +311,16 @@
                         "description": "Sort by ASC | DESC",
                         "in": "query",
                         "name": "sort"
+                    },
+                    {
+                        "description": "Limit the returned results.",
+                        "in": "query",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Specific page to return.",
+                        "in": "query",
+                        "name": "page"
                     }
                 ],
                 "tags": ["News"],
@@ -347,6 +357,16 @@
                         "in": "path",
                         "name": "outlet",
                         "required": true
+                    },
+                    {
+                        "description": "Limit the returned results.",
+                        "in": "query",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Specific page to return.",
+                        "in": "query",
+                        "name": "page"
                     }
                 ],
                 "tags": ["News"],
