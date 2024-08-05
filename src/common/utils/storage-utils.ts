@@ -7,6 +7,8 @@ import type {
     TTLValue,
 } from '@common/types';
 
+import { v5 as uuidv5 } from 'uuid';
+
 export class StorageError extends Error {
     public status: number | undefined;
     constructor(message: string, options?: StorageErrorOptions) {
@@ -25,11 +27,13 @@ export class ObjectStorage<
 > {
     private storage: Store<StorageTypes>;
     private expiration: number;
+    private uuid_namespace: string;
 
     constructor(expiration?: number) {
         this.storage = {};
         // Default expiration to 36 hours if not provided
         this.expiration = expiration ?? 129600 * 1000;
+        this.uuid_namespace = '9e3a3f45-caf8-4e89-8a00-865dac767f42';
     }
 
     /**
@@ -37,23 +41,8 @@ export class ObjectStorage<
      * @param {string} value - String value of the Object to create an ID for
      * @returns {string} - The ID of the object
      */
-    private createId = (value: any): string => {
-        let id = 0;
-        for (let i = 0; i < value.length; i++) {
-            const char = value.charCodeAt(i);
-            id = (id << 5) - id + char;
-            id |= 0;
-        }
-
-        // Force Id to be positive
-        id = id + 2147483647;
-
-        // Create an simple connected ID
-        const stringifiedId = id.toString().split('');
-        stringifiedId.splice(4, 0, '-');
-        stringifiedId.splice(8, 0, '-');
-        return stringifiedId.join('').padEnd(13, '0');
-    };
+    private createId = (value: string): string =>
+        uuidv5(value, this.uuid_namespace);
 
     /**
      * A function to reduce a response into an array of chunked values

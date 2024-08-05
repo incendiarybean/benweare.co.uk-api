@@ -1,4 +1,5 @@
 import { ObjectStorage } from '../../src/common/utils/storage-utils';
+import { v5 as uuidv5 } from 'uuid';
 
 interface TestType {
     message: string;
@@ -74,13 +75,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test',
-                id: '4223-304-6000',
+                id: '48f2f9ca-e080-51bc-80a2-621100590ed7',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'overwitten test',
-                id: '1868-390-5790',
+                id: '892670a1-5e29-5018-8167-50c07836a878',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
@@ -92,7 +93,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test',
-                id: '4223-304-6000',
+                id: '48f2f9ca-e080-51bc-80a2-621100590ed7',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_1',
             },
@@ -201,13 +202,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(result1.items).toEqual([
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
@@ -270,13 +271,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
@@ -304,13 +305,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
@@ -348,31 +349,31 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-4',
-                id: '1931-511-2290',
+                id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                 date: dateArray[4],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-3',
-                id: '1931-510-2680',
+                id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                 date: dateArray[3],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-2',
-                id: '1931-509-3070',
+                id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                 date: dateArray[2],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: dateArray[1],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: dateArray[0],
                 name: 'TEST_COLLECTION_0',
             },
@@ -397,37 +398,37 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-5',
-                id: '1931-512-1900',
+                id: '14fae9f1-6337-5d72-9c10-c6d165baa713',
                 date: dateArray[5],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-4',
-                id: '1931-511-2290',
+                id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                 date: dateArray[4],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-3',
-                id: '1931-510-2680',
+                id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                 date: dateArray[3],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-2',
-                id: '1931-509-3070',
+                id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                 date: dateArray[2],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: dateArray[1],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: dateArray[0],
                 name: 'TEST_COLLECTION_0',
             },
@@ -452,49 +453,49 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-7',
-                id: '1931-514-1120',
+                id: '727e4e89-a43c-5025-9a57-3080669563c7',
                 date: dateArray[7],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-6',
-                id: '1931-513-1510',
+                id: '25824c09-da35-5ccf-a3c8-fcabadbe6688',
                 date: dateArray[6],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-5',
-                id: '1931-512-1900',
+                id: '14fae9f1-6337-5d72-9c10-c6d165baa713',
                 date: dateArray[5],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-4',
-                id: '1931-511-2290',
+                id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                 date: dateArray[4],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-3',
-                id: '1931-510-2680',
+                id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                 date: dateArray[3],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-2',
-                id: '1931-509-3070',
+                id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                 date: dateArray[2],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: dateArray[1],
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: dateArray[0],
                 name: 'TEST_COLLECTION_0',
             },
@@ -524,31 +525,31 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         ).toEqual([
             {
                 message: 'test-0',
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-1',
-                id: '1931-508-3460',
+                id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-2',
-                id: '1931-509-3070',
+                id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-3',
-                id: '1931-510-2680',
+                id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
             {
                 message: 'test-4',
-                id: '1931-511-2290',
+                id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                 date: new Date().toISOString(),
                 name: 'TEST_COLLECTION_0',
             },
@@ -593,31 +594,31 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             items: [
                 {
                     message: 'test-4',
-                    id: '1931-511-2290',
+                    id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                     date: dateArray[4],
                     name: 'TEST_COLLECTION_1',
                 },
                 {
                     message: 'test-3',
-                    id: '1931-510-2680',
+                    id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                     date: dateArray[3],
                     name: 'TEST_COLLECTION_1',
                 },
                 {
                     message: 'test-2',
-                    id: '1931-509-3070',
+                    id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                     date: dateArray[2],
                     name: 'TEST_COLLECTION_0',
                 },
                 {
                     message: 'test-1',
-                    id: '1931-508-3460',
+                    id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                     date: dateArray[1],
                     name: 'TEST_COLLECTION_0',
                 },
                 {
                     message: 'test-0',
-                    id: '1931-507-3850',
+                    id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                     date: dateArray[0],
                     name: 'TEST_COLLECTION_0',
                 },
@@ -630,31 +631,31 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             items: [
                 {
                     message: 'test-0',
-                    id: '1931-507-3850',
+                    id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                     date: dateArray[0],
                     name: 'TEST_COLLECTION_0',
                 },
                 {
                     message: 'test-1',
-                    id: '1931-508-3460',
+                    id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
                     date: dateArray[1],
                     name: 'TEST_COLLECTION_0',
                 },
                 {
                     message: 'test-2',
-                    id: '1931-509-3070',
+                    id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
                     date: dateArray[2],
                     name: 'TEST_COLLECTION_0',
                 },
                 {
                     message: 'test-3',
-                    id: '1931-510-2680',
+                    id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
                     date: dateArray[3],
                     name: 'TEST_COLLECTION_1',
                 },
                 {
                     message: 'test-4',
-                    id: '1931-511-2290',
+                    id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
                     date: dateArray[4],
                     name: 'TEST_COLLECTION_1',
                 },
@@ -690,9 +691,14 @@ describe('The Storage-Utils should allow storage of items and access to stored i
             ]
         );
 
-        expect(storage.itemById('TEST_NAMESPACE_0', '1931-507-3850')).toEqual({
+        expect(
+            storage.itemById(
+                'TEST_NAMESPACE_0',
+                '9d07fd97-a3b1-5685-a4e3-eca6780b1995'
+            )
+        ).toEqual({
             date: date.toISOString(),
-            id: '1931-507-3850',
+            id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
             message: 'test-0',
             name: 'TEST_COLLECTION_0',
         });
@@ -702,7 +708,10 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         const storage = new ObjectStorage<TestType>();
 
         try {
-            storage.itemById('TEST_NAMESPACE_0', '1931-507-3850');
+            storage.itemById(
+                'TEST_NAMESPACE_0',
+                '9d07fd97-a3b1-5685-a4e3-eca6780b1995'
+            );
         } catch (e) {
             expect(e.message).toEqual(
                 'Could not find namespace: TEST_NAMESPACE_0'
@@ -722,10 +731,13 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         );
 
         try {
-            storage.itemById('TEST_NAMESPACE_0', '1931-507-3850');
+            storage.itemById(
+                'TEST_NAMESPACE_0',
+                '9d07fd97-a3b1-5685-a4e3-eca6780b1995'
+            );
         } catch (e) {
             expect(e.message).toEqual(
-                'Could not find item with ID: 1931-507-3850'
+                'Could not find item with ID: 9d07fd97-a3b1-5685-a4e3-eca6780b1995'
             );
             expect(e.status).toEqual(404);
         }
@@ -773,7 +785,7 @@ describe('The Storage-Utils should allow storage of items and access to stored i
         expect(result.items).toEqual([
             {
                 date: date.toISOString(),
-                id: '1931-507-3850',
+                id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
                 message: 'test-0',
                 name: 'TEST_COLLECTION_0',
             },

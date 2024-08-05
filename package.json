@@ -1,6 +1,6 @@
 {
     "name": "benweare.co.uk-server",
-    "version": "2.3.9",
+    "version": "2.3.10",
     "private": true,
     "main": "./build/index.js",
     "dependencies": {
@@ -16,7 +16,8 @@
         "libsodium-wrappers": "^0.7.10",
         "socket.io": "^4.5.2",
         "swagger-ui-slim": "^1.2.2",
-        "typescript": "^4.7.4"
+        "typescript": "^4.7.4",
+        "uuid": "^10.0.0"
     },
     "scripts": {
         "start": "node -r dotenv/config .",
@@ -59,6 +60,7 @@
         "@types/react-dom": "^18.0.6",
         "@types/supertest": "^2.0.12",
         "@types/swagger-ui-dist": "^3.30.1",
+        "@types/uuid": "^10.0.0",
         "@typescript-eslint/eslint-plugin": "^5.33.1",
         "axios-mock-adapter": "^1.21.5",
         "babel-jest": "^29.6.2",
