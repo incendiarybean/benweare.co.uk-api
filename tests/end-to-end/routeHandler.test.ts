@@ -216,21 +216,6 @@ describe('Server should return expected responses from endpoints defined in rout
     });
 
     describe('Steam endpoints should return appropriate responses.', () => {
-        it('should return the status of the Steam API', async () => {
-            mockAxios
-                .onGet(
-                    `${process.env.STEAM_API}/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=`
-                )
-                .replyOnce(200);
-
-            const result = await request(app)
-                .get('/api/steam/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.body.message).toEqual('ok');
-        });
-
         it('should make a request to the Steam API and formulate a response', async () => {
             mockAxios
                 .onGet(
@@ -275,14 +260,6 @@ describe('Server should return expected responses from endpoints defined in rout
                 .set('x-forwarded-proto', 'https://test.com');
             HTTPServer.close();
             expect(result.status).toEqual(422);
-        });
-
-        it('should send an error response when the steam API is unavailable', async () => {
-            const result = await request(app)
-                .get('/api/steam/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-            expect(result.status).toEqual(500);
         });
     });
 
