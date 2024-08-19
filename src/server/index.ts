@@ -6,9 +6,10 @@ import http from 'http';
 
 export const app = express();
 
-export const HTTPServer = http
-    .createServer(app)
-    .listen(process.env.PORT ?? 8000, () => {
+export const HTTPServer = http.createServer(app);
+
+if (process.env.NODE_ENV !== 'test') {
+    HTTPServer.listen(process.env.PORT ?? 8000, () => {
         console.info(`[${new Date()}] ENV: ${process.env.NODE_ENV}`);
         console.info(
             `[${new Date()}] Server is active on port: ${
@@ -16,6 +17,7 @@ export const HTTPServer = http
             }`
         );
     });
+}
 
 export const IO = new Server(HTTPServer, {
     cors: {

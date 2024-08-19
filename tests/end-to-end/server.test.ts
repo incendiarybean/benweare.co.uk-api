@@ -2,6 +2,10 @@ describe('Server should start correctly.', () => {
     it('should use the default server PORT when environmental variable is not available', async () => {
         const loggerSpy = jest.spyOn(console, 'info');
         const PORT = process.env.PORT;
+
+        // Set NODE_ENV to test LISTEN
+        process.env.NODE_ENV = 'development';
+
         delete process.env.PORT;
 
         const { HTTPServer } = require('../../src/server');

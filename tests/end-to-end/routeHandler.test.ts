@@ -26,7 +26,158 @@ describe('Server should return expected responses from endpoints defined in rout
                 .set('x-forwarded-proto', 'https://test.com');
             HTTPServer.close();
 
-            expect(result.body.message).toEqual('ok');
+            expect(result.body).toEqual({
+                description: 'Check API status.',
+                link: {
+                    action: 'GET',
+                    href: '/api/status',
+                },
+                response: {
+                    errors: [],
+                    health: 'OPERATIONAL',
+                    endpoints: [
+                        {
+                            message: 'WEATHER source obtained successfully.',
+                            status: {
+                                errors: [],
+                                health: 'OPERATIONAL',
+                            },
+                        },
+                        {
+                            message: 'NEWS source obtained successfully.',
+                            status: {
+                                errors: [],
+                                health: 'OPERATIONAL',
+                            },
+                        },
+                    ],
+                },
+                timestamp: testingDate.toISOString(),
+            });
+        });
+
+        it('should return the status of the API as INOPERATIONAL if all of the sources are inactive', async () => {
+            jest.spyOn(storage, 'collections').mockReturnValue(() => {
+                throw new Error();
+            });
+
+            const result = await request(app)
+                .get('/api/status')
+                .set('x-forwarded-proto', 'https://test.com');
+            HTTPServer.close();
+
+            expect(result.body).toEqual({
+                description: 'Check API status.',
+                link: {
+                    action: 'GET',
+                    href: '/api/status',
+                },
+                response: {
+                    errors: [
+                        'METOFFICE',
+                        'ARS_TECHNICA',
+                        'NASA',
+                        'PCGAMER',
+                        'ROCK_PAPER_SHOTGUN',
+                        'THE_REGISTER',
+                        'BBC',
+                    ],
+                    health: 'INOPERATIONAL',
+                    endpoints: [
+                        {
+                            message:
+                                'WEATHER source could not be obtained successfully.',
+                            status: {
+                                errors: ['METOFFICE'],
+                                health: 'INOPERATIONAL',
+                            },
+                        },
+                        {
+                            message:
+                                'NEWS source could not be obtained successfully.',
+                            status: {
+                                errors: [
+                                    'ARS_TECHNICA',
+                                    'NASA',
+                                    'PCGAMER',
+                                    'ROCK_PAPER_SHOTGUN',
+                                    'THE_REGISTER',
+                                    'BBC',
+                                ],
+                                health: 'INOPERATIONAL',
+                            },
+                        },
+                    ],
+                },
+                timestamp: testingDate.toISOString(),
+            });
+        });
+
+        it('should return the status of the API as DEGRADED if one or more sources are inactive', async () => {
+            jest.spyOn(storage, 'collections').mockReturnValue([
+                {
+                    name: 'METOFFICE',
+                    updated: testingDate.toISOString(),
+                    description: "Test's Latest Test.",
+                },
+                {
+                    name: 'BBC',
+                    updated: testingDate.toISOString(),
+                    description: "Test's Latest Test.",
+                },
+                {
+                    name: 'THE_REGISTER',
+                    updated: testingDate.toISOString(),
+                    description: "Test's Latest Test.",
+                },
+                {
+                    name: 'ROCK_PAPER_SHOTGUN',
+                    updated: testingDate.toISOString(),
+                    description: "Test's Latest Test.",
+                },
+                {
+                    name: 'PCGAMER',
+                    updated: testingDate.toISOString(),
+                    description: "Test's Latest Test.",
+                },
+            ]);
+
+            const result = await request(app)
+                .get('/api/status')
+                .set('x-forwarded-proto', 'https://test.com');
+            HTTPServer.close();
+
+            expect(result.body).toEqual({
+                description: 'Check API status.',
+                link: {
+                    action: 'GET',
+                    href: '/api/status',
+                },
+                response: {
+                    errors: ['/api/news/ars_technica', '/api/news/nasa'],
+                    health: 'DEGRADED',
+                    endpoints: [
+                        {
+                            message: 'WEATHER source obtained successfully.',
+                            status: {
+                                errors: [],
+                                health: 'OPERATIONAL',
+                            },
+                        },
+                        {
+                            message: 'NEWS source obtained successfully.',
+                            status: {
+                                errors: [
+                                    '/api/news/ars_technica',
+                                    '/api/news/nasa',
+                                ],
+                                health: 'DEGRADED',
+                            },
+                        },
+                    ],
+                },
+                timestamp: testingDate.toISOString(),
+            });
         });
 
         it('should return the client index file when requesting the base domain', async () => {
@@ -65,21 +216,6 @@ describe('Server should return expected responses from endpoints defined in rout
     });
 
     describe('Steam endpoints should return appropriate responses.', () => {
-        it('should return the status of the Steam API', async () => {
-            mockAxios
-                .onGet(
-                    `${process.env.STEAM_API}/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=`
-                )
-                .replyOnce(200);
-
-            const result = await request(app)
-                .get('/api/steam/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.body.message).toEqual('ok');
-        });
-
         it('should make a request to the Steam API and formulate a response', async () => {
             mockAxios
                 .onGet(
@@ -124,14 +260,6 @@ describe('Server should return expected responses from endpoints defined in rout
                 .set('x-forwarded-proto', 'https://test.com');
             HTTPServer.close();
             expect(result.status).toEqual(422);
-        });
-
-        it('should send an error response when the steam API is unavailable', async () => {
-            const result = await request(app)
-                .get('/api/steam/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-            expect(result.status).toEqual(500);
         });
     });
 
