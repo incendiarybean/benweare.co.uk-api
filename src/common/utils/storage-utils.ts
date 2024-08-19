@@ -263,10 +263,17 @@ export class ObjectStorage<
 
         const storedData = this.storage[namespace].get(collection);
         if (!storedData) {
+            // Create a new collection
             this.storage[namespace].set(collection, {
                 items: new Map<string, TTLValue<StorageTypes>>(),
                 updated: new Date(),
                 description,
+            });
+        } else {
+            // Update the existing collection's timestamp
+            this.storage[namespace].set(collection, {
+                ...storedData,
+                updated: new Date(),
             });
         }
 
