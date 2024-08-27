@@ -16,17 +16,18 @@ router.get(
     cors({ origin: '*' }),
     async (req: Request, res: Response) => {
         // Expected sources that should be collected and stored in each namespace
-        const sources: { [key: string]: string[] } = {
-            WEATHER: ['METOFFICE'],
-            NEWS: [
-                'ARS_TECHNICA',
-                'NASA',
-                'PCGAMER',
-                'ROCK_PAPER_SHOTGUN',
-                'THE_REGISTER',
-                'BBC',
-            ],
+        const sources: { [key: string]: { [key: string]: boolean } } = {
+            WEATHER: { METOFFICE: false },
+            NEWS: {
+                ARS_TECHNICA: false,
+                NASA: false,
+                PCGAMER: false,
+                ROCK_PAPER_SHOTGUN: false,
+                THE_REGISTER: false,
+                BBC: false,
+            },
         };
+
         const sourceCount = Object.keys(sources)
             .map((key) => sources[key])
             .flat().length;
@@ -36,17 +37,18 @@ router.get(
         const endpoints: EndpointStatus[] = Object.keys(sources).map(
             (namespace) => {
                 try {
-                    const errors = sources[namespace]
-                        .filter(
-                            (source) =>
-                                !storage
-                                    .collections(namespace)
-                                    .map((feed) => feed.name)
-                                    .includes(source)
-                        )
+                    Object.entries(sources[namespace]).forEach((object) => {
+                        sources[namespace][object[0]] = storage
+                            .collections(namespace)
+                            .map((feed) => feed.name)
+                            .includes(object[0]);
+                    });
+
+                    const errors = Object.entries(sources[namespace])
+                        .filter((source) => !source[1])
                         .map(
                             (endpoint) =>
-                                `/api/${namespace.toLowerCase()}/${endpoint.toLowerCase()}`
+                                `/api/${namespace.toLowerCase()}/${endpoint[0].toLowerCase()}`
                         );
 
                     return {
@@ -54,18 +56,28 @@ router.get(
                         status: {
                             health:
                                 (!errors.length && 'OPERATIONAL') ||
-                                (errors.length < sources[namespace].length &&
+                                (errors.length <
+                                    Object.keys(sources[namespace]).length &&
                                     'DEGRADED') ||
                                 'INOPERATIONAL',
+                            feeds: sources[namespace],
                             errors,
                         },
                     };
                 } catch (e: any) {
+                    const errors = Object.entries(sources[namespace])
+                        .filter((source) => !source[1])
+                        .map(
+                            (endpoint) =>
+                                `/api/${namespace.toLowerCase()}/${endpoint[0].toLowerCase()}`
+                        );
+
                     return {
                         message: `${namespace} source could not be obtained successfully.`,
                         status: {
                             health: 'INOPERATIONAL',
-                            errors: sources[namespace],
+                            feeds: sources[namespace],
+                            errors,
                         },
                     };
                 }
@@ -73,7 +85,9 @@ router.get(
         );
 
         // Flatten all errors and assign to top level status
-        const errors = endpoints.map((source) => source.status.errors).flat();
+        const errors = endpoints.filter(
+            (source) => source.status.errors.length
+        );
 
         return res.status(200).json({
             response: {
@@ -81,7 +95,6 @@ router.get(
                     (!errors.length && 'OPERATIONAL') ||
                     (errors.length < sourceCount && 'DEGRADED') ||
                     'INOPERATIONAL',
-                errors,
                 endpoints,
             },
             description: OpenApiSchema.paths['/api/status']?.get?.summary,
