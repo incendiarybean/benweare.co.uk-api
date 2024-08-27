@@ -33,13 +33,15 @@ describe('Server should return expected responses from endpoints defined in rout
                     href: '/api/status',
                 },
                 response: {
-                    errors: [],
                     health: 'OPERATIONAL',
                     endpoints: [
                         {
                             message: 'WEATHER source obtained successfully.',
                             status: {
                                 errors: [],
+                                feeds: {
+                                    METOFFICE: true,
+                                },
                                 health: 'OPERATIONAL',
                             },
                         },
@@ -47,6 +49,14 @@ describe('Server should return expected responses from endpoints defined in rout
                             message: 'NEWS source obtained successfully.',
                             status: {
                                 errors: [],
+                                feeds: {
+                                    ARS_TECHNICA: true,
+                                    BBC: true,
+                                    NASA: true,
+                                    PCGAMER: true,
+                                    ROCK_PAPER_SHOTGUN: true,
+                                    THE_REGISTER: true,
+                                },
                                 health: 'OPERATIONAL',
                             },
                         },
@@ -73,22 +83,16 @@ describe('Server should return expected responses from endpoints defined in rout
                     href: '/api/status',
                 },
                 response: {
-                    errors: [
-                        'METOFFICE',
-                        'ARS_TECHNICA',
-                        'NASA',
-                        'PCGAMER',
-                        'ROCK_PAPER_SHOTGUN',
-                        'THE_REGISTER',
-                        'BBC',
-                    ],
                     health: 'INOPERATIONAL',
                     endpoints: [
                         {
                             message:
                                 'WEATHER source could not be obtained successfully.',
                             status: {
-                                errors: ['METOFFICE'],
+                                errors: ['/api/weather/metoffice'],
+                                feeds: {
+                                    METOFFICE: false,
+                                },
                                 health: 'INOPERATIONAL',
                             },
                         },
@@ -97,13 +101,21 @@ describe('Server should return expected responses from endpoints defined in rout
                                 'NEWS source could not be obtained successfully.',
                             status: {
                                 errors: [
-                                    'ARS_TECHNICA',
-                                    'NASA',
-                                    'PCGAMER',
-                                    'ROCK_PAPER_SHOTGUN',
-                                    'THE_REGISTER',
-                                    'BBC',
+                                    '/api/news/ars_technica',
+                                    '/api/news/nasa',
+                                    '/api/news/pcgamer',
+                                    '/api/news/rock_paper_shotgun',
+                                    '/api/news/the_register',
+                                    '/api/news/bbc',
                                 ],
+                                feeds: {
+                                    ARS_TECHNICA: false,
+                                    BBC: false,
+                                    NASA: false,
+                                    PCGAMER: false,
+                                    ROCK_PAPER_SHOTGUN: false,
+                                    THE_REGISTER: false,
+                                },
                                 health: 'INOPERATIONAL',
                             },
                         },
@@ -154,19 +166,27 @@ describe('Server should return expected responses from endpoints defined in rout
                     href: '/api/status',
                 },
                 response: {
-                    errors: ['/api/news/ars_technica', '/api/news/nasa'],
                     health: 'DEGRADED',
                     endpoints: [
                         {
                             message: 'WEATHER source obtained successfully.',
                             status: {
                                 errors: [],
+                                feeds: { METOFFICE: true },
                                 health: 'OPERATIONAL',
                             },
                         },
                         {
                             message: 'NEWS source obtained successfully.',
                             status: {
+                                feeds: {
+                                    ARS_TECHNICA: false,
+                                    BBC: true,
+                                    NASA: false,
+                                    PCGAMER: true,
+                                    ROCK_PAPER_SHOTGUN: true,
+                                    THE_REGISTER: true,
+                                },
                                 errors: [
                                     '/api/news/ars_technica',
                                     '/api/news/nasa',
