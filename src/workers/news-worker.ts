@@ -24,8 +24,8 @@ export const getArsTechnicaNews = (): Promise<void> =>
     fetchArticles(
         'Ars_Technica',
         'https://arstechnica.com/gadgets/',
-        '.listing-latest',
-        '.article'
+        '#main',
+        'article'
     ).then((output: FetchArticleOutput) =>
         saveArticles(output, (articles: NewsArticle[], element: Element) => {
             const title: UndefinedNews = element
