@@ -1,5 +1,6 @@
-import { checkSteamApi, getGameData } from '../../src/workers/steam-worker';
 import { steamContent, steamUserContent } from '../data/test-data';
+
+import { getGameData } from '../../src/workers/steam-worker';
 
 const mockAxios = globalThis.__mockAxios__;
 
@@ -85,20 +86,6 @@ describe('The Steam-Worker should correctly validate data and return it', () => 
             ],
             wiki: undefined,
         });
-    });
-
-    it('should throw if steam API is down', async () => {
-        mockAxios
-            .onGet(
-                `${process.env.STEAM_API}/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=`
-            )
-            .replyOnce(502);
-
-        try {
-            await checkSteamApi();
-        } catch (e) {
-            expect(e.message).toEqual('Request failed with status code 502');
-        }
     });
 
     it('should throw if no gameId is given', async () => {

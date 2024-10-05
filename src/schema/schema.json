@@ -138,6 +138,28 @@
                     }
                 }
             },
+            "StatusResponse": {
+                "type": "object",
+                "properties": {
+                    "health": { "type": "string" },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "endpoints": {
+                        "type": "object",
+                        "properties": {
+                            "message": { "type": "string" },
+                            "errors": {
+                                "type": "array",
+                                "items": { "type": "string" }
+                            }
+                        }
+                    }
+                }
+            },
             "SteamResponse": {
                 "type": "object",
                 "properties": {
@@ -188,6 +210,12 @@
                                 "items": {
                                     "$ref": "#/components/schemas/SteamResponse"
                                 }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/StatusResponse"
+                                }
                             }
                         ]
                     },
@@ -202,6 +230,9 @@
                 "$ref": "#/components/schemas/DefaultResponse"
             },
             "Weather": {
+                "$ref": "#/components/schemas/DefaultResponse"
+            },
+            "Status": {
                 "$ref": "#/components/schemas/DefaultResponse"
             }
         }

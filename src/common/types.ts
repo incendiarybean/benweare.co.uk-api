@@ -12,6 +12,17 @@ export type FetchArticleOutput = {
     unformattedArticles: Element[];
 };
 
+export type EndpointStatus = {
+    message: string;
+    status: {
+        health: 'OPERATIONAL' | 'DEGRADED' | 'INOPERATIONAL';
+        feeds?: {
+            [key: string]: boolean;
+        };
+        errors: string[];
+    };
+};
+
 /* STORAGE TYPES */
 export interface CollectionList {
     name: string;
