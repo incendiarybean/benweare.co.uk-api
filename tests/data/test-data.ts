@@ -59,7 +59,7 @@ export const bbcContent = () => {
 export const arsTechnicaContent = () => {
     return replacer(
         template,
-        'listing-latest',
+        'main',
         'article',
         'text',
         '',
