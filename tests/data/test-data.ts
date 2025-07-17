@@ -27,8 +27,8 @@ export const registerContent = () => {
 export const rpsContent = () => {
     return replacer(
         template,
-        'articles',
-        'li',
+        'blog',
+        'blog__item',
         'title',
         'thumbnail_image',
         '<div>Test Title</div>'
