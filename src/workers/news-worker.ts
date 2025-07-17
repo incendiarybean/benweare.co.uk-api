@@ -120,13 +120,14 @@ export const getRPSNews = (): Promise<void> =>
     fetchArticles(
         'Rock_Paper_Shotgun',
         'https://www.rockpapershotgun.com/latest',
-        '.articles',
-        'li'
+        '.blog',
+        '.blog__item'
     ).then((output: FetchArticleOutput) =>
         saveArticles(output, (articles: NewsArticle[], element: Element) => {
             const title: UndefinedNews = element
                 .querySelector('.title')
                 ?.children[0].textContent?.trim();
+
             if (title) {
                 const url: string =
                     element.querySelector('a')?.href ?? 'Not Found';
