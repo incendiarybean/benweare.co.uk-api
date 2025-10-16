@@ -134,7 +134,7 @@ export const getRPSNews = (): Promise<void> =>
 
                 const img: string =
                     element
-                        .querySelector('.thumbnail_image')
+                        .querySelector('.thumbnail img')
                         ?.getAttribute('src') ?? 'Not Found';
 
                 const date: string = dateGenerator(
