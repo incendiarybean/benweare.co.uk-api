@@ -1,39 +1,62 @@
 {
     "compilerOptions": {
-        "target": "es2022",
-        "module": "commonjs",
-        "rootDir": "./src",
-        "moduleResolution": "node",
-        "baseUrl": ".",
-        "outDir": "./build",
-        "esModuleInterop": true,
-        "checkJs": true,
+        // Environment setup & latest features
+        "lib": [
+            "ESNext"
+        ],
+        "target": "ESNext",
+        "module": "nodenext",
+        "moduleDetection": "force",
+        "jsx": "react-jsx",
         "allowJs": true,
-        "forceConsistentCasingInFileNames": true,
+        "types": [
+            "node",
+            "ts-jest"
+        ],
+        // Bundler mode
+        "moduleResolution": "nodenext",
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
+        "noEmit": true,
+        // Best practices
         "strict": true,
-        "noImplicitAny": true,
-        "strictPropertyInitialization": true,
-        "noImplicitThis": true,
-        "alwaysStrict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": false,
-        "exactOptionalPropertyTypes": true,
-        "noImplicitReturns": true,
-        "allowUnusedLabels": false,
-        "allowUnreachableCode": false,
         "skipLibCheck": true,
-        "resolveJsonModule": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noPropertyAccessFromIndexSignature": true,
         "paths": {
-            "@server": ["./src/server"],
-            "@schema": ["./src/schema"],
-            "@handlers/*": ["./src/handlers/*"],
-            "@routes/*": ["./src/routes/*"],
-            "@workers/*": ["./src/workers/*"],
-            "@common/*": ["./src/common/*"]
-        }
+            "@server": [
+                "./src/server/index.ts"
+            ],
+            "@schema": [
+                "./src/schema/index.ts"
+            ],
+            "@handlers/*": [
+                "./src/handlers/*"
+            ],
+            "@routes/*": [
+                "./src/routes/*"
+            ],
+            "@workers/*": [
+                "./src/workers/*"
+            ],
+            "@common/*": [
+                "./src/common/*"
+            ],
+            "@utils/*": [
+                "./src/common/utils/*"
+            ]
+        },
     },
     "ts-node": {
         "files": true
     },
-    "exclude": ["tests/**", "*.config.js", "build", "coverage"]
+    "exclude": [
+        "*.config.js",
+        "build",
+        "coverage"
+    ]
 }

@@ -1,23 +1,44 @@
-describe('Server should start correctly.', () => {
-    it('should use the default server PORT when environmental variable is not available', async () => {
-        const loggerSpy = jest.spyOn(console, 'info');
-        const PORT = process.env.PORT;
+describe(
+    'Server should start correctly.', () => {
+        it(
+            'should use the default server PORT when environmental variable is not available', async () => {
+                const loggerSpy = jest.spyOn(
+                    console, 'info'
+                );
+                const PORT = process.env.PORT;
 
-        // Set NODE_ENV to test LISTEN
-        process.env.NODE_ENV = 'development';
+                // Set NODE_ENV to test LISTEN
+                process.env.NODE_ENV = 'development';
 
-        delete process.env.PORT;
+                delete process.env.PORT;
 
-        const { HTTPServer } = require('../../src/server');
+                const { HTTPServer } = require(
+                    '../../src/server'
+                );
 
-        jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 200));
+                jest.useRealTimers();
+                await new Promise(
+                    (
+                        resolve
+                    ) => setTimeout(
+                        resolve, 200
+                    )
+                );
 
-        const startValue = loggerSpy.mock.lastCall[0].split('] ')[1];
-        expect(startValue).toEqual('Server is active on port: 8000');
+                const startValue = loggerSpy.mock.lastCall[0].split(
+                    '] '
+                )[1];
 
-        HTTPServer.close();
+                expect(
+                    startValue
+                ).toEqual(
+                    'Server is active on port: 8000'
+                );
 
-        process.env.PORT = PORT;
-    });
-});
+                HTTPServer.close();
+
+                process.env.PORT = PORT;
+            }
+        );
+    }
+);

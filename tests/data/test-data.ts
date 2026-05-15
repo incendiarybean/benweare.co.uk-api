@@ -1,6 +1,8 @@
 import { readFileSync } from 'fs';
 
-const template = readFileSync('./tests/data/default.html', 'utf8');
+const template = readFileSync(
+    './tests/data/default.html', 'utf8'
+);
 
 const replacer = (
     input: string,
@@ -10,18 +12,30 @@ const replacer = (
     image: string,
     innerDiv: string = ''
 ) => {
-    const output = input
-        .replace(/to-replace-article-container/g, container)
-        .replace(/to-replace-article-divider/g, divider)
-        .replace(/to-replace-title-class/g, title)
-        .replace(/to-replace-inner-title-div/g, innerDiv)
-        .replace(/to-replace-image-class/g, image);
+    const output = input.
+        replace(
+            /to-replace-article-container/g, container
+        ).
+        replace(
+            /to-replace-article-divider/g, divider
+        ).
+        replace(
+            /to-replace-title-class/g, title
+        ).
+        replace(
+            /to-replace-inner-title-div/g, innerDiv
+        ).
+        replace(
+            /to-replace-image-class/g, image
+        );
 
     return output;
 };
 
 export const registerContent = () => {
-    return replacer(template, 'main-col', 'article', 'h4', 'thumbnail_image');
+    return replacer(
+        template, 'main-col', 'article', 'h4', 'thumbnail_image'
+    );
 };
 
 export const rpsContent = () => {
@@ -68,7 +82,9 @@ export const arsTechnicaContent = () => {
 };
 
 export const genericContent = () => {
-    return replacer(template, 'container', 'article', 'title', 'image');
+    return replacer(
+        template, 'container', 'article', 'title', 'image'
+    );
 };
 
 export const nasaContent = {
@@ -79,7 +95,7 @@ export const nasaContent = {
     media_type: 'image',
     service_version: 'v1',
     title: 'Test Title',
-    url: 'test-image.png',
+    url: 'test-image.png'
 };
 
 export const metofficeContent = {
@@ -135,7 +151,7 @@ export const metofficeContent = {
                         dayProbabilityOfHail: 0,
                         nightProbabilityOfHail: 3,
                         dayProbabilityOfSferics: 0,
-                        nightProbabilityOfSferics: 2,
+                        nightProbabilityOfSferics: 2
                     },
                     {
                         time: '2023-02-02T00:00Z',
@@ -179,12 +195,12 @@ export const metofficeContent = {
                         dayProbabilityOfHail: 16,
                         nightProbabilityOfHail: 0,
                         dayProbabilityOfSferics: 15,
-                        nightProbabilityOfSferics: 1,
-                    },
-                ],
-            },
-        },
-    ],
+                        nightProbabilityOfSferics: 1
+                    }
+                ]
+            }
+        }
+    ]
 };
 
 export const steamContent = {
@@ -200,19 +216,31 @@ export const steamContent = {
                     hidden: 0,
                     description: 'New Achievement!',
                     icon: 'steamIcon',
-                    icongray: 'steamIconGray',
-                },
+                    icongray: 'steamIconGray'
+                }
             ],
-            stats: [{ name: 'version', defaultvalue: 0, displayName: '' }],
-        },
-    },
+            stats: [
+                {
+                    name: 'version',
+                    defaultvalue: 0,
+                    displayName: ''
+                }
+            ]
+        }
+    }
 };
 
 export const steamUserContent = {
     playerstats: {
         steamID: 'SteamUserID',
         gameName: 'Video Game Name',
-        achievements: [{ apiname: '1', achieved: 1, unlocktime: 1657572168 }],
-        success: true,
-    },
+        achievements: [
+            {
+                apiname: '1',
+                achieved: 1,
+                unlocktime: 1657572168
+            }
+        ],
+        success: true
+    }
 };

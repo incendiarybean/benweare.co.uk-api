@@ -1,4 +1,6 @@
-import type { WeatherCodes, WeatherRecord } from '@common/types';
+import type {
+    WeatherCodes, WeatherRecord
+} from '@common/types.ts';
 
 export const mockWeatherResponse: WeatherRecord[] = [
     {
@@ -8,7 +10,7 @@ export const mockWeatherResponse: WeatherRecord[] = [
         maxWindSpeed: 3,
         date: '2023-02-01T00:00:00.000Z',
         weather: 'cloud',
-        weatherDescription: 'Cloudy',
+        weatherDescription: 'Cloudy'
     },
     {
         lowTemp: '13º',
@@ -17,39 +19,129 @@ export const mockWeatherResponse: WeatherRecord[] = [
         maxWindSpeed: 3,
         date: '2023-02-02T00:00:00.000Z',
         weather: 'rain',
-        weatherDescription: 'Light rain',
-    },
+        weatherDescription: 'Light rain'
+    }
 ];
 
 export const weatherCodes: WeatherCodes = {
-    0: ['sun', 'Clear night'],
-    1: ['sun', 'Sunny day'],
-    2: ['cloud', 'Partly cloudy (night)'],
-    3: ['cloud', 'Partly cloudy (day)'],
-    5: ['foggy', 'Mist'],
-    6: ['foggy', 'Fog'],
-    7: ['cloud', 'Cloudy'],
-    8: ['cloud', 'Overcast'],
-    9: ['rain', 'Light rain shower (night)'],
-    10: ['rain', 'Light rain shower (day)'],
-    11: ['rain', 'Drizzle'],
-    12: ['rain', 'Light rain'],
-    13: ['rain', 'Heavy rain shower (night)'],
-    14: ['rain', 'Heavy rain shower (day)'],
-    15: ['rain', 'Heavy rain'],
-    16: ['snow', 'Sleet shower (night)'],
-    17: ['snow', 'Sleet shower (day)'],
-    18: ['snow', 'Sleet'],
-    19: ['snow', 'Hail shower (night)'],
-    20: ['snow', 'Hail shower (day)'],
-    21: ['snow', 'Hail'],
-    22: ['snow', 'Light snow shower (night)'],
-    23: ['snow', 'Light snow shower (day)'],
-    24: ['snow', 'Light snow'],
-    25: ['snow', 'Heavy snow shower (night)'],
-    26: ['snow', 'Heavy snow shower (day)'],
-    27: ['snow', 'Heavy snow'],
-    28: ['thunder', 'Thunder shower (night)'],
-    29: ['thunder', 'Thunder shower (day)'],
-    30: ['thunder', 'Thunder'],
+    0: [
+        'sun',
+        'Clear night'
+    ],
+    1: [
+        'sun',
+        'Sunny day'
+    ],
+    2: [
+        'cloud',
+        'Partly cloudy (night)'
+    ],
+    3: [
+        'cloud',
+        'Partly cloudy (day)'
+    ],
+    5: [
+        'foggy',
+        'Mist'
+    ],
+    6: [
+        'foggy',
+        'Fog'
+    ],
+    7: [
+        'cloud',
+        'Cloudy'
+    ],
+    8: [
+        'cloud',
+        'Overcast'
+    ],
+    9: [
+        'rain',
+        'Light rain shower (night)'
+    ],
+    10: [
+        'rain',
+        'Light rain shower (day)'
+    ],
+    11: [
+        'rain',
+        'Drizzle'
+    ],
+    12: [
+        'rain',
+        'Light rain'
+    ],
+    13: [
+        'rain',
+        'Heavy rain shower (night)'
+    ],
+    14: [
+        'rain',
+        'Heavy rain shower (day)'
+    ],
+    15: [
+        'rain',
+        'Heavy rain'
+    ],
+    16: [
+        'snow',
+        'Sleet shower (night)'
+    ],
+    17: [
+        'snow',
+        'Sleet shower (day)'
+    ],
+    18: [
+        'snow',
+        'Sleet'
+    ],
+    19: [
+        'snow',
+        'Hail shower (night)'
+    ],
+    20: [
+        'snow',
+        'Hail shower (day)'
+    ],
+    21: [
+        'snow',
+        'Hail'
+    ],
+    22: [
+        'snow',
+        'Light snow shower (night)'
+    ],
+    23: [
+        'snow',
+        'Light snow shower (day)'
+    ],
+    24: [
+        'snow',
+        'Light snow'
+    ],
+    25: [
+        'snow',
+        'Heavy snow shower (night)'
+    ],
+    26: [
+        'snow',
+        'Heavy snow shower (day)'
+    ],
+    27: [
+        'snow',
+        'Heavy snow'
+    ],
+    28: [
+        'thunder',
+        'Thunder shower (night)'
+    ],
+    29: [
+        'thunder',
+        'Thunder shower (day)'
+    ],
+    30: [
+        'thunder',
+        'Thunder'
+    ]
 };

@@ -1,26 +1,26 @@
-import type { AudioPlayer, VoiceConnection } from '@discordjs/voice';
+import type {
+    AudioPlayer, VoiceConnection
+} from '@discordjs/voice';
 import type {
     CacheType,
     CommandInteractionOption,
     Guild,
-    GuildMember,
+    GuildMember
 } from 'discord.js';
 
 /* COMMON TYPES */
 export type FetchArticleOutput = {
-    outlet: string;
-    unformattedArticles: Element[];
+    outlet: string,
+    unformattedArticles: Element[],
 };
 
 export type EndpointStatus = {
-    message: string;
+    message: string,
     status: {
-        health: 'OPERATIONAL' | 'DEGRADED' | 'INOPERATIONAL';
-        feeds?: {
-            [key: string]: boolean;
-        };
-        errors: string[];
-    };
+        health: 'OPERATIONAL' | 'DEGRADED' | 'INOPERATIONAL',
+        feeds?: { [key: string]: boolean, },
+        errors: string[],
+    },
 };
 
 /* STORAGE TYPES */
@@ -49,18 +49,12 @@ export interface TTLValue<StorageTypes> {
     timer: ReturnType<typeof setTimeout>;
 }
 
-export interface Store<StorageTypes> {
-    [key: string]: Map<string, MapStorage<StorageTypes>>;
-}
+export interface Store<StorageTypes> { [key: string]: Map<string, MapStorage<StorageTypes>>, }
 
 export interface StoreMap<StorageTypes> {
     updated: Date;
     description: string;
     items: Map<number, TTLValue<StorageTypes>>;
-}
-
-export interface StorageErrorOptions extends ErrorOptions {
-    status: number;
 }
 
 /* NEWS TYPES */
@@ -88,12 +82,15 @@ export interface NasaArticle {
 /* WEATHER TYPES */
 export interface WeatherFeatures {
     type: string;
-    geometry: { type: string; coordinates: number[] };
+    geometry: {
+        type: string,
+        coordinates: number[],
+    };
     properties: {
-        location: { name: string };
-        requestPointDistance: number;
-        modelRunDate: string;
-        timeSeries: WeatherTimeSeries[];
+        location: { name: string, },
+        requestPointDistance: number,
+        modelRunDate: string,
+        timeSeries: WeatherTimeSeries[],
     };
 }
 
@@ -106,6 +103,7 @@ export interface WeatherRecord {
     weather: string;
     weatherDescription: string;
 }
+
 
 export interface WeatherTimeSeries {
     location: string;
@@ -161,35 +159,31 @@ export interface WeatherTimeSeries {
 
 export interface WeatherParam {
     [key: string]: {
-        type: string;
-        description: string;
+        type: string,
+        description: string,
         unit: {
-            label: string;
+            label: string,
             symbol: {
-                value: string;
-                type: string;
-            };
-        };
+                value: string,
+                type: string,
+            },
+        },
     };
 }
 
 export interface WeatherConfig {
     method: string;
     url: string;
-    qs: {
-        [key: string]: string;
-    };
+    qs: { [key: string]: string, };
     headers: WeatherRequestHeaders;
 }
 
 export type WeatherRequestHeaders = {
-    apikey: string;
-    accept: string;
+    apikey: string,
+    accept: string,
 };
 
-export interface WeatherCodes {
-    [index: number]: string[];
-}
+export type WeatherCodes = Record<number, [string, string]>;
 
 /* DISCORD TYPES */
 export interface CheckDiscordVoiceTarget {
@@ -205,13 +199,13 @@ export interface CreateDiscordPlayer {
 
 export type DiscordUsernameOptions = {
     user: {
-        id: string;
-        bot: boolean;
-        system: boolean;
-        username: string;
-        discriminator: string;
-        avatar: string;
-        banner: undefined | string;
-        accentColor: undefined | string;
-    };
+        id: string,
+        bot: boolean,
+        system: boolean,
+        username: string,
+        discriminator: string,
+        avatar: string,
+        banner: undefined | string,
+        accentColor: undefined | string,
+    },
 } & CommandInteractionOption<CacheType>;
