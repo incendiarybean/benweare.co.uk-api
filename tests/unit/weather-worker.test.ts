@@ -140,23 +140,27 @@ describe(
 
         it(
             'should collect all weather when requested', async () => {
-                vi.mock(
-                    '../../src/workers/weather-worker.ts'
-                );
                 const weatherWorker = await import(
                     '../../src/workers/weather-worker.ts'
                 );
 
-                const getMetOffice = vi.spyOn(
-                    weatherWorker, 'getMetOffice'
+                const retryHandler = vi.spyOn(
+                    commonUtils, 'retryHandler'
                 );
 
                 weatherWorker.getWeather();
 
                 expect(
-                    getMetOffice
+                    retryHandler
                 ).toHaveBeenCalledTimes(
                     1
+                );
+
+                expect(
+                    retryHandler
+                ).toHaveBeenCalledWith(
+                    weatherWorker.getMetOffice,
+                    2
                 );
             }
         );

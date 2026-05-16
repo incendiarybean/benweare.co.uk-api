@@ -775,70 +775,50 @@ describe(
 
         it(
             'should call all collectors when requested', async () => {
-                // vi.useFakeTimers(
-                //     { shouldAdvanceTime: true }
-                // );
-
                 const newsWorker = await import(
                     '../../src/workers/news-worker.ts'
                 );
-
-                const getArsTechnicaNews = vi.spyOn(
-                    newsWorker, 'getArsTechnicaNews'
-                );
-                const getNasaImage = vi.spyOn(
-                    newsWorker, 'getNasaImage'
-                );
-                const getPCGamerNews = vi.spyOn(
-                    newsWorker, 'getPCGamerNews'
-                );
-                const getRPSNews = vi.spyOn(
-                    newsWorker, 'getRPSNews'
-                );
-                const getRegisterNews = vi.spyOn(
-                    newsWorker, 'getRegisterNews'
-                );
-                const getUKNews = vi.spyOn(
-                    newsWorker, 'getUKNews'
+                const retryHandler = vi.spyOn(
+                    commonUtils, 'retryHandler'
                 );
 
-                const { getNews } = await import(
-                    '../../src/workers/news-worker.ts'
-                );
-
-                getNews();
-
-                // vi.runAllTimers();
+                newsWorker.getNews();
 
                 expect(
-                    getArsTechnicaNews
+                    retryHandler
                 ).toHaveBeenCalledTimes(
-                    1
+                    6
                 );
+
                 expect(
-                    getNasaImage
-                ).toHaveBeenCalledTimes(
-                    1
-                );
-                expect(
-                    getPCGamerNews
-                ).toHaveBeenCalledTimes(
-                    1
-                );
-                expect(
-                    getRPSNews
-                ).toHaveBeenCalledTimes(
-                    1
-                );
-                expect(
-                    getRegisterNews
-                ).toHaveBeenCalledTimes(
-                    1
-                );
-                expect(
-                    getUKNews
-                ).toHaveBeenCalledTimes(
-                    1
+                    retryHandler.mock.calls
+                ).toEqual(
+                    [
+                        [
+                            newsWorker.getArsTechnicaNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getNasaImage,
+                            5
+                        ],
+                        [
+                            newsWorker.getPCGamerNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getRPSNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getRegisterNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getUKNews,
+                            5
+                        ]
+                    ]
                 );
             }
         );
