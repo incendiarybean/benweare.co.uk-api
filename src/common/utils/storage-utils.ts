@@ -4,7 +4,7 @@ import type {
     MapStorage,
     Store,
     TTLValue
-} from '@common/types.ts';
+} from '../types.ts';
 import type { HttpStatusCode } from 'axios';
 import { v5 as uuidv5 } from 'uuid';
 

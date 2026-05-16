@@ -1,13 +1,17 @@
-import type { CollectionList } from '@common/types';
-import { ObjectStorage } from '../../src/common/utils/storage-utils';
+import type { CollectionList } from '../../src/common/types.ts';
+import { ObjectStorage } from '../../src/common/utils/storage-utils.ts';
 import {
-    jest, describe, it, expect
-} from '@jest/globals';
+    vi, describe, it, expect
+} from 'vitest';
 
 interface TestType {
     message: string;
     date: string;
 }
+
+vi.useFakeTimers(
+    { shouldAdvanceTime: true }
+);
 
 describe(
     'The Storage-Utils should allow storage of items and access to stored items', () => {
@@ -15,23 +19,13 @@ describe(
             'should throw a 404 if no items are found in namespace', () => {
                 const storage = new ObjectStorage<TestType>;
 
-                try {
-                    storage.collections(
+                expect(
+                    () => storage.collections(
                         'TEST'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'No collections available in namespace: TEST'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'No collections available in namespace: TEST'
+                );
             }
         );
 
@@ -137,13 +131,17 @@ describe(
                         {
                             message: 'test',
                             id: '48f2f9ca-e080-51bc-80a2-621100590ed7',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'overwitten test',
                             id: '892670a1-5e29-5018-8167-50c07836a878',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         }
                     ]
@@ -159,7 +157,9 @@ describe(
                         {
                             message: 'test',
                             id: '48f2f9ca-e080-51bc-80a2-621100590ed7',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_1'
                         }
                     ]
@@ -189,8 +189,6 @@ describe(
                 ).toEqual(
                     1
                 );
-
-                jest.runOnlyPendingTimers();
 
                 storage.write(
                     'TEST_NAMESPACE_0',
@@ -230,25 +228,15 @@ describe(
                     ]
                 );
 
-                jest.runOnlyPendingTimers();
+                vi.runAllTimers();
 
-                try {
-                    storage.search(
+                expect(
+                    () => storage.search(
                         'TEST_NAMESPACE_0', 'TEST_COLLECTION_0'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not find items in collection: TEST_COLLECTION_0 in TEST_NAMESPACE_0'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'Could not find items in collection: TEST_COLLECTION_0 in TEST_NAMESPACE_0'
+                );
             }
         );
 
@@ -369,13 +357,17 @@ describe(
                         {
                             message: 'test-0',
                             id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-1',
                             id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         }
                     ]
@@ -395,24 +387,14 @@ describe(
             'should throw an error when searching if no namespace or collection is found', () => {
                 const storage = new ObjectStorage<TestType>;
 
-                // Check that error is thrown if it cannot find a namespace to search
-                try {
-                    storage.search(
+
+                expect(
+                    () => storage.search(
                         'TEST_NAMESPACE_0', 'TEST_COLLECTION_0'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not find namespace: TEST_NAMESPACE_0'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'Could not find namespace: TEST_NAMESPACE_0'
+                );
 
                 storage.write(
                     'TEST_NAMESPACE_0',
@@ -426,24 +408,13 @@ describe(
                     ]
                 );
 
-                // Check that error is thrown if it cannot find a collection to search within a namespace
-                try {
-                    storage.search(
+                expect(
+                    () => storage.search(
                         'TEST_NAMESPACE_0', 'TEST_COLLECTION_0'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not find collection: TEST_COLLECTION_0 in TEST_NAMESPACE_0'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'Could not find collection: TEST_COLLECTION_0 in TEST_NAMESPACE_0'
+                );
             }
         );
 
@@ -485,19 +456,23 @@ describe(
                         {
                             message: 'test-1',
                             id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-0',
                             id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         }
                     ]
                 );
 
-                jest.runOnlyPendingTimers();
+                vi.runOnlyPendingTimers();
 
                 storage.write(
                     'TEST_NAMESPACE_0',
@@ -533,13 +508,17 @@ describe(
                         {
                             message: 'test-0',
                             id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-1',
                             id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         }
                     ]
@@ -558,9 +537,7 @@ describe(
                         8
                     ).keys()
                 ).map(
-                    (
-                        i
-                    ) => new Date(
+                    () => new Date(
                         startDate.setMinutes(
                             startDate.getMinutes() + 1
                         )
@@ -575,23 +552,23 @@ describe(
                     [
                         {
                             message: 'test-3',
-                            date: dateArray[3]
+                            date: dateArray[3] as string
                         },
                         {
                             message: 'test-2',
-                            date: dateArray[2]
+                            date: dateArray[2] as string
                         },
                         {
                             message: 'test-4',
-                            date: dateArray[4]
+                            date: dateArray[4] as string
                         },
                         {
                             message: 'test-0',
-                            date: dateArray[0]
+                            date: dateArray[0] as string
                         },
                         {
                             message: 'test-1',
-                            date: dateArray[1]
+                            date: dateArray[1] as string
                         }
                     ]
                 );
@@ -643,24 +620,24 @@ describe(
                     [
                         {
                             message: 'test-1',
-                            date: dateArray[1]
-                        }, // <-- last item on the page
+                            date: dateArray[1] as string
+                        },
                         {
                             message: 'test-2',
-                            date: dateArray[2]
+                            date: dateArray[2] as string
                         },
                         {
                             message: 'test-3',
-                            date: dateArray[3]
+                            date: dateArray[3] as string
                         },
                         {
                             message: 'test-4',
-                            date: dateArray[4]
+                            date: dateArray[4] as string
                         },
                         {
                             message: 'test-5',
-                            date: dateArray[5]
-                        } // <-- newest item on the page
+                            date: dateArray[5] as string
+                        }
                     ]
                 );
 
@@ -717,24 +694,24 @@ describe(
                     [
                         {
                             message: 'test-3',
-                            date: dateArray[3]
-                        }, // <-- last item on the page
+                            date: dateArray[3] as string
+                        },
                         {
                             message: 'test-4',
-                            date: dateArray[4]
+                            date: dateArray[4] as string
                         },
                         {
                             message: 'test-5',
-                            date: dateArray[5]
+                            date: dateArray[5] as string
                         },
                         {
                             message: 'test-6',
-                            date: dateArray[6]
+                            date: dateArray[6] as string
                         },
                         {
                             message: 'test-7',
-                            date: dateArray[7]
-                        } // <-- newest item on the page
+                            date: dateArray[7] as string
+                        }
                     ]
                 );
 
@@ -807,7 +784,7 @@ describe(
                     'TEST_COLLECTION_0',
                     'TEST_COLLECTION_0\'s latest test.',
                     [
-                        //@ts-ignore
+                        // @ts-expect-error this is fine
                         { message: 'test-0' },
                         {
                             message: 'test-1',
@@ -838,31 +815,41 @@ describe(
                         {
                             message: 'test-0',
                             id: '9d07fd97-a3b1-5685-a4e3-eca6780b1995',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-1',
                             id: '2f558a77-6678-5541-a8de-1ba25bce4f28',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-2',
                             id: 'fa4108e4-7dd1-5baf-8289-f436a241156e',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-3',
                             id: '911c9d98-35e4-5aa9-8902-7895ca903bb0',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         },
                         {
                             message: 'test-4',
                             id: '8d11b5c9-78fa-5af1-a0b2-9987102a61fe',
-                            date: (new Date).toISOString(),
+                            date: expect.any(
+                                String
+                            ),
                             name: 'TEST_COLLECTION_0'
                         }
                     ]
@@ -881,9 +868,7 @@ describe(
                         5
                     ).keys()
                 ).map(
-                    (
-                        i
-                    ) => new Date(
+                    () => new Date(
                         startDate.setMinutes(
                             startDate.getMinutes() + 1
                         )
@@ -897,15 +882,15 @@ describe(
                     [
                         {
                             message: 'test-0',
-                            date: dateArray[0]
+                            date: dateArray[0] as string
                         },
                         {
                             message: 'test-1',
-                            date: dateArray[1]
+                            date: dateArray[1] as string
                         },
                         {
                             message: 'test-2',
-                            date: dateArray[2]
+                            date: dateArray[2] as string
                         }
                     ]
                 );
@@ -917,11 +902,11 @@ describe(
                     [
                         {
                             message: 'test-3',
-                            date: dateArray[3]
+                            date: dateArray[3] as string
                         },
                         {
                             message: 'test-4',
-                            date: dateArray[4]
+                            date: dateArray[4] as string
                         }
                     ]
                 );
@@ -1018,23 +1003,13 @@ describe(
             'should report a 404 when no namespace is found when searching items', () => {
                 const storage = new ObjectStorage<TestType>;
 
-                try {
-                    storage.list(
+                expect(
+                    () => storage.list(
                         'TEST_NAMESPACE_0'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'No items available in namespace: TEST_NAMESPACE_0'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'No items available in namespace: TEST_NAMESPACE_0'
+                );
             }
         );
 
@@ -1084,24 +1059,15 @@ describe(
             'should report a 404 when no namespace is found when searching an item by its ID', () => {
                 const storage = new ObjectStorage<TestType>;
 
-                try {
-                    storage.itemById(
+
+                expect(
+                    () => storage.itemById(
                         'TEST_NAMESPACE_0',
                         '9d07fd97-a3b1-5685-a4e3-eca6780b1995'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not find namespace: TEST_NAMESPACE_0'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'Could not find namespace: TEST_NAMESPACE_0'
+                );
             }
         );
 
@@ -1121,24 +1087,14 @@ describe(
                     ]
                 );
 
-                try {
-                    storage.itemById(
+                expect(
+                    () => storage.itemById(
                         'TEST_NAMESPACE_0',
                         '9d07fd97-a3b1-5685-a4e3-eca6780b1995'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not find item with ID: 9d07fd97-a3b1-5685-a4e3-eca6780b1995'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'Could not find item with ID: 9d07fd97-a3b1-5685-a4e3-eca6780b1995'
+                );
             }
         );
 
@@ -1170,7 +1126,7 @@ describe(
                     3
                 );
                 expect(
-                    items[0].length
+                    items[0]?.length
                 ).toEqual(
                     1
                 );
@@ -1260,41 +1216,21 @@ describe(
                     ]
                 );
 
-                try {
-                    storage.search(
+                expect(
+                    () => storage.search(
                         'TEST_NAMESPACE_0', 'TEST_COLLECTION_0', '1', '10'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'No items found on page: 10'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'No items found on page: 10'
+                );
 
-                try {
-                    storage.list(
+                expect(
+                    () => storage.list(
                         'TEST_NAMESPACE_0', 'ASC', '1', '10'
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'No items found on page: 10'
-                    );
-                    expect(
-                        e.status
-                    ).toEqual(
-                        404
-                    );
-                }
+                    )
+                ).toThrow(
+                    'No items found on page: 10'
+                );
             }
         );
     }

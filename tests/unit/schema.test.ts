@@ -1,14 +1,18 @@
+import {
+    expect, it, describe
+} from 'vitest';
+
 describe(
     'The Documentation/Schema should provide the correct hostnames dependant on the environment', () => {
         it(
-            'should provide development domains on the development environment', () => {
-                const { getServers } = require(
-                    '../../src/schema'
+            'should provide development domains on the development environment', async () => {
+                const { getServers } = await import(
+                    '../../src/schema/index.ts'
                 );
-                const PORT = process.env.PORT;
+                const PORT = process.env['PORT'];
 
                 // Remove env variables to use fallback value
-                delete process.env.PORT;
+                delete process.env['PORT'];
 
                 expect(
                     getServers()
@@ -30,21 +34,22 @@ describe(
                 );
 
                 // Re-add env variables for future tests
-                process.env.PORT = PORT;
+                // Re-add env variables for future tests
+                process.env['PORT'] = PORT;
             }
         );
 
         it(
-            'should provide a default domain in development if not provided by the environment', () => {
-                const HOSTNAME = process.env.HOSTNAME;
-                const PORT = process.env.PORT;
+            'should provide a default domain in development if not provided by the environment', async () => {
+                const HOSTNAME = process.env['HOSTNAME'];
+                const PORT = process.env['PORT'];
 
                 // Remove env variables to use fallback value
-                delete process.env.HOSTNAME;
-                delete process.env.PORT;
+                delete process.env['HOSTNAME'];
+                delete process.env['PORT'];
 
-                const { getServers } = require(
-                    '../../src/schema'
+                const { getServers } = await import(
+                    '../../src/schema/index.ts'
                 );
 
                 expect(
@@ -67,17 +72,18 @@ describe(
                 );
 
                 // Re-add env variables for future tests
-                process.env.HOSTNAME = HOSTNAME;
-                process.env.PORT = PORT;
+                // Re-add env variables for future tests
+                process.env['HOSTNAME'] = HOSTNAME;
+                process.env['PORT'] = PORT;
             }
         );
 
         it(
-            'should provide production domains on the production environment', () => {
-                process.env.NODE_ENV = 'production';
+            'should provide production domains on the production environment', async () => {
+                process.env['NODE_ENV'] = 'production';
 
-                const { getServers } = require(
-                    '../../src/schema'
+                const { getServers } = await import(
+                    '../../src/schema/index.ts'
                 );
 
                 expect(
@@ -94,15 +100,15 @@ describe(
         );
 
         it(
-            'should default the version if it is not found', () => {
-                const OpenApiSchema = require(
-                    '../../src/schema'
-                ).default;
+            'should default the version if it is not found', async () => {
+                const OpenApiSchema = await import(
+                    '../../src/schema/index.ts'
+                );
 
                 expect(
-                    OpenApiSchema.info.version
+                    OpenApiSchema.default.info.version
                 ).toEqual(
-                    process.env.npm_package_version
+                    process.env['npm_package_version']
                 );
             }
         );

@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {
     getWikiContent, ServerError
 } from '../common/utils/common-utils.ts';
@@ -22,12 +22,9 @@ async function getGameData(
     const gameId: string = req.query['gameId'] as string;
 
     if (!gameId) {
-        const error = new Error(
-            'No gameId provided!'
-        ) as NodeJS.ErrnoException;
-
-        error.code = '422';
-        throw error;
+        throw new ServerError(
+            'No gameId provided!', 422
+        );
     }
 
     /*
@@ -89,7 +86,7 @@ async function getGameData(
     }
     catch (error) {
         throw new ServerError(
-            (error as Error).message, 502
+            ((error as AxiosError).response?.data as { message: string, })?.['message'] ?? (error as Error).message, 502
         );
     }
 }

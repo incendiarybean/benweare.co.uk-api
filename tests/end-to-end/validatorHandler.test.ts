@@ -1,13 +1,16 @@
 import request from 'supertest';
 import {
     HTTPServer, app
-} from '../../src/server';
+} from '../../src/server/index.ts';
+import {
+    describe, beforeAll, it, expect, vi
+} from 'vitest';
 
 describe(
     'Server should accept/reject paths as defined in validatorHandler.', () => {
         beforeAll(
             () => {
-                jest.runOnlyPendingTimers();
+                vi.runOnlyPendingTimers();
             }
         );
 

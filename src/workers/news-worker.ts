@@ -2,7 +2,7 @@ import type {
     NasaArticle,
     NewsArticle,
     UndefinedNews
-} from '@common/types.ts';
+} from '../common/types.ts';
 import {
     dateGenerator,
     fetchArticles,

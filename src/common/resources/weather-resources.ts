@@ -1,6 +1,6 @@
 import type {
     WeatherCodes, WeatherRecord
-} from '@common/types.ts';
+} from '../types.ts';
 
 export const mockWeatherResponse: WeatherRecord[] = [
     {

@@ -1,7 +1,15 @@
 import request from 'supertest';
 import {
-    HTTPServer, app
-} from '../../src/server';
+    describe, expect, it
+} from 'vitest';
+import express from 'express';
+import headerHandler from '../../src/handlers/header-handler.ts';
+
+const app = express();
+
+app.use(
+    headerHandler
+);
 
 describe(
     'Server should redirect to HTTPS when HTTP is used', () => {
@@ -17,12 +25,13 @@ describe(
                         'x-forwarded-proto', 'http://test.com'
                     );
 
-                HTTPServer.close();
                 expect(
                     result.status
                 ).toBe(
                     301
                 );
+
+                return;
             }
         );
 
@@ -34,12 +43,13 @@ describe(
                     '/'
                 );
 
-                HTTPServer.close();
                 expect(
                     result.status
                 ).toBe(
                     403
                 );
+
+                return;
             }
         );
     }

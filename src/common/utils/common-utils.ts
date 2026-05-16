@@ -1,10 +1,11 @@
-import * as jsdom from 'jsdom';
 import type {
     FetchArticleOutput, NewsArticle
 } from '../types.ts';
 import type { HttpStatusCode } from 'axios';
 import { IO } from '../../server/index.ts';
-import { JSDOM } from 'jsdom';
+import {
+    JSDOM, VirtualConsole
+} from 'jsdom';
 import axios from 'axios';
 import { storage } from '../../index.ts';
 import type { Response } from 'express';
@@ -71,6 +72,9 @@ function retryHandler(
         (
             e
         ) => {
+            console.log(
+                e
+            );
             if (tries === 1) {
                 return console.error(
                     `Function: ${fn.name} failed... (Tried ${counter} times).`
@@ -110,7 +114,7 @@ async function fetchArticles (
     );
 
     // Create a virtual console to silence CSS parsing errors
-    const virtualConsole = new jsdom.VirtualConsole;
+    const virtualConsole = new VirtualConsole;
 
     virtualConsole.on(
         'error', () => {
@@ -334,14 +338,14 @@ function errorHandler(
         res.status(
             error.statusCode
         ).json(
-            { error: error.message }
+            { message: error.message }
         );
     }
     else if (error instanceof Error) {
         res.status(
             502
         ).json(
-            { error: error.message }
+            { message: error.message }
         );
     }
     else {

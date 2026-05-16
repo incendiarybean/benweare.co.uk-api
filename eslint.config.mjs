@@ -13,7 +13,12 @@ export default defineConfig(
                 '@stylistic': stylistic
             },
             extends: ['js/recommended'],
-            languageOptions: { globals: globals.browser }
+            languageOptions: {
+                globals: {
+                    ...globals.node,
+                    ...globals.jest
+                }
+            }
         },
         tseslint.configs.recommended,
         {

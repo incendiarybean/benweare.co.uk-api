@@ -1,32 +1,28 @@
 import {
-    jest, describe, it, expect
-} from '@jest/globals';
+    vi, describe, it, expect
+} from 'vitest';
+import * as commonUtils from '../../src/common/utils/common-utils.ts';
 
-// These mocks ensure that the real server, storage and refresher will not be used
-jest.mock(
+vi.spyOn(
+    commonUtils, 'staticRefresher'
+).mockImplementation(
+    () => {
+    }
+);
+vi.mock(
     '../../src/server', () => ({
         IO: {
             local: {
-                emit: () => {
+                emit: (): void => {
                 }
             }
         }
     })
 );
-jest.mock(
-    '../../src/common/utils/common-utils', () => ({
-        ...jest.requireActual(
-            '../../src/common/utils/common-utils'
-        ) as object,
-        staticRefresher: () => {
-        }
-    })
-);
-
-jest.mock(
+vi.mock(
     '../../src/common/utils/storage-utils', () => ({
         ObjectStorage: class TestObject {
-            write() {
+            write(): void {
             }
         }
     })
@@ -37,12 +33,12 @@ describe(
         it(
             'should collect metoffice correctly', async () => {
                 const { getMetOffice } = await import(
-                    '../../src/workers/weather-worker'
+                    '../../src/workers/weather-worker.ts'
                 );
                 const { storage } = await import(
-                    '../../src'
+                    '../../src/index.ts'
                 );
-                const storageSpy = jest.spyOn(
+                const storageSpy = vi.spyOn(
                     storage, 'write'
                 );
 
@@ -92,12 +88,12 @@ describe(
                 process.env['NODE_ENV'] = 'development';
 
                 const { getWeather } = await import(
-                    '../../src/workers/weather-worker'
+                    '../../src/workers/weather-worker.ts'
                 );
                 const { storage } = await import(
-                    '../../src'
+                    '../../src/index.ts'
                 );
-                const storageSpy = jest.spyOn(
+                const storageSpy = vi.spyOn(
                     storage, 'write'
                 );
 
@@ -144,18 +140,18 @@ describe(
 
         it(
             'should collect all weather when requested', async () => {
-                const { getWeather } = await import(
-                    '../../src/workers/weather-worker'
+                vi.mock(
+                    '../../src/workers/weather-worker.ts'
                 );
                 const weatherWorker = await import(
-                    '../../src/workers/weather-worker'
+                    '../../src/workers/weather-worker.ts'
                 );
 
-                const getMetOffice = jest.spyOn(
+                const getMetOffice = vi.spyOn(
                     weatherWorker, 'getMetOffice'
                 );
 
-                getWeather();
+                weatherWorker.getWeather();
 
                 expect(
                     getMetOffice

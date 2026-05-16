@@ -1,4 +1,7 @@
 import {
+    describe, it, expect, vi
+} from 'vitest';
+import {
     dateGenerator,
     dateParses,
     fetchArticles,
@@ -7,27 +10,26 @@ import {
     isBritishSummerTime,
     retryHandler,
     staticRefresher
-} from '../../src/common/utils/common-utils';
+} from '../../src/common/utils/common-utils.ts';
 
-import { genericContent } from '../data/test-data';
+import { genericContent } from '../data/test-data.ts';
 import { readFileSync } from 'fs';
+import axios from 'axios';
 
-const mockAxios = globalThis.__mockAxios__;
 
 // These mocks ensure that the real server will not be used
-jest.mock(
+vi.mock(
     '../../src/server', () => ({
         IO: {
             local: {
-                emit: (
-                    ...args
-                ) => {
+                emit: (): void => {
                 }
             }
         }
     })
 );
-jest.mock(
+
+vi.mock(
     '../../src', () => ({})
 );
 
@@ -35,12 +37,12 @@ describe(
     'Refresh & Retry utils should function as desired.', () => {
         it(
             'should repeatedly call a function using the staticRefresher method', async () => {
-                const loggerSpy = jest.spyOn(
+                const loggerSpy = vi.spyOn(
                     console, 'debug'
                 );
 
-                jest.useFakeTimers();
-                const testingStaticRefresher = () => {
+                vi.useFakeTimers();
+                const testingStaticRefresher = (): void => {
                     console.debug(
                         'Testing Refresh Handler'
                     );
@@ -49,7 +51,7 @@ describe(
                 staticRefresher(
                     500, testingStaticRefresher
                 );
-                jest.advanceTimersToNextTimer();
+                vi.advanceTimersToNextTimer();
                 expect(
                     loggerSpy.mock.calls.length
                 ).toBe(
@@ -57,11 +59,11 @@ describe(
                 );
                 expect(
                     loggerSpy
-                ).lastCalledWith(
+                ).toHaveBeenLastCalledWith(
                     'Testing Refresh Handler'
                 );
 
-                jest.advanceTimersToNextTimer();
+                vi.advanceTimersToNextTimer();
                 expect(
                     loggerSpy.mock.calls.length
                 ).toBe(
@@ -69,21 +71,21 @@ describe(
                 );
                 expect(
                     loggerSpy
-                ).lastCalledWith(
+                ).toHaveBeenLastCalledWith(
                     'Testing Refresh Handler'
                 );
 
-                jest.clearAllTimers();
+                vi.clearAllTimers();
             }
         );
 
         it(
             'should repeatedly call a function when it fails a specific number of times', async () => {
-                const loggerErrorSpy = jest.spyOn(
+                const loggerErrorSpy = vi.spyOn(
                     console, 'error'
                 );
 
-                const testFunction = async () => {
+                const testFunction = async (): Promise<void> => {
                     throw new Error(
                         'Test Error'
                     );
@@ -93,7 +95,7 @@ describe(
                     testFunction, 2
                 );
 
-                jest.useRealTimers();
+                vi.useRealTimers();
                 await new Promise(
                     (
                         resolve
@@ -126,13 +128,14 @@ describe(
             'should fetch a webpage and return an array of articles', async () => {
                 const genericData = genericContent();
 
-                mockAxios.
-                    onGet(
-                        'http://getGenericArticles.com'
-                    ).
-                    replyOnce(
-                        200, genericData
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: genericData
+                    }
+                );
 
                 const result = await fetchArticles(
                     'generic_article',
@@ -150,7 +153,7 @@ describe(
                     1
                 );
                 expect(
-                    result.unformattedArticles[0].
+                    result.unformattedArticles[0]?.
                         querySelector(
                             '.title'
                         )?.
@@ -171,10 +174,13 @@ describe(
                     './tests/data/wiki.html'
                 );
 
-                mockAxios.onGet(
-                    'http://getWikiContent.com'
-                ).replyOnce(
-                    200, wikiData
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: wikiData
+                    }
                 );
 
                 const result = await fetchWikiBody(
@@ -182,7 +188,7 @@ describe(
                 );
 
                 expect(
-                    [result[0].trim()]
+                    [result[0]?.trim()]
                 ).toEqual(
                     ['<td>Unlocked a new achievement!</td>']
                 );
@@ -195,13 +201,14 @@ describe(
                     './tests/data/wiki.html'
                 );
 
-                mockAxios.
-                    onGet(
-                        'https://bindingofisaacrebirth.fandom.com/wiki/Achievements'
-                    ).
-                    replyOnce(
-                        200, wikiData
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: wikiData
+                    }
+                );
 
                 let result = await getWikiContent(
                     'TestGameID'
@@ -214,7 +221,7 @@ describe(
                 result = await getWikiContent(
                     '250900'
                 ) ?? [];
-                result[0] = result[0].trim();
+                result[0] = result[0]?.trim() as string;
                 expect(
                     result
                 ).toEqual(
@@ -254,8 +261,8 @@ describe(
             'should create a valid UK date from existing/scratch', () => {
                 const today = new Date;
 
-                jest.useFakeTimers();
-                jest.setSystemTime(
+                vi.useFakeTimers();
+                vi.setSystemTime(
                     today
                 );
 

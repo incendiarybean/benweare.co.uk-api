@@ -10,14 +10,15 @@
         "jsx": "react-jsx",
         "allowJs": true,
         "types": [
-            "node",
-            "ts-jest"
+            "node"
         ],
         // Bundler mode
         "moduleResolution": "nodenext",
         "allowImportingTsExtensions": true,
         "verbatimModuleSyntax": true,
+        "resolveJsonModule": true,
         "noEmit": true,
+        "esModuleInterop": true,
         // Best practices
         "strict": true,
         "skipLibCheck": true,

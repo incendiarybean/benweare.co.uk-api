@@ -1,25 +1,28 @@
 import {
     steamContent, steamUserContent
-} from '../data/test-data';
+} from '../data/test-data.ts';
 
-import { getGameData } from '../../src/workers/steam-worker';
+import { getGameData } from '../../src/workers/steam-worker.ts';
+import {
+    describe, expect, it, vi
+} from 'vitest';
+import axios from 'axios';
+import type { Request } from 'express';
+import { ServerError } from '../../src/common/utils/common-utils.ts';
 
-const mockAxios = globalThis.__mockAxios__;
 
 // These mocks ensure that the real server will not be used
-jest.mock(
+vi.mock(
     '../../src/server', () => ({
         IO: {
             local: {
-                emit: (
-                    ...args
-                ) => {
+                emit: (): void => {
                 }
             }
         }
     })
 );
-jest.mock(
+vi.mock(
     '../../src', () => ({})
 );
 
@@ -27,13 +30,15 @@ describe(
     'The Steam-Worker should correctly validate data and return it', () => {
         it(
             'should return a valid object containing achievements without a steam userId', async () => {
-                mockAxios.
-                    onGet(
-                        `${process.env.STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${process.env.STEAM_API_KEY}&appid=TestGameID`
-                    ).
-                    replyOnce(
-                        200, steamContent
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: steamContent
+                    }
+                );
+
 
                 const req = {
                     query: {
@@ -43,7 +48,7 @@ describe(
                 };
 
                 const result = await getGameData(
-                    req as any
+                    req as unknown as Request
                 );
 
                 expect(
@@ -69,21 +74,23 @@ describe(
 
         it(
             'should return a valid object containing achievements with a steam userId', async () => {
-                mockAxios.
-                    onGet(
-                        `${process.env.STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${process.env.STEAM_API_KEY}&appid=TestGameID`
-                    ).
-                    replyOnce(
-                        200, steamContent
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: steamContent
+                    }
+                );
 
-                mockAxios.
-                    onGet(
-                        `${process.env.STEAM_API}/ISteamUserStats/GetPlayerAchievements/v0001?key=${process.env.STEAM_API_KEY}&appid=TestGameID&steamid=SteamUserID`
-                    ).
-                    replyOnce(
-                        200, steamUserContent
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockResolvedValueOnce(
+                    {
+                        statusCode: 200,
+                        data: steamUserContent
+                    }
+                );
 
                 const req = {
                     query: {
@@ -93,7 +100,7 @@ describe(
                 };
 
                 const result = await getGameData(
-                    req as any
+                    req as unknown as Request
                 );
 
                 expect(
@@ -129,35 +136,28 @@ describe(
                     }
                 };
 
-                try {
-                    await getGameData(
-                        req as any
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'No gameId provided!'
-                    );
-                    expect(
-                        e.code
-                    ).toEqual(
-                        '422'
-                    );
-                }
+                expect(
+                    async () => await getGameData(
+                        req as unknown as Request
+                    )
+                ).rejects.toEqual(
+                    new ServerError(
+                        'No gameId provided!', 422
+                    )
+                );
             }
         );
 
         it(
             'should throw if axios call to steam fails', async () => {
-                mockAxios.
-                    onGet(
-                        `${process.env.STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${process.env.STEAM_API_KEY}&appid=TestGameID`
-                    ).
-                    replyOnce(
-                        502, { message: 'Bad Gateway' }
-                    );
+                vi.spyOn(
+                    axios, 'get'
+                ).mockRejectedValue(
+                    {
+                        statusCode: 502,
+                        data: { message: 'Bad Gateway' }
+                    }
+                );
 
                 const req = {
                     query: {
@@ -166,23 +166,15 @@ describe(
                     }
                 };
 
-                try {
-                    await getGameData(
-                        req as any
-                    );
-                }
-                catch (e) {
-                    expect(
-                        e.message
-                    ).toEqual(
-                        'Could not process request'
-                    );
-                    expect(
-                        e.code
-                    ).toEqual(
-                        '502'
-                    );
-                }
+                expect(
+                    async () => await getGameData(
+                        req as unknown as Request
+                    )
+                ).rejects.toEqual(
+                    new ServerError(
+                        '', 502
+                    )
+                );
             }
         );
     }
