@@ -104,7 +104,6 @@ export interface WeatherRecord {
     weatherDescription: string;
 }
 
-
 export interface WeatherTimeSeries {
     location: string;
     time: string;

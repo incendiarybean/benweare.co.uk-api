@@ -16,7 +16,6 @@ import { genericContent } from '../data/test-data.ts';
 import { readFileSync } from 'fs';
 import axios from 'axios';
 
-
 // These mocks ensure that the real server will not be used
 vi.mock(
     '../../src/server', () => ({

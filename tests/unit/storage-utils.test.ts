@@ -387,7 +387,6 @@ describe(
             'should throw an error when searching if no namespace or collection is found', () => {
                 const storage = new ObjectStorage<TestType>;
 
-
                 expect(
                     () => storage.search(
                         'TEST_NAMESPACE_0', 'TEST_COLLECTION_0'
@@ -1058,7 +1057,6 @@ describe(
         it(
             'should report a 404 when no namespace is found when searching an item by its ID', () => {
                 const storage = new ObjectStorage<TestType>;
-
 
                 expect(
                     () => storage.itemById(

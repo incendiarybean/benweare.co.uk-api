@@ -28,7 +28,6 @@ class ServerError extends Error{
     }
 }
 
-
 /**
  * This function is wrapped in a setImmediate to schedule execution
  * This will trigger at the end of the current event loop to ensure other processing is complete.

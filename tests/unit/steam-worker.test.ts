@@ -10,7 +10,6 @@ import axios from 'axios';
 import type { Request } from 'express';
 import { ServerError } from '../../src/common/utils/common-utils.ts';
 
-
 // These mocks ensure that the real server will not be used
 vi.mock(
     '../../src/server', () => ({
@@ -38,7 +37,6 @@ describe(
                         data: steamContent
                     }
                 );
-
 
                 const req = {
                     query: {
