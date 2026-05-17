@@ -11,7 +11,7 @@ const replacer = (
     title: string,
     image: string,
     innerDiv: string = ''
-) => {
+): string => {
     const output = input.
         replace(
             /to-replace-article-container/g, container
@@ -32,13 +32,13 @@ const replacer = (
     return output;
 };
 
-export const registerContent = () => {
+export const registerContent = (): string => {
     return replacer(
         template, 'main-col', 'article', 'h4', 'thumbnail_image'
     );
 };
 
-export const rpsContent = () => {
+export const rpsContent = (): string => {
     return replacer(
         template,
         'blog',
@@ -49,7 +49,7 @@ export const rpsContent = () => {
     );
 };
 
-export const pcgContent = () => {
+export const pcgContent = (): string => {
     return replacer(
         template,
         'home/latest',
@@ -59,7 +59,7 @@ export const pcgContent = () => {
     );
 };
 
-export const bbcContent = () => {
+export const bbcContent = (): string => {
     return replacer(
         template,
         'list',
@@ -70,7 +70,7 @@ export const bbcContent = () => {
     );
 };
 
-export const arsTechnicaContent = () => {
+export const arsTechnicaContent = (): string => {
     return replacer(
         template,
         'main',
@@ -81,7 +81,7 @@ export const arsTechnicaContent = () => {
     );
 };
 
-export const genericContent = () => {
+export const genericContent = (): string => {
     return replacer(
         template, 'container', 'article', 'title', 'image'
     );
