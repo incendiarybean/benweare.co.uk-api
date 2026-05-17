@@ -8,7 +8,7 @@ const {
 } = process.env;
 
 client.on(
-    'ready', () => {
+    'clientReady', () => {
         console.info(
             `[${new Date}] Discord Bot ${client.user?.tag} has logged in!`
         );

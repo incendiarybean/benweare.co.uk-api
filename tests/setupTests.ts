@@ -33,10 +33,6 @@ beforeEach(
                 url
             ) => {
 
-                console.log(
-                    url
-                );
-
                 switch (url) {
                     case 'https://www.theregister.com/security': return Promise.resolve(
                         {

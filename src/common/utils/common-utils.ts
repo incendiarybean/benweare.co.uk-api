@@ -72,9 +72,6 @@ function retryHandler(
         (
             e
         ) => {
-            console.log(
-                e
-            );
             if (tries === 1) {
                 return console.error(
                     `Function: ${fn.name} failed... (Tried ${counter} times).`

@@ -134,27 +134,32 @@ if (DISCORD_ENABLED && ![
 ].includes(
     process.env['NODE_ENV']
 )) {
-    rest.put(
-        Routes.applicationCommands(
-            DISCORD_CLIENT_ID as string
-        ), { body: commands }
-    ).
-        then(
-            () => {
-                console.info(
-                    `[${new Date}] Discord Bot commands loaded!`
+    client.on(
+        'clientReady', () => {
+            rest.put(
+                Routes.applicationCommands(
+                    DISCORD_CLIENT_ID as string
+                ), { body: commands }
+            ).
+                then(
+                    () => {
+                        console.info(
+                            `[${new Date}] Discord Bot commands loaded!`
+                        );
+                    }
+                ).
+                catch(
+                    (
+                        e
+                    ) => {
+                        console.error(
+                            `[${new Date}] ERROR: ${e.message}`
+                        );
+                    }
                 );
-            }
-        ).
-        catch(
-            (
-                e
-            ) => {
-                console.error(
-                    `[${new Date}] ERROR: ${e.message}`
-                );
-            }
-        );
+        }
+    );
+
 }
 
 /*--------------*/

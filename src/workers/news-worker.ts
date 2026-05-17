@@ -217,7 +217,7 @@ async function getRegisterNews(): Promise<void>{
     const output = await fetchArticles(
         'The_Register',
         'https://www.theregister.com/security',
-        '#main-col',
+        '#main',
         'article'
     );
 
@@ -227,7 +227,7 @@ async function getRegisterNews(): Promise<void>{
         ) => {
             const title: UndefinedNews = element.
                 querySelector(
-                    'h4'
+                    'h2'
                 )?.
                 textContent?.trim();
 
@@ -241,26 +241,19 @@ async function getRegisterNews(): Promise<void>{
                         )?.href
                     }`
                     : 'Not Found';
-                const epoch: string | null | undefined = element.
+                const datetime: string | null | undefined = element.
                     querySelector(
-                        '.time_stamp'
+                        'time'
                     )?.
                     getAttribute(
-                        'data-epoch'
+                        'datetime'
                     );
 
-                if (epoch) {
-                    const epochDate = new Date(
-                        0
-                    );
-
-                    epochDate.setUTCSeconds(
-                        parseInt(
-                            epoch, 10
-                        )
-                    );
+                if (datetime) {
                     const date: string = dateGenerator(
-                        epochDate.toISOString()
+                        new Date(
+                            datetime
+                        ).toISOString()
                     );
 
                     articles.push(
@@ -381,9 +374,10 @@ export const getNews = (): void => {
     retryHandler(
         getArsTechnicaNews, 5
     );
-    retryHandler(
-        getNasaImage, 5
-    );
+
+    // retryHandler(
+    //     getNasaImage, 5
+    // );
     retryHandler(
         getPCGamerNews, 5
     );
