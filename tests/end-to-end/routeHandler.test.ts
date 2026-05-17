@@ -285,7 +285,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.headers['content-type']
                 ).toEqual(
@@ -306,7 +305,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.headers['content-type']
                 ).toEqual(
@@ -326,7 +324,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -392,7 +389,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.body.description
                 ).toEqual(
@@ -422,7 +418,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -454,7 +449,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -501,7 +495,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -553,7 +546,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.status
                 ).toEqual(
@@ -600,7 +592,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -671,7 +662,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.status
                 ).toEqual(
@@ -738,7 +728,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.status
                 ).toEqual(
@@ -769,7 +758,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -816,7 +804,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status
@@ -888,7 +875,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-
                 expect(
                     result.status
                 ).toEqual(
@@ -932,7 +918,6 @@ describe(
                     }
                 );
 
-
                 const result = await request(
                     mockApp
                 ).
@@ -942,7 +927,6 @@ describe(
                     set(
                         'x-forwarded-proto', 'https://test.com'
                     );
-
 
                 expect(
                     result.status

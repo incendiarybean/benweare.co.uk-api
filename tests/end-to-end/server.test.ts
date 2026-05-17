@@ -18,7 +18,7 @@ describe(
 
                 delete process.env['PORT'];
 
-                const { HTTPServer } = await import(
+                await import(
                     '../../src/server/index.ts'
                 );
 
@@ -40,8 +40,6 @@ describe(
                 ).toEqual(
                     'Server is active on port: 8000'
                 );
-
-                HTTPServer.close();
 
                 process.env['PORT'] = PORT;
             }

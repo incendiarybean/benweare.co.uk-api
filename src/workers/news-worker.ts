@@ -374,10 +374,9 @@ export const getNews = (): void => {
     retryHandler(
         getArsTechnicaNews, 5
     );
-
-    // retryHandler(
-    //     getNasaImage, 5
-    // );
+    retryHandler(
+        getNasaImage, 5
+    );
     retryHandler(
         getPCGamerNews, 5
     );

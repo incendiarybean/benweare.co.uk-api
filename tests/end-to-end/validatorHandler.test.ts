@@ -1,18 +1,14 @@
 import request from 'supertest';
 import {
-    HTTPServer, app
-} from '../../src/server/index.ts';
-import {
-    describe, beforeAll, it, expect, vi
+    describe, it, expect, vi
 } from 'vitest';
+
+vi.useFakeTimers(
+    { shouldAdvanceTime: true }
+);
 
 describe(
     'Server should accept/reject paths as defined in validatorHandler.', () => {
-        beforeAll(
-            () => {
-                vi.runOnlyPendingTimers();
-            }
-        );
 
         it.each(
             [
@@ -27,6 +23,10 @@ describe(
             async (
                 path
             ) => {
+                const { app } = await import(
+                    '../../src/server/index.ts'
+                );
+
                 const result = await request(
                     app
                 ).
@@ -37,7 +37,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-                HTTPServer.close();
                 expect(
                     result.statusCode
                 ).toBe(
@@ -59,6 +58,12 @@ describe(
             async (
                 path
             ) => {
+
+                const { app } = await import(
+                    '../../src/server/index.ts'
+                );
+
+                vi.runAllTimers();
                 const result = await request(
                     app
                 ).
@@ -69,7 +74,6 @@ describe(
                         'x-forwarded-proto', 'https://test.com'
                     );
 
-                HTTPServer.close();
                 expect(
                     result.statusCode
                 ).toBe(

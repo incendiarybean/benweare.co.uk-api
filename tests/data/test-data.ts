@@ -34,7 +34,7 @@ const replacer = (
 
 export const registerContent = (): string => {
     return replacer(
-        template, 'main-col', 'article', 'h4', 'thumbnail_image'
+        template, 'main', 'article', 'h2', 'thumbnail_image'
     );
 };
 
