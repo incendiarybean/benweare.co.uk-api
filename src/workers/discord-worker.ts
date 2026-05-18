@@ -30,7 +30,7 @@ import {
 /*    CONFIG    */
 /*--------------*/
 
-export const client = new Client(
+const client = new Client(
     {
         intents: [
             GatewayIntentBits.Guilds,
@@ -374,5 +374,5 @@ async function rpg (
 }
 
 export {
-    checkVoiceTarget, createPlayer, assist, cry, roll, rpg
+    client, checkVoiceTarget, createPlayer, assist, cry, roll, rpg
 };

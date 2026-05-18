@@ -9,9 +9,9 @@ import type {
  * @param res Response - to redirect where necessary
  * @param next NextFunction - to continue after check
  */
-const headerHandler = (
+function headerHandler(
     req: Request, res: Response, next: NextFunction
-): void => {
+): void {
     const isSecure
         = req.secure
           || ((req.headers['x-forwarded-proto'] as string) || '').includes(
@@ -38,6 +38,6 @@ const headerHandler = (
     }
 
     next();
-};
+}
 
 export default headerHandler;

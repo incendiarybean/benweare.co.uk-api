@@ -2,7 +2,7 @@ import type {
     WeatherCodes, WeatherRecord
 } from '../types.ts';
 
-export const mockWeatherResponse: WeatherRecord[] = [
+const mockWeatherResponse: WeatherRecord[] = [
     {
         maxFeels: '18º',
         lowTemp: '14º',
@@ -23,7 +23,7 @@ export const mockWeatherResponse: WeatherRecord[] = [
     }
 ];
 
-export const weatherCodes: WeatherCodes = {
+const weatherCodes: WeatherCodes = {
     0: [
         'sun',
         'Clear night'
@@ -144,4 +144,8 @@ export const weatherCodes: WeatherCodes = {
         'thunder',
         'Thunder'
     ]
+};
+
+export {
+    weatherCodes, mockWeatherResponse
 };

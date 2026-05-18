@@ -28,7 +28,7 @@ beforeEach(
             axios, 'get'
         ).mockImplementation(
 
-            // @ts-expect-error this is fine
+            // @ts-expect-error As a test, this is not required to be accurate
             (
                 url
             ) => {

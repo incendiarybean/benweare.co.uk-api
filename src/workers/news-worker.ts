@@ -370,7 +370,7 @@ async function getUKNews(): Promise<void> {
     );
 }
 
-export const getNews = (): void => {
+function getNews(): void {
     retryHandler(
         getArsTechnicaNews, 5
     );
@@ -389,12 +389,12 @@ export const getNews = (): void => {
     retryHandler(
         getUKNews, 5
     );
-};
+}
 
 staticRefresher(
     240000, getNews
 );
 
 export {
-    getArsTechnicaNews, getNasaImage, getPCGamerNews, getRPSNews, getRegisterNews, getUKNews
+    getArsTechnicaNews, getNasaImage, getPCGamerNews, getRPSNews, getRegisterNews, getUKNews, getNews
 };

@@ -7,7 +7,6 @@ import express from 'express';
 
 const router = express.Router();
 
-// TODO -> Implement Authorisation headers
 export const origins = {
     development: [
         'http://localhost:3000',

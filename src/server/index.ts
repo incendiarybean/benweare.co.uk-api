@@ -6,9 +6,9 @@ import { Server } from 'socket.io';
 import express from 'express';
 import http from 'http';
 
-export const app = express();
+const app = express();
 
-export const HTTPServer = http.createServer(
+const HTTPServer = http.createServer(
     app
 );
 
@@ -27,7 +27,7 @@ if (process.env['NODE_ENV'] !== 'test') {
     );
 }
 
-export const IO = new Server(
+const IO = new Server(
     HTTPServer, { cors: { methods: ['GET'] } }
 );
 
@@ -45,3 +45,7 @@ app.use(
 app.use(
     routeHandler
 );
+
+export {
+    app, IO
+};

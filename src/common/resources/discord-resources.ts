@@ -1,4 +1,4 @@
-export const die: string[] = [
+const die: string[] = [
     `
 ○=○=○
 ○=●=○
@@ -45,3 +45,5 @@ export const die: string[] = [
 ●=●=●
 `
 ];
+
+export { die };

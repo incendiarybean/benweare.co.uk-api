@@ -1,6 +1,6 @@
 import type {
     NewsArticle, WeatherRecord
-} from '@common/types.ts';
+} from '../../src/common/types.ts';
 import {
     StorageError, type ObjectStorage
 } from '../../src/common/utils/storage-utils.ts';

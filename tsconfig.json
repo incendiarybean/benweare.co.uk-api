@@ -7,17 +7,19 @@
         "target": "ESNext",
         "module": "nodenext",
         "moduleDetection": "force",
-        "jsx": "react-jsx",
         "allowJs": true,
         "types": [
             "node"
         ],
+        "outDir": "build",
+        "rootDir": "./src",
         // Bundler mode
         "moduleResolution": "nodenext",
         "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true,
         "verbatimModuleSyntax": true,
         "resolveJsonModule": true,
-        "noEmit": true,
+        "noEmit": false,
         "esModuleInterop": true,
         // Best practices
         "strict": true,
@@ -28,35 +30,13 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noPropertyAccessFromIndexSignature": true,
-        "paths": {
-            "@server": [
-                "./src/server/index.ts"
-            ],
-            "@schema": [
-                "./src/schema/index.ts"
-            ],
-            "@handlers/*": [
-                "./src/handlers/*"
-            ],
-            "@routes/*": [
-                "./src/routes/*"
-            ],
-            "@workers/*": [
-                "./src/workers/*"
-            ],
-            "@common/*": [
-                "./src/common/*"
-            ],
-            "@utils/*": [
-                "./src/common/utils/*"
-            ]
-        },
     },
     "ts-node": {
         "files": true
     },
     "exclude": [
-        "*.config.js",
+        "tests",
+        "*.config.*",
         "build",
         "coverage"
     ]

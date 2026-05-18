@@ -8,7 +8,7 @@ import type {
 import type { HttpStatusCode } from 'axios';
 import { v5 as uuidv5 } from 'uuid';
 
-export class StorageError extends Error {
+class StorageError extends Error {
     public statusCode: number;
 
     constructor(
@@ -22,7 +22,7 @@ export class StorageError extends Error {
     }
 }
 
-export class ObjectStorage<
+class ObjectStorage<
     StorageTypes extends {
         date: string,
         img?: string,
@@ -462,3 +462,7 @@ export class ObjectStorage<
         );
     }
 }
+
+export {
+    ObjectStorage, StorageError
+};
