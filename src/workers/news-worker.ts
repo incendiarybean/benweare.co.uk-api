@@ -234,13 +234,7 @@ async function getRegisterNews(): Promise<void>{
             if (title) {
                 const url: string = element.querySelector(
                     'a'
-                )?.href
-                    ? `https://www.theregister.com${
-                        element.querySelector(
-                            'a'
-                        )?.href
-                    }`
-                    : 'Not Found';
+                )?.href ?? 'Not Found';
                 const datetime: string | null | undefined = element.
                     querySelector(
                         'time'
