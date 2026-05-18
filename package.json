@@ -24,7 +24,7 @@
         "build": "tsc -p ./tsconfig.json",
         "lint": "eslint .",
         "lint-fix": "eslint --fix .",
-        "test": "vitest"
+        "test": "vitest run"
     },
     "browserslist": {
         "production": [

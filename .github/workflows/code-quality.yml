@@ -33,7 +33,7 @@ jobs:
                   npm install --quiet
                   npm run lint
 
-    jest-test:
+    test:
         runs-on: ubuntu-latest
         needs: [lint-code]
 
@@ -60,7 +60,7 @@ jobs:
 
     test-build:
         runs-on: ubuntu-latest
-        needs: [jest-test]
+        needs: [test]
 
         steps:
             - uses: actions/checkout@v4
