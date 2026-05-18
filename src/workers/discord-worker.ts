@@ -2,7 +2,7 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    CacheType,
+    type CacheType,
     ChatInputCommandInteraction,
     Client,
     GatewayIntentBits,
@@ -10,224 +10,369 @@ import {
     Partials,
     REST,
     Routes,
-    SlashCommandBuilder,
+    SlashCommandBuilder
 } from 'discord.js';
-import { die } from '@common/resources/discord-resources';
+import { die } from '../common/resources/discord-resources.ts';
 import type {
     CheckDiscordVoiceTarget,
     CreateDiscordPlayer,
-    DiscordUsernameOptions,
-} from '@common/types';
+    DiscordUsernameOptions
+} from '../common/types.ts';
 import {
     AudioPlayerStatus,
     VoiceConnectionStatus,
     createAudioPlayer,
     createAudioResource,
-    joinVoiceChannel,
+    joinVoiceChannel
 } from '@discordjs/voice';
 
 /*--------------*/
 /*    CONFIG    */
 /*--------------*/
 
-export const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.MessageContent,
-    ],
-    partials: [Partials.Channel, Partials.Message],
-});
+const client = new Client(
+    {
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildPresences,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.MessageContent
+        ],
+        partials: [
+            Partials.Channel,
+            Partials.Message
+        ]
+    }
+);
 
 /*--------------*/
 /*    EVENTS    */
 /*--------------*/
 
 const commands = [
-    new SlashCommandBuilder()
-        .setName('assist')
-        .setDescription('You following to assist?'),
-    new SlashCommandBuilder()
-        .setName('cry')
-        .setDescription('Gonna cry?')
-        .addUserOption((option) =>
-            option.setName('username').setDescription('who?').setRequired(true)
+    (new SlashCommandBuilder).
+        setName(
+            'assist'
+        ).
+        setDescription(
+            'You following to assist?'
         ),
-    new SlashCommandBuilder()
-        .setName('roll')
-        .setDescription('Roll a dice!')
-        .addStringOption((option) =>
-            option
-                .setName('faces')
-                .setDescription('The number of Die faces')
-                .setRequired(true)
-                .addChoices(
-                    { name: '6', value: '6' },
-                    { name: '9', value: '9' }
+    (new SlashCommandBuilder).
+        setName(
+            'cry'
+        ).
+        setDescription(
+            'Gonna cry?'
+        ).
+        addUserOption(
+            (
+                option
+            ) => option.setName(
+                'username'
+            ).setDescription(
+                'who?'
+            ).
+                setRequired(
+                    true
                 )
         ),
-    new SlashCommandBuilder().setName('rpg').setDescription('Oh no...'),
+    (new SlashCommandBuilder).
+        setName(
+            'roll'
+        ).
+        setDescription(
+            'Roll a dice!'
+        ).
+        addStringOption(
+            (
+                option
+            ) => option.
+                setName(
+                    'faces'
+                ).
+                setDescription(
+                    'The number of Die faces'
+                ).
+                setRequired(
+                    true
+                ).
+                addChoices(
+                    {
+                        name: '6',
+                        value: '6'
+                    },
+                    {
+                        name: '9',
+                        value: '9'
+                    }
+                )
+        ),
+    (new SlashCommandBuilder).setName(
+        'rpg'
+    ).
+        setDescription(
+            'Oh no...'
+        )
 ];
 
-const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_ENABLED } = process.env;
+const {
+    DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_ENABLED
+} = process.env;
 
-const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN as string);
+const rest = new REST(
+    { version: '10' }
+).setToken(
+    DISCORD_TOKEN as string
+);
 
-if (DISCORD_ENABLED && ![undefined, 'test'].includes(process.env.NODE_ENV)) {
-    rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID as string), {
-        body: commands,
-    })
-        .then(() => {
-            console.info(`[${new Date()}] Discord Bot commands loaded!`);
-        })
-        .catch((e) => {
-            console.error(`[${new Date()}] ERROR: ${e.message}`);
-        });
+if (DISCORD_ENABLED && ![
+    undefined,
+    'test'
+].includes(
+    process.env['NODE_ENV']
+)) {
+    client.on(
+        'clientReady', () => {
+            rest.put(
+                Routes.applicationCommands(
+                    DISCORD_CLIENT_ID as string
+                ), { body: commands }
+            ).
+                then(
+                    () => {
+                        console.info(
+                            `[${new Date}] Discord Bot commands loaded!`
+                        );
+                    }
+                ).
+                catch(
+                    (
+                        e
+                    ) => {
+                        console.error(
+                            `[${new Date}] ERROR: ${e.message}`
+                        );
+                    }
+                );
+        }
+    );
+
 }
 
 /*--------------*/
 /* INTERACTIONS */
 /*--------------*/
 
-export const checkVoiceTarget = (
+function checkVoiceTarget (
     interaction: ChatInputCommandInteraction<CacheType>
-): CheckDiscordVoiceTarget => {
+): CheckDiscordVoiceTarget {
     if (!interaction.guild) {
-        throw new Error('Play only works while in a guild!');
+        throw new Error(
+            'Play only works while in a guild!'
+        );
     }
 
-    const targetUser = interaction.guild.members.cache.get(interaction.user.id);
+    const targetUser = interaction.guild.members.cache.get(
+        interaction.user.id
+    );
+
     if (!targetUser) {
-        throw new Error("Couldn't find you in the server?");
+        throw new Error(
+            'Couldn\'t find you in the server?'
+        );
     }
 
     const targetVoiceChannel = targetUser.voice.channelId;
+
     if (!targetVoiceChannel) {
-        throw new Error('Please join a voice channel!');
+        throw new Error(
+            'Please join a voice channel!'
+        );
     }
 
-    return { targetUser, targetVoiceChannel, guild: interaction.guild };
-};
+    return {
+        targetUser,
+        targetVoiceChannel,
+        guild: interaction.guild
+    };
+}
 
-export const createPlayer = (
+function createPlayer(
     guild: Guild,
     targetVoiceChannel: string
-): CreateDiscordPlayer => {
+): CreateDiscordPlayer {
     const player = createAudioPlayer();
-    const connection = joinVoiceChannel({
-        channelId: targetVoiceChannel,
-        guildId: guild.id,
-        adapterCreator: guild.voiceAdapterCreator,
-        selfDeaf: false,
-    });
+    const connection = joinVoiceChannel(
+        {
+            channelId: targetVoiceChannel,
+            guildId: guild.id,
+            adapterCreator: guild.voiceAdapterCreator,
+            selfDeaf: false
+        }
+    );
 
     if (!connection) {
-        throw new Error("Bot couldn't connect to the voice channel.");
+        throw new Error(
+            'Bot couldn\'t connect to the voice channel.'
+        );
     }
 
-    connection.subscribe(player);
+    connection.subscribe(
+        player
+    );
 
-    return { connection, player };
-};
+    return {
+        connection,
+        player
+    };
+}
 
-export const assist = async (
+async function assist (
     interaction: ChatInputCommandInteraction<CacheType>
-): Promise<void> => {
+): Promise<void>{
     try {
-        await interaction.reply('https://www.youtube.com/watch?v=CRzfZu0GH14');
-    } catch (e: any) {
-        await interaction.reply({
-            content: `Bot couldn't complete your request at this time. (${e.message})`,
-            ephemeral: true,
-        });
+        await interaction.reply(
+            'https://www.youtube.com/watch?v=CRzfZu0GH14'
+        );
     }
-};
+    catch (e) {
+        await interaction.reply(
+            {
+                content: `Bot couldn't complete your request at this time. (${(e as Error).message})`,
+                ephemeral: true
+            }
+        );
+    }
+}
 
-export const cry = async (
+async function cry(
     interaction: ChatInputCommandInteraction<CacheType>
-): Promise<void> => {
+): Promise<void> {
     try {
         const message = interaction.options.data[0] as DiscordUsernameOptions;
-        if (message?.user) {
-            await interaction.reply({
-                content: `${message.user}`,
-                embeds: [
-                    {
-                        image: {
-                            url: 'https://media3.giphy.com/media/8JZxZgr39TLczSJQoS/giphy.gif',
-                        },
-                    },
-                ],
-                allowedMentions: { parse: ['everyone'] },
-            });
-        }
-    } catch (e: any) {
-        await interaction.reply({
-            content: `Bot couldn't complete your request at this time. (${e.message})`,
-            ephemeral: true,
-        });
-    }
-};
 
-export const roll = async (
+        if (message?.user) {
+            await interaction.reply(
+                {
+                    content: `${message.user}`,
+                    embeds: [{ image: { url: 'https://media3.giphy.com/media/8JZxZgr39TLczSJQoS/giphy.gif' } }],
+                    allowedMentions: { parse: ['everyone'] }
+                }
+            );
+        }
+    }
+    catch (e) {
+        await interaction.reply(
+            {
+                content: `Bot couldn't complete your request at this time. (${(e as Error).message})`,
+                ephemeral: true
+            }
+        );
+    }
+}
+
+async function roll(
     interaction: ChatInputCommandInteraction<CacheType>
-): Promise<void> => {
+): Promise<void> {
     try {
-        const faceCount = interaction.options.data[0].value
-            ? parseInt(interaction.options.data[0].value as string)
+        const faceCount = interaction.options.data[0]?.value
+            ? parseInt(
+                interaction.options.data[0].value as string
+            )
             : 6;
 
-        const dieArray = die.slice(0, faceCount);
-        const randomFace = Math.floor(Math.random() * faceCount);
-
-        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder()
-                .setCustomId('ClearDiceRoll')
-                .setLabel('Done!')
-                .setStyle(ButtonStyle.Primary)
+        const dieArray = die.slice(
+            0, faceCount
+        );
+        const randomFace = Math.floor(
+            Math.random() * faceCount
         );
 
-        await interaction.reply({
-            content: dieArray[randomFace],
-            components: [row],
-        });
-    } catch (e: any) {
-        await interaction.reply({
-            content: `Bot couldn't complete your request at this time. (${e.message})`,
-            ephemeral: true,
-        });
-    }
-};
+        const row = (new ActionRowBuilder<ButtonBuilder>).addComponents(
+            (new ButtonBuilder).
+                setCustomId(
+                    'ClearDiceRoll'
+                ).
+                setLabel(
+                    'Done!'
+                ).
+                setStyle(
+                    ButtonStyle.Primary
+                )
+        );
 
-export const rpg = async (
+        await interaction.reply(
+            {
+                content: dieArray[randomFace],
+                components: [row]
+            }
+        );
+    }
+    catch (e) {
+        await interaction.reply(
+            {
+                content: `Bot couldn't complete your request at this time. (${(e as Error).message})`,
+                ephemeral: true
+            }
+        );
+    }
+}
+
+async function rpg (
     interaction: ChatInputCommandInteraction<CacheType>
-): Promise<void> => {
+): Promise<void> {
     try {
-        const { targetVoiceChannel, guild } = checkVoiceTarget(interaction);
+        const {
+            targetVoiceChannel, guild
+        } = checkVoiceTarget(
+            interaction
+        );
 
-        const { connection, player } = createPlayer(guild, targetVoiceChannel);
+        const {
+            connection, player
+        } = createPlayer(
+            guild, targetVoiceChannel
+        );
 
-        await interaction.reply({ content: 'BOOM!' });
+        await interaction.reply(
+            { content: 'BOOM!' }
+        );
 
-        connection.on(VoiceConnectionStatus.Ready, () => {
-            const resource = createAudioResource('./src/common/audio/rpg.mp3');
+        connection.on(
+            VoiceConnectionStatus.Ready, () => {
+                const resource = createAudioResource(
+                    './src/common/audio/rpg.mp3'
+                );
 
-            resource.volume?.setVolume(1);
+                resource.volume?.setVolume(
+                    1
+                );
 
-            player.play(resource);
-            player.on(AudioPlayerStatus.Idle, () => {
-                connection.destroy();
-                interaction.deleteReply();
-            });
-        });
-    } catch (e: any) {
-        await interaction.reply({
-            content: `Bot couldn't complete your request at this time. (${e.message})`,
-            ephemeral: true,
-        });
+                player.play(
+                    resource
+                );
+                player.on(
+                    AudioPlayerStatus.Idle, () => {
+                        connection.destroy();
+                        interaction.deleteReply();
+                    }
+                );
+            }
+        );
     }
+    catch (e) {
+        await interaction.reply(
+            {
+                content: `Bot couldn't complete your request at this time. (${(e as Error).message})`,
+                ephemeral: true
+            }
+        );
+    }
+}
+
+export {
+    client, checkVoiceTarget, createPlayer, assist, cry, roll, rpg
 };

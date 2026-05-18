@@ -1,108 +1,168 @@
-// These mocks ensure that the real server, storage and refresher will not be used
-jest.mock('../../src/server', () => ({
-    IO: {
-        local: {
-            emit: (...args) => {},
-        },
-    },
-}));
-jest.mock('../../src/common/utils/common-utils', () => ({
-    ...jest.requireActual('../../src/common/utils/common-utils'),
-    staticRefresher: (...args) => {},
-}));
-jest.mock('../../src/common/utils/storage-utils', () => ({
-    ObjectStorage: class TestObject {
-        write(...args) {
-            // Do nothing
+import {
+    vi, describe, it, expect
+} from 'vitest';
+import * as commonUtils from '../../src/common/utils/common-utils.ts';
+
+vi.spyOn(
+    commonUtils, 'staticRefresher'
+).mockImplementation(
+    () => {
+    }
+);
+vi.mock(
+    '../../src/server', () => ({
+        IO: {
+            local: {
+                emit: (): void => {
+                }
+            }
         }
-    },
-}));
+    })
+);
+vi.mock(
+    '../../src/common/utils/storage-utils', () => ({
+        ObjectStorage: class TestObject {
+            write(): void {
+            }
+        }
+    })
+);
 
-describe('Weather-Worker should collect weather as expected', () => {
-    it('should collect metoffice correctly', async () => {
-        const { getMetOffice } = require('../../src/workers/weather-worker');
-        const { storage } = require('../../src');
-        const storageSpy = jest.spyOn(storage, 'write');
+describe(
+    'Weather-Worker should collect weather as expected', () => {
+        it(
+            'should collect metoffice correctly', async () => {
+                const { getMetOffice } = await import(
+                    '../../src/workers/weather-worker.ts'
+                );
+                const { storage } = await import(
+                    '../../src/index.ts'
+                );
+                const storageSpy = vi.spyOn(
+                    storage, 'write'
+                );
 
-        await getMetOffice();
+                await getMetOffice();
 
-        expect(storageSpy.mock.calls.length).toEqual(1);
-        expect(storageSpy.mock.calls).toEqual([
-            [
-                'WEATHER',
-                'MetOffice',
-                'Weather in testing',
-                [
-                    {
-                        maxFeels: '18º',
-                        lowTemp: '14º',
-                        maxTemp: '20º',
-                        maxWindSpeed: 3,
-                        date: '2023-02-01T00:00:00.000Z',
-                        weather: 'cloud',
-                        weatherDescription: 'Cloudy',
-                    },
-                    {
-                        lowTemp: '13º',
-                        maxFeels: '16º',
-                        maxTemp: '18º',
-                        maxWindSpeed: 3,
-                        date: '2023-02-02T00:00:00.000Z',
-                        weather: 'rain',
-                        weatherDescription: 'Light rain',
-                    },
-                ],
-            ],
-        ]);
-    });
+                expect(
+                    storageSpy.mock.calls.length
+                ).toEqual(
+                    1
+                );
+                expect(
+                    storageSpy.mock.calls
+                ).toEqual(
+                    [
+                        [
+                            'WEATHER',
+                            'MetOffice',
+                            'Weather in testing',
+                            [
+                                {
+                                    maxFeels: '18º',
+                                    lowTemp: '14º',
+                                    maxTemp: '20º',
+                                    maxWindSpeed: 3,
+                                    date: '2023-02-01T00:00:00.000Z',
+                                    weather: 'cloud',
+                                    weatherDescription: 'Cloudy'
+                                },
+                                {
+                                    lowTemp: '13º',
+                                    maxFeels: '16º',
+                                    maxTemp: '18º',
+                                    maxWindSpeed: 3,
+                                    date: '2023-02-02T00:00:00.000Z',
+                                    weather: 'rain',
+                                    weatherDescription: 'Light rain'
+                                }
+                            ]
+                        ]
+                    ]
+                );
+            }
+        );
 
-    it('should use fake MetOffice data in development', async () => {
-        process.env.NODE_ENV = 'development';
+        it(
+            'should use fake MetOffice data in development', async () => {
+                process.env['NODE_ENV'] = 'development';
 
-        const { getWeather } = require('../../src/workers/weather-worker');
-        const { storage } = require('../../src');
-        const storageSpy = jest.spyOn(storage, 'write');
+                const { getWeather } = await import(
+                    '../../src/workers/weather-worker.ts'
+                );
+                const { storage } = await import(
+                    '../../src/index.ts'
+                );
+                const storageSpy = vi.spyOn(
+                    storage, 'write'
+                );
 
-        getWeather();
+                getWeather();
 
-        expect(storageSpy.mock.calls.length).toEqual(1);
-        expect(storageSpy.mock.calls).toEqual([
-            [
-                'WEATHER',
-                'MetOffice',
-                'Weather in development',
-                [
-                    {
-                        maxFeels: '18º',
-                        lowTemp: '14º',
-                        maxTemp: '20º',
-                        maxWindSpeed: 3,
-                        date: '2023-02-01T00:00:00.000Z',
-                        weather: 'cloud',
-                        weatherDescription: 'Cloudy',
-                    },
-                    {
-                        lowTemp: '13º',
-                        maxFeels: '16º',
-                        maxTemp: '18º',
-                        maxWindSpeed: 3,
-                        date: '2023-02-02T00:00:00.000Z',
-                        weather: 'rain',
-                        weatherDescription: 'Light rain',
-                    },
-                ],
-            ],
-        ]);
-    });
+                expect(
+                    storageSpy.mock.calls.length
+                ).toEqual(
+                    1
+                );
+                expect(
+                    storageSpy.mock.calls
+                ).toEqual(
+                    [
+                        [
+                            'WEATHER',
+                            'MetOffice',
+                            'Weather in development',
+                            [
+                                {
+                                    maxFeels: '18º',
+                                    lowTemp: '14º',
+                                    maxTemp: '20º',
+                                    maxWindSpeed: 3,
+                                    date: '2023-02-01T00:00:00.000Z',
+                                    weather: 'cloud',
+                                    weatherDescription: 'Cloudy'
+                                },
+                                {
+                                    lowTemp: '13º',
+                                    maxFeels: '16º',
+                                    maxTemp: '18º',
+                                    maxWindSpeed: 3,
+                                    date: '2023-02-02T00:00:00.000Z',
+                                    weather: 'rain',
+                                    weatherDescription: 'Light rain'
+                                }
+                            ]
+                        ]
+                    ]
+                );
+            }
+        );
 
-    it('should collect all weather when requested', async () => {
-        const { getWeather } = require('../../src/workers/weather-worker');
-        const weatherWorker = require('../../src/workers/weather-worker');
+        it(
+            'should collect all weather when requested', async () => {
+                const weatherWorker = await import(
+                    '../../src/workers/weather-worker.ts'
+                );
 
-        const getMetOffice = jest.spyOn(weatherWorker, 'getMetOffice');
+                const retryHandler = vi.spyOn(
+                    commonUtils, 'retryHandler'
+                );
 
-        getWeather();
+                weatherWorker.getWeather();
 
-        expect(getMetOffice).toBeCalledTimes(1);
-    });
-});
+                expect(
+                    retryHandler
+                ).toHaveBeenCalledTimes(
+                    1
+                );
+
+                expect(
+                    retryHandler
+                ).toHaveBeenCalledWith(
+                    weatherWorker.getMetOffice,
+                    2
+                );
+            }
+        );
+    }
+);

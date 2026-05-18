@@ -1,560 +1,944 @@
-import { StorageError } from '../../src/common/utils/storage-utils';
+import type {
+    NewsArticle, WeatherRecord
+} from '../../src/common/types.ts';
+import {
+    StorageError, type ObjectStorage
+} from '../../src/common/utils/storage-utils.ts';
 import request from 'supertest';
-import { steamContent } from '../data/test-data';
-import { storage } from '../../src';
+import {
+    beforeEach, describe, expect, it, test, vi
+} from 'vitest';
+import type { App } from 'supertest/types.js';
+import { steamContent } from '../data/test-data.ts';
+import axios from 'axios';
 
-const mockAxios = globalThis.__mockAxios__;
+describe(
+    'Server should return expected responses from endpoints defined in routeHandler.', async () => {
+        const testingDate = new Date;
+        let mockStorage: ObjectStorage<NewsArticle | WeatherRecord>;
+        let mockApp: App;
 
-describe('Server should return expected responses from endpoints defined in routeHandler.', () => {
-    const testingDate = new Date();
-    const { HTTPServer, app } = require('../../src/server');
+        vi.useFakeTimers(
+            { shouldAdvanceTime: true }
+        );
 
-    beforeAll(() => {
-        jest.runOnlyPendingTimers();
-    });
+        beforeEach(
+            async () => {
+                const { storage } = await import(
+                    '../../src/index.ts'
+                );
 
-    beforeEach(() => {
-        // Force system time for comparison
-        jest.useFakeTimers();
-        jest.setSystemTime(testingDate);
-    });
+                const { app } = await import(
+                    '../../src/server/index.ts'
+                );
 
-    describe('Base Routes should return appropriate responses.', () => {
-        it('should return the status of the API', async () => {
-            const result = await request(app)
-                .get('/api/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                mockStorage = storage;
+                mockApp = app;
 
-            expect(result.body).toEqual({
-                description: 'Check API status.',
-                link: {
-                    action: 'GET',
-                    href: '/api/status',
-                },
-                response: {
-                    health: 'OPERATIONAL',
-                    endpoints: [
-                        {
-                            message: 'WEATHER source obtained successfully.',
-                            status: {
-                                errors: [],
-                                feeds: {
-                                    METOFFICE: true,
-                                },
-                                health: 'OPERATIONAL',
-                            },
+                vi.runOnlyPendingTimers();
+                vi.runAllTicks();
+
+                // Force system time for comparison
+                vi.setSystemTime(
+                    testingDate
+                );
+            }, 5000
+        );
+
+        it(
+            'should return the status of the API', async () => {
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/status'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Check API status.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/status'
                         },
-                        {
-                            message: 'NEWS source obtained successfully.',
-                            status: {
-                                errors: [],
-                                feeds: {
-                                    ARS_TECHNICA: true,
-                                    BBC: true,
-                                    NASA: true,
-                                    PCGAMER: true,
-                                    ROCK_PAPER_SHOTGUN: true,
-                                    THE_REGISTER: true,
+                        response: {
+                            health: 'OPERATIONAL',
+                            endpoints: [
+                                {
+                                    message: 'WEATHER source obtained successfully.',
+                                    status: {
+                                        errors: [],
+                                        feeds: { METOFFICE: true },
+                                        health: 'OPERATIONAL'
+                                    }
                                 },
-                                health: 'OPERATIONAL',
-                            },
+                                {
+                                    message: 'NEWS source obtained successfully.',
+                                    status: {
+                                        errors: [],
+                                        feeds: {
+                                            ARS_TECHNICA: true,
+                                            BBC: true,
+                                            NASA: true,
+                                            PCGAMER: true,
+                                            ROCK_PAPER_SHOTGUN: true,
+                                            THE_REGISTER: true
+                                        },
+                                        health: 'OPERATIONAL'
+                                    }
+                                }
+                            ]
                         },
-                    ],
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
 
-        it('should return the status of the API as INOPERATIONAL if all of the sources are inactive', async () => {
-            jest.spyOn(storage, 'collections').mockReturnValue(() => {
-                throw new Error();
-            });
+                return;
+            }
+        );
 
-            const result = await request(app)
-                .get('/api/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+        it(
+            'should return the status of the API as INOPERATIONAL if all of the sources are inactive', async () => {
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockRejectedValue(
+                    new Error(
+                        'Failure'
+                    )
+                );
 
-            expect(result.body).toEqual({
-                description: 'Check API status.',
-                link: {
-                    action: 'GET',
-                    href: '/api/status',
-                },
-                response: {
-                    health: 'INOPERATIONAL',
-                    endpoints: [
-                        {
-                            message:
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/status'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Check API status.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/status'
+                        },
+                        response: {
+                            health: 'INOPERATIONAL',
+                            endpoints: [
+                                {
+                                    message:
                                 'WEATHER source could not be obtained successfully.',
-                            status: {
-                                errors: ['/api/weather/metoffice'],
-                                feeds: {
-                                    METOFFICE: false,
+                                    status: {
+                                        errors: ['/api/weather/metoffice'],
+                                        feeds: { METOFFICE: false },
+                                        health: 'INOPERATIONAL'
+                                    }
                                 },
-                                health: 'INOPERATIONAL',
-                            },
-                        },
-                        {
-                            message:
+                                {
+                                    message:
                                 'NEWS source could not be obtained successfully.',
-                            status: {
-                                errors: [
-                                    '/api/news/ars_technica',
-                                    '/api/news/nasa',
-                                    '/api/news/pcgamer',
-                                    '/api/news/rock_paper_shotgun',
-                                    '/api/news/the_register',
-                                    '/api/news/bbc',
-                                ],
-                                feeds: {
-                                    ARS_TECHNICA: false,
-                                    BBC: false,
-                                    NASA: false,
-                                    PCGAMER: false,
-                                    ROCK_PAPER_SHOTGUN: false,
-                                    THE_REGISTER: false,
+                                    status: {
+                                        errors: [
+                                            '/api/news/ars_technica',
+                                            '/api/news/nasa',
+                                            '/api/news/pcgamer',
+                                            '/api/news/rock_paper_shotgun',
+                                            '/api/news/the_register',
+                                            '/api/news/bbc'
+                                        ],
+                                        feeds: {
+                                            ARS_TECHNICA: false,
+                                            BBC: false,
+                                            NASA: false,
+                                            PCGAMER: false,
+                                            ROCK_PAPER_SHOTGUN: false,
+                                            THE_REGISTER: false
+                                        },
+                                        health: 'INOPERATIONAL'
+                                    }
+                                }
+                            ]
+                        },
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+
+                return;
+            }
+        );
+
+        it(
+            'should return the status of the API as DEGRADED if one or more sources are inactive', async () => {
+
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockReturnValue(
+                    [
+                        {
+                            name: 'METOFFICE',
+                            updated: testingDate,
+                            description: 'Test\'s Latest Test.'
+                        },
+                        {
+                            name: 'BBC',
+                            updated: testingDate,
+                            description: 'Test\'s Latest Test.'
+                        },
+                        {
+                            name: 'THE_REGISTER',
+                            updated: testingDate,
+                            description: 'Test\'s Latest Test.'
+                        },
+                        {
+                            name: 'ROCK_PAPER_SHOTGUN',
+                            updated: testingDate,
+                            description: 'Test\'s Latest Test.'
+                        },
+                        {
+                            name: 'PCGAMER',
+                            updated: testingDate,
+                            description: 'Test\'s Latest Test.'
+                        }
+                    ]
+                );
+
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/status'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Check API status.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/status'
+                        },
+                        response: {
+                            health: 'DEGRADED',
+                            endpoints: [
+                                {
+                                    message: 'WEATHER source obtained successfully.',
+                                    status: {
+                                        errors: [],
+                                        feeds: { METOFFICE: true },
+                                        health: 'OPERATIONAL'
+                                    }
                                 },
-                                health: 'INOPERATIONAL',
-                            },
+                                {
+                                    message: 'NEWS source obtained successfully.',
+                                    status: {
+                                        feeds: {
+                                            ARS_TECHNICA: false,
+                                            BBC: true,
+                                            NASA: false,
+                                            PCGAMER: true,
+                                            ROCK_PAPER_SHOTGUN: true,
+                                            THE_REGISTER: true
+                                        },
+                                        errors: [
+                                            '/api/news/ars_technica',
+                                            '/api/news/nasa'
+                                        ],
+                                        health: 'DEGRADED'
+                                    }
+                                }
+                            ]
                         },
-                    ],
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
 
-        it('should return the status of the API as DEGRADED if one or more sources are inactive', async () => {
-            jest.spyOn(storage, 'collections').mockReturnValue([
-                {
-                    name: 'METOFFICE',
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                {
-                    name: 'BBC',
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                {
-                    name: 'THE_REGISTER',
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                {
-                    name: 'ROCK_PAPER_SHOTGUN',
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                {
-                    name: 'PCGAMER',
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-            ]);
+        it(
+            'should return the client index file when requesting the base domain', async () => {
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
 
-            const result = await request(app)
-                .get('/api/status')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                expect(
+                    result.headers['content-type']
+                ).toEqual(
+                    'text/html; charset=utf-8'
+                );
+            }
+        );
 
-            expect(result.body).toEqual({
-                description: 'Check API status.',
-                link: {
-                    action: 'GET',
-                    href: '/api/status',
-                },
-                response: {
-                    health: 'DEGRADED',
-                    endpoints: [
-                        {
-                            message: 'WEATHER source obtained successfully.',
-                            status: {
-                                errors: [],
-                                feeds: { METOFFICE: true },
-                                health: 'OPERATIONAL',
-                            },
+        it(
+            'should return the client index file when requesting any non-matching route', async () => {
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        ''
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.headers['content-type']
+                ).toEqual(
+                    'text/html; charset=utf-8'
+                );
+            }
+        );
+
+        it(
+            'should return a 404 error when requesting a non-existent API endpoint', async () => {
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/not-an-endpoint'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    404
+                );
+                expect(
+                    result.body.message
+                ).toEqual(
+                    'GET is not defined on /api/not-an-endpoint'
+                );
+            }
+        );
+
+        it(
+            'should make a request to the Steam API and formulate a response', async () => {
+                vi.spyOn(
+                    axios, 'get'
+                ).mockImplementation(
+
+                    // @ts-expect-error this is fine
+                    (
+                        url
+                    ) => {
+                        if (url === `${process.env['STEAM_API']}/ISteamUserStats/GetSchemaForGame/v0002?key=${process.env['STEAM_API_KEY']}&appid=TestGameID`) {
+                            return {
+                                statusCode: 200,
+                                data: steamContent
+                            };
+                        }
+                    }
+                );
+
+                const output = {
+                    response: {
+                        achievements: [
+                            {
+                                name: '1',
+                                defaultvalue: 0,
+                                displayName: 'Test Achievement',
+                                hidden: 0,
+                                description: 'New Achievement!',
+                                icon: 'steamIcon',
+                                icongray: 'steamIconGray'
+                            }
+                        ]
+                    },
+                    description: 'Retrieve a specific game\'s data from Steam.',
+                    timestamp: '',
+                    link: {
+                        action: 'GET',
+                        href: '/api/steam/achieve'
+                    }
+                };
+
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/steam/achieve?gameId=TestGameID'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.body.description
+                ).toEqual(
+                    output.description
+                );
+                expect(
+                    result.body.link
+                ).toEqual(
+                    output.link
+                );
+                expect(
+                    result.body.response.achievements
+                ).toEqual(
+                    output.response.achievements
+                );
+            }
+        );
+
+        it(
+            'should send an error response when invalid query params are sent to the achievement endpoint', async () => {
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/steam/achieve'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    422
+                );
+            }
+        );
+
+        it(
+            'should return a collection of articles in a formatted response with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockReturnValueOnce(
+                    {
+                        items: [],
+                        updated: testingDate,
+                        description: 'Test\'s Latest Test.'
+                    }
+                );
+
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/news/test/articles'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve a specific news outlet\'s articles.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/news/test/articles'
                         },
-                        {
-                            message: 'NEWS source obtained successfully.',
-                            status: {
-                                feeds: {
-                                    ARS_TECHNICA: false,
-                                    BBC: true,
-                                    NASA: false,
-                                    PCGAMER: true,
-                                    ROCK_PAPER_SHOTGUN: true,
-                                    THE_REGISTER: true,
-                                },
-                                errors: [
-                                    '/api/news/ars_technica',
-                                    '/api/news/nasa',
-                                ],
-                                health: 'DEGRADED',
-                            },
+                        items: [],
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
+
+        it(
+            'should return the entire stored object of the outlet with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockReturnValueOnce(
+                    {
+                        items: [],
+                        updated: testingDate,
+                        description: 'Test\'s Latest Test.'
+                    }
+                );
+
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/news/test'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve a specific news outlet.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/news/test'
                         },
-                    ],
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
-
-        it('should return the client index file when requesting the base domain', async () => {
-            const result = await request(app)
-                .get('/')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.headers['content-type']).toEqual(
-                'text/html; charset=UTF-8'
-            );
-        });
-
-        it('should return the client index file when requesting any non-matching route', async () => {
-            const result = await request(app)
-                .get('')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.headers['content-type']).toEqual(
-                'text/html; charset=UTF-8'
-            );
-        });
-
-        it('should return a 404 error when requesting a non-existent API endpoint', async () => {
-            const result = await request(app)
-                .get('/api/not-an-endpoint')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.status).toEqual(404);
-            expect(result.body.message).toEqual(
-                'GET is not defined on /api/not-an-endpoint'
-            );
-        });
-    });
-
-    describe('Steam endpoints should return appropriate responses.', () => {
-        it('should make a request to the Steam API and formulate a response', async () => {
-            mockAxios
-                .onGet(
-                    `${process.env.STEAM_API}/ISteamUserStats/GetSchemaForGame/v0002?key=${process.env.STEAM_API_KEY}&appid=TestGameID`
-                )
-                .replyOnce(200, steamContent);
-
-            const output = {
-                response: {
-                    achievements: [
-                        {
-                            name: '1',
-                            defaultvalue: 0,
-                            displayName: 'Test Achievement',
-                            hidden: 0,
-                            description: 'New Achievement!',
-                            icon: 'steamIcon',
-                            icongray: 'steamIconGray',
+                        response: {
+                            items: [],
+                            updated: expect.any(
+                                String
+                            ),
+                            description: 'Test\'s Latest Test.'
                         },
-                    ],
-                },
-                description: "Retrieve a specific game's data from Steam.",
-                timestamp: '',
-                link: { action: 'GET', href: '/api/steam/achieve' },
-            };
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
 
-            const result = await request(app)
-                .get('/api/steam/achieve?gameId=TestGameID')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+        it(
+            'should return all stored objects of NEWS with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'list'
+                ).mockReturnValueOnce(
 
-            expect(result.body.description).toEqual(output.description);
-            expect(result.body.link).toEqual(output.link);
-            expect(result.body.response.achievements).toEqual(
-                output.response.achievements
-            );
-        });
+                    // @ts-expect-error this is fine
+                    {}
+                );
 
-        it('should send an error response when invalid query params are sent to the achievement endpoint', async () => {
-            const result = await request(app)
-                .get('/api/steam/achieve')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-            expect(result.status).toEqual(422);
-        });
-    });
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/news/articles'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
 
-    describe('News endpoints should return appropriate responses.', () => {
-        it('should return a collection of articles in a formatted response with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'search').mockReturnValueOnce({
-                name: 'Test',
-                items: [],
-                updated: testingDate.toISOString(),
-                description: "Test's Latest Test.",
-            });
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve all collected news articles.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/news/articles'
+                        },
+                        response: {},
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
 
-            const result = await request(app)
-                .get('/api/news/test/articles')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+        it(
+            'should return the article associated with an ID with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'itemById'
+                ).mockReturnValueOnce(
+                    {
+                        title: 'Test',
+                        url: 'Test URL',
+                        img: 'Test IMG',
+                        date: '1970-01-01T00:00:00.000Z'
+                    }
+                );
 
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: "Retrieve a specific news outlet's articles.",
-                link: { action: 'GET', href: '/api/news/test/articles' },
-                items: [],
-                timestamp: testingDate.toISOString(),
-            });
-        });
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/news/articles/test-test-test'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
 
-        it('should return the entire stored object of the outlet with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'search').mockReturnValueOnce({
-                name: 'Test',
-                items: [],
-                updated: testingDate.toISOString(),
-                description: "Test's Latest Test.",
-            });
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve all collected news articles.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/news/articles/test-test-test'
+                        },
+                        response: {
+                            title: 'Test',
+                            url: 'Test URL',
+                            img: 'Test IMG',
+                            date: '1970-01-01T00:00:00.000Z'
+                        },
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
 
-            const result = await request(app)
-                .get('/api/news/test')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: 'Retrieve a specific news outlet.',
-                link: { action: 'GET', href: '/api/news/test' },
-                response: {
-                    name: 'Test',
-                    items: [],
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
-
-        it('should return all stored objects of NEWS with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'list').mockReturnValueOnce({});
-
-            const result = await request(app)
-                .get('/api/news/articles')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: 'Retrieve all collected news articles.',
-                link: { action: 'GET', href: '/api/news/articles' },
-                response: {},
-                timestamp: testingDate.toISOString(),
-            });
-        });
-
-        it('should return the article associated with an ID with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'itemById').mockReturnValueOnce({
-                title: 'Test',
-                url: 'Test URL',
-                img: 'Test IMG',
-                name: 'Test',
-                date: '1970-01-01T00:00:00.000Z',
-                id: 'test-test-test',
-            });
-
-            const result = await request(app)
-                .get('/api/news/articles/test-test-test')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
-
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: 'Retrieve all collected news articles.',
-                link: {
-                    action: 'GET',
-                    href: '/api/news/articles/test-test-test',
-                },
-                response: {
-                    title: 'Test',
-                    url: 'Test URL',
-                    img: 'Test IMG',
-                    name: 'Test',
-                    date: '1970-01-01T00:00:00.000Z',
-                    id: 'test-test-test',
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
-
-        test.each([
-            { path: '/api/news' },
-            { path: '/api/news/outlet' },
-            { path: '/api/news/outlet/articles' },
-        ])(
+        test.each(
+            [
+                { path: '/api/news' },
+                { path: '/api/news/outlet' },
+                { path: '/api/news/outlet/articles' }
+            ]
+        )(
             'should return a 404 if the specified news outlet collection is not found on route: $path',
-            async ({ path }) => {
-                jest.spyOn(storage, 'collections').mockImplementationOnce(
+            async (
+                { path }
+            ) => {
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockImplementation(
                     () => {
                         throw new StorageError(
-                            `No items available in namespace`,
-                            {
-                                status: 404,
-                            }
+                            'No items available in namespace', 404
                         );
                     }
                 );
-                jest.spyOn(storage, 'search').mockImplementationOnce(() => {
-                    throw new StorageError(`No items available in namespace`, {
-                        status: 404,
-                    });
-                });
 
-                const result = await request(app)
-                    .get(path)
-                    .set('x-forwarded-proto', 'https://test.com');
-                HTTPServer.close();
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockImplementation(
+                    () => {
+                        throw new StorageError(
+                            'No items available in namespace', 404
+                        );
+                    }
+                );
 
-                expect(result.status).toEqual(404);
-                expect(result.body.message).toEqual(
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        path
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    404
+                );
+
+                expect(
+                    result.body.message
+                ).toEqual(
                     'No items available in namespace'
                 );
             }
         );
 
-        it.each([
-            { path: '/api/news' },
-            { path: '/api/news/articles' },
-            { path: '/api/news/articles/test-test-test' },
-            { path: '/api/news/outlet' },
-            { path: '/api/news/outlet/articles' },
-        ])('should return a 502 if a server error occurs', async ({ path }) => {
-            jest.spyOn(storage, 'collections').mockImplementationOnce(
-                new Error('Failed')
-            );
-            jest.spyOn(storage, 'search').mockImplementationOnce(
-                new Error('Failed')
-            );
-            jest.spyOn(storage, 'list').mockImplementationOnce(
-                new Error('Failed')
-            );
+        it.each(
+            [
+                { path: '/api/news' },
+                { path: '/api/news/articles' },
+                { path: '/api/news/articles/test-test-test' },
+                { path: '/api/news/outlet' },
+                { path: '/api/news/outlet/articles' }
+            ]
+        )(
+            'should return a 502 if a server error occurs', async (
+                { path }
+            ) => {
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockImplementation(
+                    () => {
+                        throw new Error(
+                            'Failed'
+                        );
+                    }
+                );
 
-            const result = await request(app)
-                .get(path)
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockImplementation(
+                    () => {
+                        throw new Error(
+                            'Failed'
+                        );
+                    }
+                );
 
-            expect(result.status).toEqual(502);
-        });
-    });
+                vi.spyOn(
+                    mockStorage, 'list'
+                ).mockImplementation(
+                    () => {
+                        throw new Error(
+                            'Failed'
+                        );
+                    }
+                );
 
-    describe('Weather endpoints should return appropriate responses.', () => {
-        it('should return a collection of weather in a formatted response with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'search').mockReturnValueOnce({
-                name: 'Test',
-                items: [],
-                updated: testingDate.toISOString(),
-                description: "Test's Latest Test.",
-            });
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        path
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
 
-            const result = await request(app)
-                .get('/api/forecasts/test/timeseries')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                expect(
+                    result.status
+                ).toEqual(
+                    502
+                );
+            }
+        );
 
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: "Retrieve a specific weather outlet's timeseries.",
-                link: { action: 'GET', href: '/api/forecasts/test/timeseries' },
-                items: [],
-                timestamp: testingDate.toISOString(),
-            });
-        });
+        it(
+            'should return a collection of weather in a formatted response with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockReturnValueOnce(
+                    {
+                        items: [],
+                        updated: testingDate,
+                        description: 'Test\'s Latest Test.'
+                    }
+                );
 
-        it('should return the entire stored object of the outlet with status 200', async () => {
-            // Mock the storage object
-            jest.spyOn(storage, 'search').mockReturnValueOnce({
-                name: 'Test',
-                items: [],
-                updated: testingDate.toISOString(),
-                description: "Test's Latest Test.",
-            });
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/forecasts/test/timeseries'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
 
-            const result = await request(app)
-                .get('/api/forecasts/test')
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve a specific weather outlet\'s timeseries.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/forecasts/test/timeseries'
+                        },
+                        items: [],
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
 
-            expect(result.status).toEqual(200);
-            expect(result.body).toEqual({
-                description: 'Retrieve a specific weather outlet.',
-                link: { action: 'GET', href: '/api/forecasts/test' },
-                response: {
-                    name: 'Test',
-                    items: [],
-                    updated: testingDate.toISOString(),
-                    description: "Test's Latest Test.",
-                },
-                timestamp: testingDate.toISOString(),
-            });
-        });
+        it(
+            'should return the entire stored object of the outlet with status 200', async () => {
+                // Mock the storage object
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockReturnValueOnce(
+                    {
+                        items: [],
+                        updated: testingDate,
+                        description: 'Test\'s Latest Test.'
+                    }
+                );
 
-        it.each([
-            { path: '/api/forecasts' },
-            { path: '/api/forecasts/weather' },
-            { path: '/api/forecasts/weather/timeseries' },
-        ])(
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        '/api/forecasts/test'
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    200
+                );
+                expect(
+                    result.body
+                ).toEqual(
+                    {
+                        description: 'Retrieve a specific weather outlet.',
+                        link: {
+                            action: 'GET',
+                            href: '/api/forecasts/test'
+                        },
+                        response: {
+                            items: [],
+                            updated: expect.any(
+                                String
+                            ),
+                            description: 'Test\'s Latest Test.'
+                        },
+                        timestamp: expect.any(
+                            String
+                        )
+                    }
+                );
+            }
+        );
+
+        it.each(
+            [
+                { path: '/api/forecasts' },
+                { path: '/api/forecasts/weather' },
+                { path: '/api/forecasts/weather/timeseries' }
+            ]
+        )(
             'should return a 404 if the specified weather outlet collection is not found on route: $path',
-            async ({ path }) => {
-                jest.spyOn(storage, 'collections').mockImplementationOnce(
+            async (
+                { path }
+            ) => {
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockImplementation(
                     () => {
                         throw new StorageError(
-                            `No items available in namespace`,
-                            {
-                                status: 404,
-                            }
+                            'No items available in namespace', 404
                         );
                     }
                 );
-                jest.spyOn(storage, 'search').mockImplementationOnce(() => {
-                    throw new StorageError(`No items available in namespace`, {
-                        status: 404,
-                    });
-                });
 
-                const result = await request(app)
-                    .get(path)
-                    .set('x-forwarded-proto', 'https://test.com');
-                HTTPServer.close();
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockImplementation(
+                    () => {
+                        throw new StorageError(
+                            'No items available in namespace', 404
+                        );
+                    }
+                );
 
-                expect(result.status).toEqual(404);
-                expect(result.body.message).toEqual(
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        path
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    404
+                );
+                expect(
+                    result.body.message
+                ).toEqual(
                     'No items available in namespace'
                 );
             }
         );
 
-        it.each([
-            { path: '/api/forecasts' },
-            { path: '/api/forecasts/weather' },
-            { path: '/api/forecasts/weather/timeseries' },
-        ])('should return a 502 if a server error occurs', async ({ path }) => {
-            jest.spyOn(storage, 'collections').mockImplementationOnce(() => {
-                throw new Error('Server failure!');
-            });
-            jest.spyOn(storage, 'search').mockImplementationOnce(() => {
-                throw new Error('Server failure!');
-            });
+        it.each(
+            [
+                { path: '/api/forecasts' },
+                { path: '/api/forecasts/weather' },
+                { path: '/api/forecasts/weather/timeseries' }
+            ]
+        )(
+            'should return a 502 if a server error occurs', async (
+                { path }
+            ) => {
+                vi.spyOn(
+                    mockStorage, 'collections'
+                ).mockImplementation(
+                    () => {
+                        throw new Error(
+                            'Failure'
+                        );
+                    }
+                );
 
-            const result = await request(app)
-                .get(path)
-                .set('x-forwarded-proto', 'https://test.com');
-            HTTPServer.close();
+                vi.spyOn(
+                    mockStorage, 'search'
+                ).mockImplementation(
+                    () => {
+                        throw new Error(
+                            'Failure'
+                        );
+                    }
+                );
 
-            expect(result.status).toEqual(502);
-            expect(result.body.message).toEqual('Server failure!');
-        });
-    });
-});
+                const result = await request(
+                    mockApp
+                ).
+                    get(
+                        path
+                    ).
+                    set(
+                        'x-forwarded-proto', 'https://test.com'
+                    );
+
+                expect(
+                    result.status
+                ).toEqual(
+                    502
+                );
+                expect(
+                    result.body.message
+                ).toEqual(
+                    'Failure'
+                );
+            }
+        );
+    }
+);

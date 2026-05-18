@@ -1,23 +1,48 @@
-describe('Server should start correctly.', () => {
-    it('should use the default server PORT when environmental variable is not available', async () => {
-        const loggerSpy = jest.spyOn(console, 'info');
-        const PORT = process.env.PORT;
+import {
+    describe, expect, it,
+    vi
+} from 'vitest';
 
-        // Set NODE_ENV to test LISTEN
-        process.env.NODE_ENV = 'development';
+describe(
+    'Server should start correctly.', () => {
+        it(
+            'should use the default server PORT when environmental variable is not available', async () => {
+                const loggerSpy = vi.spyOn(
+                    console, 'info'
+                );
+                const PORT = process.env['PORT'];
 
-        delete process.env.PORT;
+                // Set NODE_ENV to test LISTEN
+                // Set NODE_ENV to test LISTEN
+                process.env['NODE_ENV'] = 'development';
 
-        const { HTTPServer } = require('../../src/server');
+                delete process.env['PORT'];
 
-        jest.useRealTimers();
-        await new Promise((resolve) => setTimeout(resolve, 200));
+                await import(
+                    '../../src/server/index.ts'
+                );
 
-        const startValue = loggerSpy.mock.lastCall[0].split('] ')[1];
-        expect(startValue).toEqual('Server is active on port: 8000');
+                vi.useRealTimers();
+                await new Promise(
+                    (
+                        resolve
+                    ) => setTimeout(
+                        resolve, 200
+                    )
+                );
 
-        HTTPServer.close();
+                const startValue = loggerSpy.mock.lastCall?.[0].split(
+                    '] '
+                )[1];
 
-        process.env.PORT = PORT;
-    });
-});
+                expect(
+                    startValue
+                ).toEqual(
+                    'Server is active on port: 8000'
+                );
+
+                process.env['PORT'] = PORT;
+            }
+        );
+    }
+);
