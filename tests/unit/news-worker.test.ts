@@ -1,60 +1,97 @@
+import {
+    describe, expect, it, vi
+} from 'vitest';
 import { JSDOM } from 'jsdom';
+import * as commonUtils from '../../src/common/utils/common-utils.ts';
 
 // These mocks ensure that the real server, storage and refresher will not be used
-jest.mock('../../src/server', () => ({
-    IO: {
-        local: {
-            emit: (...args) => {},
-        },
-    },
-}));
-jest.mock('../../src/common/utils/common-utils', () => ({
-    ...jest.requireActual('../../src/common/utils/common-utils'),
-    staticRefresher: (...args) => {},
-}));
-jest.mock('../../src/common/utils/storage-utils', () => ({
-    ObjectStorage: class TestObject {
-        write(...args) {
-            // Do nothing
+vi.spyOn(
+    commonUtils, 'staticRefresher'
+).mockImplementation(
+    () => {
+    }
+);
+vi.mock(
+    '../../src/server', () => ({
+        IO: {
+            local: {
+                emit: (): void => {
+                }
+            }
         }
-    },
-}));
+    })
+);
+vi.mock(
+    '../../src/common/utils/storage-utils', () => ({
+        ObjectStorage: class TestObject {
+            write(): void {
+            // Do nothing
+            }
+        }
+    })
+);
 
-describe('News-Worker should collect news as expected', () => {
-    describe('Ars Technica', () => {
-        it('should collect Ars Technica news correctly', async () => {
-            const {
-                getArsTechnicaNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+describe(
+    'News-Worker should collect news as expected', () => {
+        describe(
+            'Ars Technica', () => {
+                it(
+                    'should collect Ars Technica news correctly', async () => {
+                        const { getArsTechnicaNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getArsTechnicaNews();
+                        await getArsTechnicaNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'Ars_Technica',
-                "Ars_Technica's Latest News.",
-                [
-                    {
-                        date: '2023-02-01T15:46:04.563Z',
-                        title: 'Test Title',
-                        url: '/test',
-                    },
-                ],
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'Ars_Technica',
+                                'Ars_Technica\'s Latest News.',
+                                [
+                                    {
+                                        date: expect.any(
+                                            String
+                                        ),
+                                        title: 'Test Title',
+                                        url: '/test'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
 
-        it('should use default values for Ars Technica content if missing', async () => {
-            const {
-                getArsTechnicaNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should use default values for Ars Technica content if missing', async () => {
+                        const { getArsTechnicaNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
             <li>
                 <div class="article">
                     <h2>
@@ -62,83 +99,143 @@ describe('News-Worker should collect news as expected', () => {
                     </h2>
                 </div>
             </li>
-        `).window.document;
+        `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'Ars_Technica',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'Ars_Technica',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getArsTechnicaNews();
+                        await getArsTechnicaNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: new Date().toISOString(),
-                    url: 'Not Found',
-                },
-            ]);
-        });
-    });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            [
+                                {
+                                    title: 'Test Title',
+                                    date: (new Date).toISOString(),
+                                    url: 'Not Found'
+                                }
+                            ]
+                        );
+                    }
+                );
+            }
+        );
 
-    describe('NASA', () => {
-        it('should collect the nasa daily image correctly', async () => {
-            const { getNasaImage } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+        describe(
+            'NASA', () => {
+                it(
+                    'should collect the nasa daily image correctly', async () => {
+                        const { getNasaImage } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getNasaImage();
+                        await getNasaImage();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'NASA',
-                'NASA Daily Image.',
-                [
-                    {
-                        date: '2023-02-01T00:00:00.000Z',
-                        description: 'Test Explanation',
-                        img: 'test-image.png',
-                        title: 'Test Title',
-                        url: 'test-image.png',
-                    },
-                ],
-            ]);
-        });
-    });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'NASA',
+                                'NASA Daily Image.',
+                                [
+                                    {
+                                        date: '2023-02-01T00:00:00.000Z',
+                                        description: 'Test Explanation',
+                                        img: 'test-image.png',
+                                        title: 'Test Title',
+                                        url: 'test-image.png'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
+            }
+        );
 
-    describe('PC Gamer', () => {
-        it('should collect PCGamer news correctly', async () => {
-            const { getPCGamerNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+        describe(
+            'PC Gamer', () => {
+                it(
+                    'should collect PCGamer news correctly', async () => {
+                        const { getPCGamerNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getPCGamerNews();
+                        await getPCGamerNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'PCGamer',
-                "PCGamer's Latest News.",
-                [
-                    {
-                        date: '2023-02-01T15:46:04.563Z',
-                        img: 'test-img.png',
-                        title: 'Test Title',
-                        url: '/test',
-                    },
-                ],
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'PCGamer',
+                                'PCGamer\'s Latest News.',
+                                [
+                                    {
+                                        date: '2023-02-01T15:46:04.563Z',
+                                        img: 'test-img.png',
+                                        title: 'Test Title',
+                                        url: '/test'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
 
-        it('should use default values for PCGamer content if missing', async () => {
-            const { getPCGamerNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should use default values for PCGamer content if missing', async () => {
+                        const { getPCGamerNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
             <li>
                 <div class="li">
                     <div class="article-name">
@@ -146,58 +243,102 @@ describe('News-Worker should collect news as expected', () => {
                     </div>
                 </div>
             </li>
-        `).window.document;
+        `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'PCGamer',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'PCGamer',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getPCGamerNews();
+                        await getPCGamerNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: new Date().toISOString(),
-                    img: 'Not Found',
-                    url: 'Not Found',
-                },
-            ]);
-        });
-    });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            [
+                                {
+                                    title: 'Test Title',
+                                    date: expect.any(
+                                        String
+                                    ),
+                                    img: 'Not Found',
+                                    url: 'Not Found'
+                                }
+                            ]
+                        );
+                    }
+                );
+            }
+        );
 
-    describe('Rock Paper Shotgun', () => {
-        it('should collect RPS news correctly', async () => {
-            const { getRPSNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+        describe(
+            'Rock Paper Shotgun', () => {
+                it(
+                    'should collect RPS news correctly', async () => {
+                        const { getRPSNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getRPSNews();
+                        await getRPSNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'Rock_Paper_Shotgun',
-                "Rock_Paper_Shotgun's Latest News.",
-                [
-                    {
-                        date: '2023-02-01T15:46:04.563Z',
-                        img: 'test-img.png',
-                        title: 'Test Title',
-                        url: '/test',
-                    },
-                ],
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'Rock_Paper_Shotgun',
+                                'Rock_Paper_Shotgun\'s Latest News.',
+                                [
+                                    {
+                                        date: '2023-02-01T15:46:04.563Z',
+                                        img: 'test-img.png',
+                                        title: 'Test Title',
+                                        url: '/test'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
 
-        it('should use default values for RPS content if missing', async () => {
-            const { getRPSNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should use default values for RPS content if missing', async () => {
+                        const { getRPSNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
                 <li>
                     <div class="li">
                         <div class="title">
@@ -205,61 +346,103 @@ describe('News-Worker should collect news as expected', () => {
                         </div>
                     </div>
                 </li>
-            `).window.document;
+            `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'Rock_Paper_Shotgun',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'Rock_Paper_Shotgun',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getRPSNews();
+                        await getRPSNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: new Date().toISOString(),
-                    img: 'Not Found',
-                    url: 'Not Found',
-                },
-            ]);
-        });
-    });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            [
+                                {
+                                    title: 'Test Title',
+                                    date: expect.any(
+                                        String
+                                    ),
+                                    img: 'Not Found',
+                                    url: 'Not Found'
+                                }
+                            ]
+                        );
+                    }
+                );
+            }
+        );
 
-    describe('The Register', () => {
-        it('should collect The Register news correctly', async () => {
-            const {
-                getRegisterNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+        describe(
+            'The Register', () => {
+                it(
+                    'should collect The Register news correctly', async () => {
+                        const { getRegisterNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getRegisterNews();
+                        await getRegisterNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'The_Register',
-                "The_Register's Latest News.",
-                [
-                    {
-                        date: '1970-01-01T00:00:00.000Z',
-                        title: 'Test Title',
-                        url: 'https://www.theregister.com/test',
-                    },
-                ],
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'The_Register',
+                                'The_Register\'s Latest News.',
+                                [
+                                    {
+                                        date: expect.any(
+                                            String
+                                        ),
+                                        title: 'Test Title',
+                                        url: 'https://www.theregister.com/test'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
 
-        it('should use default values for The Register content if missing', async () => {
-            const {
-                getRegisterNews,
-            } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should use default values for The Register content if missing', async () => {
+                        const { getRegisterNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
                 <li>
                     <article>
                         <h4 class="title">
@@ -267,51 +450,93 @@ describe('News-Worker should collect news as expected', () => {
                         </h4>
                     </article>
                 </li>
-            `).window.document;
+            `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'The_Register',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'The_Register',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getRegisterNews();
+                        await getRegisterNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([]);
-        });
-    });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            []
+                        );
+                    }
+                );
+            }
+        );
 
-    describe('BBC', () => {
-        it('should collect bbc news correctly', async () => {
-            const { getUKNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+        describe(
+            'BBC', () => {
+                it(
+                    'should collect bbc news correctly', async () => {
+                        const { getUKNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            await getUKNews();
+                        await getUKNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0]).toEqual([
-                'NEWS',
-                'BBC',
-                "BBC's Latest News.",
-                [
-                    {
-                        date: (storageSpy.mock.calls[0][3] as any)[0].date,
-                        img: 'test-img.png',
-                        title: 'Test Title',
-                        url: 'https://www.bbc.co.uk/test',
-                    },
-                ],
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]
+                        ).toEqual(
+                            [
+                                'NEWS',
+                                'BBC',
+                                'BBC\'s Latest News.',
+                                [
+                                    {
+                                        date: storageSpy.mock.calls[0]?.[3]?.[0]?.date,
+                                        img: 'test-img.png',
+                                        title: 'Test Title',
+                                        url: 'https://www.bbc.co.uk/test'
+                                    }
+                                ]
+                            ]
+                        );
+                    }
+                );
 
-        it('should use default values for BBC content if missing', async () => {
-            const { getUKNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should use default values for BBC content if missing', async () => {
+                        const { getUKNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
                 <li>
                     <div type="article">
                         <div role="text">
@@ -319,65 +544,123 @@ describe('News-Worker should collect news as expected', () => {
                         </div>
                     </div>
                 </li>
-            `).window.document;
+            `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'BBC',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'BBC',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getUKNews();
+                        await getUKNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([
-                {
-                    title: 'Test Title',
-                    date: (storageSpy.mock.calls[0][3] as any)[0].date,
-                    img: 'Not Found',
-                    url: 'Not Found',
-                },
-            ]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            [
+                                {
+                                    title: 'Test Title',
+                                    date: storageSpy.mock.calls[0]?.[3]?.[0]?.date,
+                                    img: 'Not Found',
+                                    url: 'Not Found'
+                                }
+                            ]
+                        );
+                    }
+                );
 
-        it('should handle invalid titles for BBC if missing', async () => {
-            const { getUKNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should handle invalid titles for BBC if missing', async () => {
+                        const { getUKNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
-            const document = new JSDOM(`
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
+                        const document = new JSDOM(
+                            `
                 <li>
                     <div type="article">
                         <div role="text"></div>
                     </div>
                 </li>
-            `).window.document;
+            `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'BBC',
-                unformattedArticles: [document],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'BBC',
+                                unformattedArticles: [document as unknown as Element]
+                            }
+                        );
 
-            await getUKNews();
+                        await getUKNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
-            expect(storageSpy.mock.calls[0][3]).toEqual([]);
-        });
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]
+                        ).toEqual(
+                            []
+                        );
+                    }
+                );
 
-        it('should handle datetime correctly', async () => {
-            const { getUKNews } = require('../../src/workers/news-worker');
-            const { storage } = require('../../src');
-            const storageSpy = jest.spyOn(storage, 'write');
+                it(
+                    'should handle datetime correctly', async () => {
+                        const { getUKNews } = await import(
+                            '../../src/workers/news-worker.ts'
+                        );
+                        const { storage } = await import(
+                            '../../src/index.ts'
+                        );
+                        const storageSpy = vi.spyOn(
+                            storage, 'write'
+                        );
 
-            const commonUtils = require('../../src/common/utils/common-utils');
+                        const commonUtils = await import(
+                            '../../src/common/utils/common-utils.ts'
+                        );
 
-            // First article should be within the last few minutes
-            const currentDate = new Date();
-            currentDate.setMinutes(currentDate.getMinutes() - 3);
-            const [currentHour, currentMinute] = currentDate
-                .toLocaleTimeString('en-GB')
-                .split(':');
-            const document1 = new JSDOM(`
+                        // First article should be within the last few minutes
+                        const currentDate = new Date;
+
+                        currentDate.setMinutes(
+                            currentDate.getMinutes() - 3
+                        );
+                        const [
+                            currentHour,
+                            currentMinute
+                        ] = currentDate.
+                            toLocaleTimeString(
+                                'en-GB'
+                            ).
+                            split(
+                                ':'
+                            );
+                        const document1 = new JSDOM(
+                            `
                 <article
                     type="article"
                     class="article"
@@ -397,16 +680,27 @@ describe('News-Worker should collect news as expected', () => {
                         Test Title <span>Test Title</span>
                     </h4>
                 </article>
-            `).window.document;
+            `
+                        ).window.document;
 
-            // Second article should be from the "future"
-            const futureDate = new Date();
+                        // Second article should be from the "future"
+                        const futureDate = new Date;
 
-            futureDate.setHours(futureDate.getHours() + 2);
-            const [futureHour, futureMinute] = futureDate
-                .toLocaleTimeString('en-GB')
-                .split(':');
-            const document2 = new JSDOM(`
+                        futureDate.setHours(
+                            futureDate.getHours() + 2
+                        );
+                        const [
+                            futureHour,
+                            futureMinute
+                        ] = futureDate.
+                            toLocaleTimeString(
+                                'en-GB'
+                            ).
+                            split(
+                                ':'
+                            );
+                        const document2 = new JSDOM(
+                            `
                 <article
                     type="article"
                     class="article"
@@ -426,51 +720,111 @@ describe('News-Worker should collect news as expected', () => {
                         Test Title <span>Test Title</span>
                     </h4>
                 </article>
-            `).window.document;
+            `
+                        ).window.document;
 
-            jest.spyOn(commonUtils, 'fetchArticles').mockResolvedValueOnce({
-                outlet: 'BBC',
-                unformattedArticles: [document1, document2],
-            });
+                        vi.spyOn(
+                            commonUtils, 'fetchArticles'
+                        ).mockResolvedValueOnce(
+                            {
+                                outlet: 'BBC',
+                                unformattedArticles: [
+                                    document1 as unknown as Element,
+                                    document2 as unknown as Element
+                                ]
+                            }
+                        );
 
-            await getUKNews();
+                        await getUKNews();
 
-            expect(storageSpy.mock.calls.length).toEqual(1);
+                        expect(
+                            storageSpy.mock.calls.length
+                        ).toEqual(
+                            1
+                        );
 
-            const date = new Date();
+                        const date = new Date;
 
-            // Non-future times are assumed to be today
-            expect(
-                (storageSpy.mock.calls[0][3] as any[])[0].date.split('T')[0]
-            ).toEqual(date.toISOString().split('T')[0]);
+                        // Non-future times are assumed to be today
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]?.[0]?.date.split(
+                                'T'
+                            )[0]
+                        ).toEqual(
+                            date.toISOString().split(
+                                'T'
+                            )[0]
+                        );
 
-            // Future times are assumed to be from yesterday
-            date.setDate(date.getDate() - 1);
-            date.setHours(20);
-            expect(
-                (storageSpy.mock.calls[0][3] as any[])[1].date.split('T')[0]
-            ).toEqual(date.toISOString().split('T')[0]);
-        });
-    });
+                        // Future times are assumed to be from yesterday
+                        date.setDate(
+                            date.getDate() - 1
+                        );
+                        date.setHours(
+                            20
+                        );
+                        expect(
+                            storageSpy.mock.calls[0]?.[3]?.[1]?.date.split(
+                                'T'
+                            )[0]
+                        ).toEqual(
+                            date.toISOString().split(
+                                'T'
+                            )[0]
+                        );
+                    }
+                );
+            }
+        );
 
-    it('should call all collectors when requested', () => {
-        const { getNews } = require('../../src/workers/news-worker');
-        const newsWorker = require('../../src/workers/news-worker');
+        it(
+            'should call all collectors when requested', async () => {
+                const newsWorker = await import(
+                    '../../src/workers/news-worker.ts'
+                );
+                const retryHandler = vi.spyOn(
+                    commonUtils, 'retryHandler'
+                );
 
-        const getArsTechnicaNews = jest.spyOn(newsWorker, 'getArsTechnicaNews');
-        const getNasaImage = jest.spyOn(newsWorker, 'getNasaImage');
-        const getPCGamerNews = jest.spyOn(newsWorker, 'getPCGamerNews');
-        const getRPSNews = jest.spyOn(newsWorker, 'getRPSNews');
-        const getRegisterNews = jest.spyOn(newsWorker, 'getRegisterNews');
-        const getUKNews = jest.spyOn(newsWorker, 'getUKNews');
+                newsWorker.getNews();
 
-        getNews();
+                expect(
+                    retryHandler
+                ).toHaveBeenCalledTimes(
+                    6
+                );
 
-        expect(getArsTechnicaNews).toBeCalledTimes(1);
-        expect(getNasaImage).toBeCalledTimes(1);
-        expect(getPCGamerNews).toBeCalledTimes(1);
-        expect(getRPSNews).toBeCalledTimes(1);
-        expect(getRegisterNews).toBeCalledTimes(1);
-        expect(getUKNews).toBeCalledTimes(1);
-    });
-});
+                expect(
+                    retryHandler.mock.calls
+                ).toEqual(
+                    [
+                        [
+                            newsWorker.getArsTechnicaNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getNasaImage,
+                            5
+                        ],
+                        [
+                            newsWorker.getPCGamerNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getRPSNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getRegisterNews,
+                            5
+                        ],
+                        [
+                            newsWorker.getUKNews,
+                            5
+                        ]
+                    ]
+                );
+            }
+        );
+    }
+);

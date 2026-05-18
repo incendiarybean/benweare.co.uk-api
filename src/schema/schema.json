@@ -1,8 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "benweare.co.uk's base API",
-        "version": ""
+        "title": "benweare.co.uk's base API"
     },
     "tags": [
         {
@@ -32,9 +31,13 @@
         },
         "schemas": {
             "Error": {
-                "required": ["message"],
+                "required": [
+                    "message"
+                ],
                 "properties": {
-                    "message": { "type": "string" }
+                    "message": {
+                        "type": "string"
+                    }
                 }
             },
             "NewsOption": {
@@ -50,48 +53,78 @@
             "Article": {
                 "type": "object",
                 "properties": {
-                    "title": { "type": "string" },
-                    "link": { "type": "string" },
-                    "img": { "type": "string" },
-                    "date": { "type": "string" },
-                    "site": { "type": "string" }
+                    "title": {
+                        "type": "string"
+                    },
+                    "link": {
+                        "type": "string"
+                    },
+                    "img": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string"
+                    },
+                    "site": {
+                        "type": "string"
+                    }
                 }
             },
             "Link": {
                 "type": "object",
                 "properties": {
-                    "action": { "type": "string" },
-                    "href": { "type": "string" }
+                    "action": {
+                        "type": "string"
+                    },
+                    "href": {
+                        "type": "string"
+                    }
                 }
             },
             "NewsResponse": {
                 "type": "object",
                 "properties": {
-                    "name": { "type": "string" },
-                    "updated": { "type": "string" },
-                    "description": { "type": "string" }
+                    "name": {
+                        "type": "string"
+                    },
+                    "updated": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
                 }
             },
             "WeatherResponse": {
                 "type": "object",
                 "properties": {
-                    "location": { "type": "string" },
+                    "location": {
+                        "type": "string"
+                    },
                     "timeseries": {
                         "type": "object",
                         "properties": {
-                            "time": { "type": "string" },
+                            "time": {
+                                "type": "string"
+                            },
                             "midnight10MWindSpeed": {
                                 "type": "number"
                             },
                             "midnight10MWindDirection": {
                                 "type": "number"
                             },
-                            "midnight10MWindGust": { "type": "number" },
-                            "midnightVisibility": { "type": "number" },
+                            "midnight10MWindGust": {
+                                "type": "number"
+                            },
+                            "midnightVisibility": {
+                                "type": "number"
+                            },
                             "midnightRelativeHumidity": {
                                 "type": "number"
                             },
-                            "midnightMslp": { "type": "number" },
+                            "midnightMslp": {
+                                "type": "number"
+                            },
                             "nightSignificantWeatherCode": {
                                 "type": "number"
                             },
@@ -141,7 +174,9 @@
             "StatusResponse": {
                 "type": "object",
                 "properties": {
-                    "health": { "type": "string" },
+                    "health": {
+                        "type": "string"
+                    },
                     "errors": {
                         "type": "array",
                         "items": {
@@ -151,10 +186,14 @@
                     "endpoints": {
                         "type": "object",
                         "properties": {
-                            "message": { "type": "string" },
+                            "message": {
+                                "type": "string"
+                            },
                             "errors": {
                                 "type": "array",
-                                "items": { "type": "string" }
+                                "items": {
+                                    "type": "string"
+                                }
                             }
                         }
                     }
@@ -219,8 +258,12 @@
                             }
                         ]
                     },
-                    "timestamp": { "type": "string" },
-                    "description": { "type": "string" },
+                    "timestamp": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
                     "link": {
                         "$ref": "#/components/schemas/Link"
                     }
@@ -237,11 +280,17 @@
             }
         }
     },
-    "security": [{ "APIKeyAuth": [] }],
+    "security": [
+        {
+            "APIKeyAuth": []
+        }
+    ],
     "paths": {
         "/api/status": {
             "get": {
-                "tags": ["API"],
+                "tags": [
+                    "API"
+                ],
                 "summary": "Check API status.",
                 "responses": {
                     "200": {
@@ -274,7 +323,9 @@
         },
         "/api/news": {
             "get": {
-                "tags": ["News"],
+                "tags": [
+                    "News"
+                ],
                 "summary": "Retrieve all available news outlets.",
                 "responses": {
                     "200": {
@@ -309,7 +360,9 @@
                         "name": "outlet"
                     }
                 ],
-                "tags": ["News"],
+                "tags": [
+                    "News"
+                ],
                 "summary": "Retrieve a specific news outlet.",
                 "responses": {
                     "200": {
@@ -354,7 +407,9 @@
                         "name": "page"
                     }
                 ],
-                "tags": ["News"],
+                "tags": [
+                    "News"
+                ],
                 "summary": "Retrieve all collected news articles.",
                 "responses": {
                     "200": {
@@ -400,7 +455,9 @@
                         "name": "page"
                     }
                 ],
-                "tags": ["News"],
+                "tags": [
+                    "News"
+                ],
                 "summary": "Retrieve a specific news outlet's articles.",
                 "responses": {
                     "200": {
@@ -428,7 +485,9 @@
         },
         "/api/forecasts": {
             "get": {
-                "tags": ["Weather"],
+                "tags": [
+                    "Weather"
+                ],
                 "summary": "Retrieve all available weather outlets.",
                 "responses": {
                     "200": {
@@ -463,7 +522,9 @@
                         "name": "outlet"
                     }
                 ],
-                "tags": ["Weather"],
+                "tags": [
+                    "Weather"
+                ],
                 "summary": "Retrieve a specific weather outlet.",
                 "responses": {
                     "200": {
@@ -499,7 +560,9 @@
                         "required": true
                     }
                 ],
-                "tags": ["Weather"],
+                "tags": [
+                    "Weather"
+                ],
                 "summary": "Retrieve a specific weather outlet's timeseries.",
                 "responses": {
                     "200": {
@@ -541,7 +604,9 @@
                         "required": false
                     }
                 ],
-                "tags": ["Steam"],
+                "tags": [
+                    "Steam"
+                ],
                 "summary": "Retrieve a specific game's data from Steam.",
                 "responses": {
                     "200": {
@@ -569,7 +634,9 @@
         },
         "/api/steam/status": {
             "get": {
-                "tags": ["Steam"],
+                "tags": [
+                    "Steam"
+                ],
                 "summary": "Check Steam API status.",
                 "responses": {
                     "200": {

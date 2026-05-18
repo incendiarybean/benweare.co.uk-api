@@ -1,70 +1,101 @@
 import {
+    afterEach, beforeEach, vi
+} from 'vitest';
+import {
     arsTechnicaContent,
     bbcContent,
     metofficeContent,
     nasaContent,
     pcgContent,
     registerContent,
-    rpsContent,
-} from './data/test-data';
+    rpsContent
+} from './data/test-data.ts';
 
-import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const mockAxios = new MockAdapter(axios);
-globalThis.__mockAxios__ = mockAxios;
-
 // Populate storage
-beforeAll(async () => {
+beforeEach(
+    async () => {
     // Stop Discord from running
-    delete process.env.DISCORD_ENABLED;
+        delete process.env['DISCORD_ENABLED'];
 
-    // Configure mocked web requests
-    console.info(`[${new Date()}] Configuring Mock Axios requests...`);
-    mockAxios
-        .onGet('https://www.theregister.com/security')
-        .reply(200, registerContent());
+        // Configure mocked web requests
+        console.info(
+            `[${new Date}] Configuring Mock Axios requests...`
+        );
 
-    mockAxios
-        .onGet('https://www.bbc.co.uk/news/england')
-        .reply(200, bbcContent());
+        vi.spyOn(
+            axios, 'get'
+        ).mockImplementation(
 
-    mockAxios
-        .onGet('https://www.rockpapershotgun.com/latest')
-        .reply(200, rpsContent());
+            // @ts-expect-error As a test, this is not required to be accurate
+            (
+                url
+            ) => {
 
-    mockAxios
-        .onGet('https://www.pcgamer.com/uk/news/')
-        .reply(200, pcgContent());
-
-    mockAxios
-        .onGet('https://arstechnica.com/gadgets/')
-        .reply(200, arsTechnicaContent());
-
-    mockAxios
-        .onGet(
-            `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
-        )
-        .reply(200, nasaContent);
-
-    mockAxios
-        .onGet(
-            `https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily?${new URLSearchParams(
-                {
-                    includeLocationName: 'true',
-                    latitude: process.env.LATITUDE ?? '',
-                    longitude: process.env.LONGITUDE ?? '',
+                switch (url) {
+                    case 'https://www.theregister.com/security': return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: registerContent()
+                        }
+                    );
+                    case 'https://www.bbc.co.uk/news/england': return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: bbcContent()
+                        }
+                    );
+                    case 'https://www.rockpapershotgun.com/latest': return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: rpsContent()
+                        }
+                    );
+                    case 'https://www.pcgamer.com/uk/news/': return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: pcgContent()
+                        }
+                    );
+                    case 'https://arstechnica.com/gadgets/': return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: arsTechnicaContent()
+                        }
+                    );
+                    case `https://api.nasa.gov/planetary/apod?api_key=${process.env['NASA_API_KEY']}`: return Promise.resolve(
+                        {
+                            statusCode: 200,
+                            data: nasaContent
+                        }
+                    );
+                    case `https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily?${new URLSearchParams(
+                        {
+                            includeLocationName: 'true',
+                            latitude: process.env['LATITUDE'] ?? '',
+                            longitude: process.env['LONGITUDE'] ?? ''
+                        }
+                    ).toString()}`: return Promise.resolve(
+                            {
+                                statusCode: 200,
+                                data: metofficeContent
+                            }
+                        );
                 }
-            ).toString()}`
-        )
-        .reply(200, metofficeContent);
-}, 5000);
+            }
+        );
+    }, 5000
+);
 
-afterEach(() => {
+afterEach(
+    () => {
     // Reset Environment after each test
-    process.env.NODE_ENV = 'test';
+        // Reset Environment after each test
+        process.env['NODE_ENV'] = 'test';
 
-    jest.clearAllMocks();
-    jest.resetAllMocks();
-    jest.clearAllTimers();
-});
+        vi.clearAllMocks();
+        vi.resetAllMocks();
+        vi.clearAllTimers();
+    }
+);
