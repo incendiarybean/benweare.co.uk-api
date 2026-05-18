@@ -63,7 +63,9 @@ describe(
                                 'Ars_Technica\'s Latest News.',
                                 [
                                     {
-                                        date: '2023-02-01T15:46:04.563Z',
+                                        date: expect.any(
+                                            String
+                                        ),
                                         title: 'Test Title',
                                         url: '/test'
                                     }

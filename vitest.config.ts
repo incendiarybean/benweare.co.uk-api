@@ -7,7 +7,17 @@ export default defineConfig(
             fileParallelism: false,
             retry: 0,
             maxConcurrency: 1,
-            maxWorkers: 1
+            maxWorkers: 1,
+            coverage: {
+                enabled: true,
+                reportsDirectory: 'coverage',
+                reporter: [
+                    'text',
+                    'html',
+                    'clover',
+                    'json'
+                ]
+            }
         }
     }
 );
