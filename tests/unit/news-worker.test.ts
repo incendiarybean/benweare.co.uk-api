@@ -418,7 +418,7 @@ describe(
                                             String
                                         ),
                                         title: 'Test Title',
-                                        url: 'https://www.theregister.com/test'
+                                        url: '/test'
                                     }
                                 ]
                             ]
