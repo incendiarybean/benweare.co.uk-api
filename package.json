@@ -15,7 +15,7 @@
     "dependencies": {
         "@discordjs/voice": "0.19.2",
         "axios": "1.16.0",
-        "benweare.co.uk-client": "1.6.2",
+        "benweare.co.uk-client": "1.6.3",
         "cors": "2.8.6",
         "discord.js": "14.26.4",
         "dotenv": "17.4.2",
